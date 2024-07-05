@@ -7,6 +7,7 @@ using QFramework;
 using Queries;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 namespace GameControllers
 {
@@ -56,9 +57,10 @@ namespace GameControllers
                 var cellBelow = _grid[x, height - 1];
                 if (cellBelow.Type == CONSTANTS.CellType.None)
                 {
+                    var random = Random.Range(3, 9);
                     isProcessing = true;
-                    var newCell = cell.Create(GetPositionCell(x, height), gridBlock,
-                        avatarSize, CONSTANTS.CellType.Normal);
+                    var newCell = 
+                        cell.Create(GetPositionCell(x, height), gridBlock, avatarSize, (CONSTANTS.CellType)random);
                     newCell.Move(GetPositionCell(x, height - 1), fillTime);
                     _grid[x, height - 1] = newCell;
                 }
@@ -73,36 +75,36 @@ namespace GameControllers
                 {
                     var cellCurrent = _grid[x, y];
                     var cellBelow = _grid[x, y - 1];
+
                     var isBelowLeftEmpty = x > 0 && _grid[x - 1, y - 1].Type == CONSTANTS.CellType.None;
                     var isBelowRightEmpty = x < width - 1 && _grid[x + 1, y - 1].Type == CONSTANTS.CellType.None;
                     var isBelowEmpty = cellBelow.Type == CONSTANTS.CellType.None;
-                    var isCellCurrentNormal = cellCurrent.Type == CONSTANTS.CellType.Normal;
+                    var isCellCurrentNormal = cellCurrent.Type != CONSTANTS.CellType.None && cellCurrent.Type != CONSTANTS.CellType.Obstacle;
                     var isBelowNotEmpty = cellBelow.Type != CONSTANTS.CellType.None;
 
                     if (isBelowEmpty && isCellCurrentNormal)
                     {
                         isProcessing = true;
                         cellCurrent.Move(GetPositionCell(x, y - 1), fillTime);
-                        _grid[x, y] = cell.Create(GetPositionCell(x, height), gridBlock,
-                            avatarSize, CONSTANTS.CellType.None);
                         _grid[x, y - 1] = cellCurrent;
+                        _grid[x, y] = 
+                            cell.Create(GetPositionCell(x, y), gridBlock, avatarSize, CONSTANTS.CellType.None);
                     }
                     else if (isBelowNotEmpty && isBelowLeftEmpty && isCellCurrentNormal)
                     {
                         isProcessing = true;
                         cellCurrent.Move(GetPositionCell(x - 1, y - 1), fillTime);
-                        _grid[x, y] = cell.Create(GetPositionCell(x, height), gridBlock,
-                            avatarSize, CONSTANTS.CellType.None);
                         _grid[x - 1, y - 1] = cellCurrent;
+                        _grid[x, y] = 
+                            cell.Create(GetPositionCell(x, y), gridBlock, avatarSize, CONSTANTS.CellType.None);
                     }
-
                     else if (isBelowNotEmpty && isBelowRightEmpty && isCellCurrentNormal)
                     {
                         isProcessing = true;
                         cellCurrent.Move(GetPositionCell(x + 1, y - 1), fillTime);
-                        _grid[x, y] = cell.Create(GetPositionCell(x, height), gridBlock,
-                            avatarSize, CONSTANTS.CellType.None);
                         _grid[x + 1, y - 1] = cellCurrent;
+                        _grid[x, y] = 
+                            cell.Create(GetPositionCell(x, y), gridBlock, avatarSize, CONSTANTS.CellType.None);
                     }
                 }
 
@@ -110,6 +112,15 @@ namespace GameControllers
             }
         }
 
+        private void FillCell(Vector2 source, Vector2 target)
+        {
+            isProcessing = true;
+            var cellSource = _grid[(int)source.x, (int)source.y];
+            cellSource.Move(GetPositionCell(target), fillTime);
+            _grid[(int)target.x, (int)target.y - 1] = cellSource;
+            _grid[(int)source.x, (int)source.y] = cell.Create(GetPositionCell(source), gridBlock,
+                avatarSize, CONSTANTS.CellType.None);
+        }
 
         [Serializable]
         private struct CellStruct
@@ -182,6 +193,10 @@ namespace GameControllers
         private Vector2 GetPositionCell(int x, int y)
         {
             return new Vector2(x - (width - 1) * 0.5f, y - (height - 1) * 0.5f) * cellSize;
+        }
+        private Vector2 GetPositionCell(Vector2 pos)
+        {
+            return new Vector2((int)pos.x - (width - 1) * 0.5f, (int)pos.y - (height - 1) * 0.5f) * cellSize;
         }
 
         public IArchitecture GetArchitecture()

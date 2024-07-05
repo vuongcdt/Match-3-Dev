@@ -1,13 +1,16 @@
-﻿namespace BaseScripts
+﻿public class CONSTANTS
 {
-    public class CONSTANTS
+    public enum CellType
     {
-        public enum CellType
-        {
-            Background,
-            None,
-            Obstacle,
-            Normal
-        }
+        Background,
+        None,
+        Obstacle,
+        Yellow,
+        Magenta,
+        Red,
+        Blue,
+        Green,
+        Pink,
+        Rainbow
     }
 }
