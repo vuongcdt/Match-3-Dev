@@ -2,7 +2,7 @@
 
 namespace Interfaces
 {
-    public interface IStorage:IUtility
+    public interface IGameStorage:IUtility
     {
         void SaveInt(string key, int value);
         int LoadInt(string key, int defaultValue = 0);

@@ -6,14 +6,15 @@ namespace Models
 {
     public class GameModel : AbstractModel, IGameModel
     {
-        public BindableProperty<int[,]> GridArray { get; } = new();
-        public BindableProperty<CellBase[,]> CellArray { get; } = new();
+        public BindableProperty<Cell[,]> GridArray { get; } = new();
+        public BindableProperty<int> Count { get; } = new();
 
         protected override void OnInit()
         {
-            var storage = this.GetUtility<IStorage>();
-            // Count.SetValueWithoutEvent(storage.LoadInt(nameof(Count)));
-            // Count.Register(newCount => storage.SaveInt(nameof(Count), newCount));
+            var storage = this.GetUtility<IGameStorage>();
+            
+            Count.SetValueWithoutEvent(storage.LoadInt(nameof(Count)));
+            Count.Register(newCount => storage.SaveInt(nameof(Count), newCount));
         }
     }
 }

@@ -6,7 +6,8 @@
         {
             Background,
             None,
-            Obstacle
+            Obstacle,
+            Normal
         }
     }
 }

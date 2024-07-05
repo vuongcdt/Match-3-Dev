@@ -4,12 +4,12 @@ using Models;
 using QFramework;
 using Utilities;
 
-public class App:Architecture<App>
+public class GameApp:Architecture<GameApp>
 {
     protected override void Init()
     {
-        this.RegisterModel<IModel>(new GameModel());
+        this.RegisterModel<IGameModel>(new GameModel());
         this.RegisterSystem<IGameSystem>(new GameSystem());
-        this.RegisterUtility<IStorage>(new Storage());
+        this.RegisterUtility<IGameStorage>(new GameStorage());
     }
 }

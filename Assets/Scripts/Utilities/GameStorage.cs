@@ -1,17 +1,18 @@
 ﻿using Interfaces;
+using UnityEngine;
 
 namespace Utilities
 {
-    public class Storage:IStorage
+    public class GameStorage : IGameStorage
     {
         public void SaveInt(string key, int value)
         {
-            throw new System.NotImplementedException();
+            PlayerPrefs.SetInt(key, value);
         }
 
         public int LoadInt(string key, int defaultValue = 0)
         {
-            throw new System.NotImplementedException();
+            return PlayerPrefs.GetInt(key);
         }
 
         public void SaveFloat(string key, float value)
