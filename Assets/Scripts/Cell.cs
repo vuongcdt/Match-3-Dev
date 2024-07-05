@@ -28,18 +28,9 @@ public class Cell : MonoBehaviour
     {
         this.transform.localScale = Vector2.one * cellSize;
         var cell = Instantiate(this, pos, Quaternion.identity, transformParent);
-
+        cell._type = cellType;
         cell.SetAvatar(sprite[(int)cellType]);
         return cell;
-    }
-
-    public Cell CreateBackground(Vector2 pos, Transform transformParent, float cellSize)
-    {
-        this.transform.localScale = Vector2.one * cellSize;
-        var obstacle = Instantiate(this, pos, Quaternion.identity, transformParent);
-        obstacle.name = "Background";
-        obstacle.SetAvatar(sprite[(int)CONSTANTS.CellType.Background]);
-        return obstacle;
     }
 
     public void ReSetAvatar()
