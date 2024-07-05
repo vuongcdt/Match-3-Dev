@@ -1,12 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using BaseScripts;
 using Commands;
 using QFramework;
 using Queries;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace GameControllers
@@ -23,10 +21,11 @@ namespace GameControllers
         [SerializeField] private float avatarSize;
         [SerializeField] private float backgroundSize;
         [SerializeField] private float fillTime;
-        [SerializeField] private List<CellStruct> cellTypes;
+        [SerializeField] private List<CellPos> cellTypes;
         [SerializeField] private bool isProcessing;
 
         private Cell[,] _grid;
+        private bool _isRevertFill;
 
         private void Start()
         {
@@ -35,6 +34,7 @@ namespace GameControllers
             _grid = new Cell[width, height];
             RenderBackgroundGrid();
             RenderCellGrid();
+            RenderRandomObstacles();
 
             StartCoroutine(FillIE());
         }
@@ -59,7 +59,7 @@ namespace GameControllers
                 {
                     var random = Random.Range(3, 9);
                     isProcessing = true;
-                    var newCell = 
+                    var newCell =
                         cell.Create(GetPositionCell(x, height), gridBlock, avatarSize, (CONSTANTS.CellType)random);
                     newCell.Move(GetPositionCell(x, height - 1), fillTime);
                     _grid[x, height - 1] = newCell;
@@ -73,83 +73,36 @@ namespace GameControllers
             {
                 for (int x = 0; x < width; x++)
                 {
-                    var cellCurrent = _grid[x, y];
-                    var cellBelow = _grid[x, y - 1];
+                    int[] checkArr = _isRevertFill ? new[] { 0, 1, -1 } : new[] { 0, -1, 1 };
 
-                    var isBelowLeftEmpty = x > 0 && _grid[x - 1, y - 1].Type == CONSTANTS.CellType.None;
-                    var isBelowRightEmpty = x < width - 1 && _grid[x + 1, y - 1].Type == CONSTANTS.CellType.None;
-                    var isBelowEmpty = cellBelow.Type == CONSTANTS.CellType.None;
-                    var isCellCurrentNormal = cellCurrent.Type != CONSTANTS.CellType.None && cellCurrent.Type != CONSTANTS.CellType.Obstacle;
-                    var isBelowNotEmpty = cellBelow.Type != CONSTANTS.CellType.None;
-
-                    if (isBelowEmpty && isCellCurrentNormal)
+                    foreach (var index in checkArr)
                     {
-                        isProcessing = true;
-                        cellCurrent.Move(GetPositionCell(x, y - 1), fillTime);
-                        _grid[x, y - 1] = cellCurrent;
-                        _grid[x, y] = 
-                            cell.Create(GetPositionCell(x, y), gridBlock, avatarSize, CONSTANTS.CellType.None);
-                    }
-                    else if (isBelowNotEmpty && isBelowLeftEmpty && isCellCurrentNormal)
-                    {
-                        isProcessing = true;
-                        cellCurrent.Move(GetPositionCell(x - 1, y - 1), fillTime);
-                        _grid[x - 1, y - 1] = cellCurrent;
-                        _grid[x, y] = 
-                            cell.Create(GetPositionCell(x, y), gridBlock, avatarSize, CONSTANTS.CellType.None);
-                    }
-                    else if (isBelowNotEmpty && isBelowRightEmpty && isCellCurrentNormal)
-                    {
-                        isProcessing = true;
-                        cellCurrent.Move(GetPositionCell(x + 1, y - 1), fillTime);
-                        _grid[x + 1, y - 1] = cellCurrent;
-                        _grid[x, y] = 
-                            cell.Create(GetPositionCell(x, y), gridBlock, avatarSize, CONSTANTS.CellType.None);
+                        var source = _grid[x, y];
+                        var isSourceFish = source.Type != CONSTANTS.CellType.None &&
+                                           source.Type != CONSTANTS.CellType.Obstacle;
+                        var isTargetEmpty = x + index >= 0 && x + index < width &&
+                                            _grid[x + index, y - 1].Type == CONSTANTS.CellType.None;
+                        if (isSourceFish && isTargetEmpty)
+                        {
+                            MoveToBelow(source, x, y, index);
+                            break;
+                        }
                     }
                 }
+
+                _isRevertFill = !_isRevertFill;
 
                 yield return new WaitForSeconds(fillTime);
             }
         }
 
-        private void FillCell(Vector2 source, Vector2 target)
+        private void MoveToBelow(Cell cellCurrent, int x, int y, int index = 0)
         {
             isProcessing = true;
-            var cellSource = _grid[(int)source.x, (int)source.y];
-            cellSource.Move(GetPositionCell(target), fillTime);
-            _grid[(int)target.x, (int)target.y - 1] = cellSource;
-            _grid[(int)source.x, (int)source.y] = cell.Create(GetPositionCell(source), gridBlock,
-                avatarSize, CONSTANTS.CellType.None);
-        }
-
-        [Serializable]
-        private struct CellStruct
-        {
-            public int X;
-            public int Y;
-            public CONSTANTS.CellType Type;
-
-            public CellStruct(int x, int y, CONSTANTS.CellType type)
-            {
-                X = x;
-                Y = y;
-                Type = type;
-            }
-        }
-
-        private void PrintGrint()
-        {
-            List<CellStruct> cells = new();
-            for (int x = 0; x < _grid.GetLength(0); x++)
-            {
-                for (int y = 0; y < _grid.GetLength(1); y++)
-                {
-                    cells.Add(new CellStruct(x, y, _grid[x, y].Type));
-                }
-            }
-
-            cells.Reverse();
-            cellTypes = cells;
+            cellCurrent.Move(GetPositionCell(x + index, y - 1), fillTime);
+            _grid[x + index, y - 1] = cellCurrent;
+            _grid[x, y] =
+                cell.Create(GetPositionCell(x, y), gridBlock, avatarSize, CONSTANTS.CellType.None);
         }
 
         private void RenderBackgroundGrid()
@@ -177,16 +130,45 @@ namespace GameControllers
                     _grid[x, y] = newCell;
                 }
             }
+        }
 
-            foreach (var obstacle in obstacles)
+        private void RenderRandomObstacles()
+        {
+            var obstaclesTotal = 25;
+            List<CellPos> cellPosList = new();
+            var count = 0;
+
+            while (cellPosList.Count < obstaclesTotal)
+            {
+                count++;
+                var randomX = Random.Range(0, width);
+                var randomY = Random.Range(0, height - 2);
+                var cellPos = new CellPos(randomX, randomY);
+                var isNoInList = cellPosList.IndexOf(cellPos) == -1;
+                var isNearByInList =
+                    (cellPosList.IndexOf(new CellPos(randomX + 1, randomY)) > -1 && randomX == width - 2) ||
+                    (cellPosList.IndexOf(new CellPos(randomX - 1, randomY)) > -1 && randomX == 1);
+                if (isNoInList && !isNearByInList)
+                {
+                    cellPosList.Add(cellPos);
+                }
+
+                if (count > 100)
+                {
+                    Debug.Log("VAR");
+                    break;
+                }
+            }
+
+            foreach (var obstacle in cellPosList)
             {
                 if (obstacle.x < 0 || obstacle.x > width - 1 || obstacle.y < 0 || obstacle.y > height - 1)
                 {
                     continue;
                 }
 
-                _grid[(int)obstacle.x, (int)obstacle.y].Type = CONSTANTS.CellType.Obstacle;
-                _grid[(int)obstacle.x, (int)obstacle.y].ReSetAvatar();
+                _grid[obstacle.x, obstacle.y].Type = CONSTANTS.CellType.Obstacle;
+                _grid[obstacle.x, obstacle.y].ReSetAvatar();
             }
         }
 
@@ -194,6 +176,7 @@ namespace GameControllers
         {
             return new Vector2(x - (width - 1) * 0.5f, y - (height - 1) * 0.5f) * cellSize;
         }
+
         private Vector2 GetPositionCell(Vector2 pos)
         {
             return new Vector2((int)pos.x - (width - 1) * 0.5f, (int)pos.y - (height - 1) * 0.5f) * cellSize;
@@ -202,6 +185,43 @@ namespace GameControllers
         public IArchitecture GetArchitecture()
         {
             return GameApp.Interface;
+        }
+
+
+        private void PrintGrint()
+        {
+            List<CellPos> cells = new();
+            for (int x = 0; x < _grid.GetLength(0); x++)
+            {
+                for (int y = 0; y < _grid.GetLength(1); y++)
+                {
+                    cells.Add(new CellPos(x, y, _grid[x, y].Type));
+                }
+            }
+
+            cells.Reverse();
+            cellTypes = cells;
+        }
+    }
+
+    [Serializable]
+    public struct CellPos
+    {
+        public int x;
+        public int y;
+        public CONSTANTS.CellType type;
+
+        public CellPos(int x, int y) : this()
+        {
+            this.x = x;
+            this.y = y;
+        }
+
+        public CellPos(int x, int y, CONSTANTS.CellType type)
+        {
+            this.x = x;
+            this.y = y;
+            this.type = type;
         }
     }
 }
