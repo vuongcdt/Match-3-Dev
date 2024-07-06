@@ -349,11 +349,11 @@ MonoBehaviour:
   - {x: 4, y: 5}
   - {x: 8, y: 5}
   - {x: 9, y: 5}
-  width: 12
-  height: 10
-  cellSize: 1
-  avatarSize: 0.7
-  backgroundSize: 0.9
+  width: 10
+  height: 8
+  cellSize: 1.2
+  avatarSize: 0.9
+  backgroundSize: 1.1
   fillTime: 1
   cellTypes: []
   isProcessing: 0

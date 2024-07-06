@@ -93,12 +93,19 @@ namespace GameControllers
 
         private void MergeCells(List<List<Cell>> cellsList)
         {
+            cellsList.Sort((listA, listB) => listB.Count - listA.Count);
             foreach (var cells in cellsList)
             {
-                foreach (var cell in cells)
+                var isActiveAll = IsActiveAll(cells);
+                if (!isActiveAll)
                 {
-                    cell.gameObject.SetActive(false);
-                    cell.Type = CONSTANTS.CellType.None;
+                    continue;
+                }
+
+                foreach (var cellMerge in cells)
+                {
+                    cellMerge.gameObject.SetActive(false);
+                    cellMerge.Type = CONSTANTS.CellType.None;
                 }
             }
 
@@ -106,6 +113,19 @@ namespace GameControllers
             {
                 StartCoroutine(ProcessingIE());
             }
+        }
+
+        private bool IsActiveAll(List<Cell> cells)
+        {
+            foreach (var cellMerge in cells)
+            {
+                if (!cellMerge.gameObject.activeSelf)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private int MatchCellX(int x, int y, Cell currentCell, List<List<Cell>> cellsList)
@@ -167,7 +187,7 @@ namespace GameControllers
                 var cellBelow = _grid[x, height - 1];
                 if (cellBelow.Type == CONSTANTS.CellType.None)
                 {
-                    var random = Random.Range(3, 9);
+                    var random = Random.Range(3, 6);
                     isProcessing = true;
                     var newCell =
                         cell.Create(GetPositionCell(x, height), gridBlock, avatarSize, (CONSTANTS.CellType)random);
@@ -213,6 +233,7 @@ namespace GameControllers
                 {
                     continue;
                 }
+
                 if (isSourceFish && isTargetEmpty)
                 {
                     MoveToBelow(source, target, x, y, index);
