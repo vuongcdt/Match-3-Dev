@@ -208,7 +208,11 @@ namespace GameControllers
                 var isSourceFish = source.Type != CONSTANTS.CellType.None &&
                                    source.Type != CONSTANTS.CellType.Obstacle;
                 var isTargetEmpty = target.Type == CONSTANTS.CellType.None;
-
+                var isNextToObstacle = _grid[x + index, y].Type == CONSTANTS.CellType.Obstacle;
+                if (index != 0 && !isNextToObstacle)
+                {
+                    continue;
+                }
                 if (isSourceFish && isTargetEmpty)
                 {
                     MoveToBelow(source, target, x, y, index);
