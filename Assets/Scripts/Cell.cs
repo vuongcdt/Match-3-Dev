@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using Interfaces;
+﻿using System.Collections;
 using QFramework;
 using Queries;
 using UnityEngine;
@@ -8,13 +6,11 @@ using UnityEngine;
 public class Cell : MonoBehaviour, IController
 {
     [SerializeField] private Sprite[] sprite;
+    [SerializeField] private CONSTANTS.CellType _type;
+    [SerializeField] private BoxCollider2D box2D;
 
-    // protected int Row;
-    // protected int Column;
-    private CONSTANTS.CellType _type;
     private IEnumerator _moveIE;
     private Vector2 _currentPos;
-    private BoxCollider2D _box2D;
     private SpriteRenderer _avatar;
     private Utils.SettingsGrid _settingsGrid;
 
@@ -28,7 +24,6 @@ public class Cell : MonoBehaviour, IController
     private void Awake()
     {
         _avatar = this.GetComponentInChildren<SpriteRenderer>();
-        _box2D = this.GetComponent<BoxCollider2D>();
     }
 
     private void Start()
@@ -39,27 +34,27 @@ public class Cell : MonoBehaviour, IController
     public Cell Create(Vector2 pos, Transform transformParent, float cellSize,
         CONSTANTS.CellType cellType)
     {
-        if (!(cellType == CONSTANTS.CellType.Background || cellType == CONSTANTS.CellType.Obstacle ||
-              cellType == CONSTANTS.CellType.None))
-        {
-            _box2D.enabled = true;
-        }
-        else
-        {
-            _box2D.enabled = false;
-        }
+        var isCellNormal =
+            cellType is not (CONSTANTS.CellType.Background or CONSTANTS.CellType.Obstacle or CONSTANTS.CellType.None);
+
+        box2D.enabled = isCellNormal;
 
         this.transform.localScale = Vector2.one * cellSize;
         var cell = Instantiate(this, pos, Quaternion.identity, transformParent);
+
         cell._type = cellType;
         cell.SetAvatar(sprite[(int)cellType]);
+        cell.name = cellType.ToString();
+
         _currentPos = pos;
+
         return cell;
     }
 
     public void ReSetAvatar()
     {
         SetAvatar(sprite[(int)Type]);
+        // this.gameObject.name = _type.ToString();
     }
 
     private void SetAvatar(Sprite image)
@@ -101,7 +96,9 @@ public class Cell : MonoBehaviour, IController
     private void OnMouseDrag()
     {
         var offset = GetOffset();
-        this.transform.position = Vector2.ClampMagnitude(offset, 1) + _currentPos;
+        this.transform.position =
+            Vector3.ClampMagnitude(offset, _settingsGrid.CellSize) + (Vector3)_currentPos + Vector3.back;
+        // this.transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
     }
 
     private float _sensitivity = 2f;
@@ -114,17 +111,19 @@ public class Cell : MonoBehaviour, IController
 
         var directionAxis = (offset - new Vector2(min, min)) * _sensitivity;
         directionAxis.Normalize();
+        Debug.Log($"directionAxis {directionAxis} {_settingsGrid.CellSize}");
         InvertedCell(_currentPos, _currentPos + directionAxis * _settingsGrid.CellSize);
     }
 
     private void InvertedCell(Vector2 sourcePos, Vector2 targetPos)
     {
-        if (Mathf.Abs(targetPos.x) < 1 && Mathf.Abs(targetPos.y) < 1)
-        {
-            Debug.Log("return");
-            this.transform.position = _currentPos;
-            return;
-        }
+        Debug.Log($"targetPos {targetPos}");
+        // if (Mathf.Abs(targetPos.x) < 1 && Mathf.Abs(targetPos.y) < 1)
+        // {
+        //     Debug.Log($"return @@@@@@@@@@@@ {targetPos}");
+        //     this.transform.position = _currentPos;
+        //     return;
+        // }
 
         var grid = this.SendQuery(new GetGridQuery());
         var sourceGridPos = GetGridPos(sourcePos);
@@ -146,7 +145,11 @@ public class Cell : MonoBehaviour, IController
         var width = (-pos.x / _settingsGrid.CellSize + (_settingsGrid.Width - 1) * 0.5f);
         var height = (-pos.y / _settingsGrid.CellSize + (_settingsGrid.Height - 1) * 0.5f);
 
-        return new Utils.GridPos(_settingsGrid.Width - 1 - (int)width, _settingsGrid.Height - 1 - (int)height);
+        var gridWidth = _settingsGrid.Width - 1 - (int)width;
+        var gridHeight = _settingsGrid.Height - 1 - (int)height;
+        Debug.Log(new Vector2(gridWidth, gridHeight));
+
+        return new Utils.GridPos(gridWidth, gridHeight);
     }
 
     private Vector2 GetOffset()

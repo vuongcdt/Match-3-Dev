@@ -1,10 +1,7 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Commands;
-using Interfaces;
 using QFramework;
-using Queries;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -37,7 +34,7 @@ namespace GameControllers
             RenderCellGrid();
             RenderRandomObstacles();
             StartCoroutine(ProcessingIE());
-            
+
             this.SendCommand(new InitGridModelCommand(_grid));
         }
 
@@ -48,8 +45,119 @@ namespace GameControllers
                 isProcessing = false;
                 yield return new WaitForSeconds(fillTime);
                 AddCellToGrid();
-                StartCoroutine(Fill());
+                StartCoroutine(FillIE());
             } while (isProcessing);
+
+            MatchGrid();
+        }
+
+        private int _tempCount = 0;
+
+        private void MatchGrid()
+        {
+            List<List<Cell>> cellsList = new();
+            for (int x = 0; x < _grid.GetLength(0); x++)
+            {
+                int index = 0;
+                for (int y = 0; y < _grid.GetLength(1) - 2; y++)
+                {
+                    if (index >= y)
+                    {
+                        continue;
+                    }
+
+                    var currentCell = _grid[x, y];
+                    index = MatchCellX(x, y, currentCell, cellsList);
+                }
+            }
+
+            for (int y = 0; y < _grid.GetLength(1); y++)
+            {
+                int index = 0;
+                for (int x = 0; x < _grid.GetLength(0) - 2; x++)
+                {
+                    if (index >= x)
+                    {
+                        continue;
+                    }
+
+                    var currentCell = _grid[x, y];
+                    index = MatchCellY(x, y, currentCell, cellsList);
+                }
+            }
+
+            MergeCells(cellsList);
+
+            print($"temp count {_tempCount}");
+        }
+
+        private void MergeCells(List<List<Cell>> cellsList)
+        {
+            foreach (var cells in cellsList)
+            {
+                foreach (var cell in cells)
+                {
+                    cell.gameObject.SetActive(false);
+                    cell.Type = CONSTANTS.CellType.None;
+                }
+            }
+
+            if (cellsList.Count > 0)
+            {
+                StartCoroutine(ProcessingIE());
+            }
+        }
+
+        private int MatchCellX(int x, int y, Cell currentCell, List<List<Cell>> cellsList)
+        {
+            List<Cell> cells = new();
+            for (int newY = y + 1; newY < _grid.GetLength(1); newY++)
+            {
+                _tempCount++;
+                var upCell = _grid[x, newY];
+                if (upCell.Type == currentCell.Type)
+                {
+                    cells.Add(upCell);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (cells.Count >= 2)
+            {
+                cells.Add(currentCell);
+                cellsList.Add(cells);
+            }
+
+            return cells.Count + y;
+        }
+
+        private int MatchCellY(int x, int y, Cell currentCell, List<List<Cell>> cellsList)
+        {
+            List<Cell> cells = new();
+            for (int newX = x + 1; newX < _grid.GetLength(0); newX++)
+            {
+                _tempCount++;
+                var upCell = _grid[newX, y];
+                if (upCell.Type == currentCell.Type)
+                {
+                    cells.Add(upCell);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (cells.Count >= 2)
+            {
+                cells.Add(currentCell);
+                cellsList.Add(cells);
+            }
+
+            return cells.Count + x;
         }
 
         private void AddCellToGrid()
@@ -69,27 +177,13 @@ namespace GameControllers
             }
         }
 
-        private IEnumerator Fill()
+        private IEnumerator FillIE()
         {
             for (int y = height - 1; y > 0; y--)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    int[] checkArr = _isRevertFill ? new[] { 0, 1, -1 } : new[] { 0, -1, 1 };
-
-                    foreach (var index in checkArr)
-                    {
-                        var source = _grid[x, y];
-                        var isSourceFish = source.Type != CONSTANTS.CellType.None &&
-                                           source.Type != CONSTANTS.CellType.Obstacle;
-                        var isTargetEmpty = x + index >= 0 && x + index < width &&
-                                            _grid[x + index, y - 1].Type == CONSTANTS.CellType.None;
-                        if (isSourceFish && isTargetEmpty)
-                        {
-                            MoveToBelow(source, x, y, index);
-                            break;
-                        }
-                    }
+                    CheckFill(x, y);
                 }
 
                 _isRevertFill = !_isRevertFill;
@@ -98,13 +192,38 @@ namespace GameControllers
             }
         }
 
-        private void MoveToBelow(Cell cellCurrent, int x, int y, int index = 0)
+        private void CheckFill(int x, int y)
+        {
+            int[] checkArr = _isRevertFill ? new[] { 0, 1, -1 } : new[] { 0, -1, 1 };
+
+            foreach (var index in checkArr)
+            {
+                if (x + index < 0 || x + index >= width)
+                {
+                    continue;
+                }
+
+                var source = _grid[x, y];
+                var target = _grid[x + index, y - 1];
+                var isSourceFish = source.Type != CONSTANTS.CellType.None &&
+                                   source.Type != CONSTANTS.CellType.Obstacle;
+                var isTargetEmpty = target.Type == CONSTANTS.CellType.None;
+
+                if (isSourceFish && isTargetEmpty)
+                {
+                    MoveToBelow(source, target, x, y, index);
+                    break;
+                }
+            }
+        }
+
+        private void MoveToBelow(Cell cellSource, Cell cellTarget, int x, int y, int index = 0)
         {
             isProcessing = true;
-            cellCurrent.Move(GetPositionCell(x + index, y - 1), fillTime);
-            _grid[x + index, y - 1] = cellCurrent;
-            _grid[x, y] =
-                cell.Create(GetPositionCell(x, y), gridBlock, avatarSize, CONSTANTS.CellType.None);
+            cellSource.Move(GetPositionCell(x + index, y - 1), fillTime);
+            _grid[x + index, y - 1] = cellSource;
+            _grid[x, y] = cellTarget;
+            cellTarget.gameObject.SetActive(false);
         }
 
         private void RenderBackgroundGrid()
@@ -115,7 +234,7 @@ namespace GameControllers
                 {
                     var background = cell.Create(GetPositionCell(x, y), backgroundBlock, backgroundSize,
                         CONSTANTS.CellType.Background);
-                    background.name = "Background";
+                    // background.name = nameof(CONSTANTS.CellType.Background);
                 }
             }
         }
@@ -136,7 +255,7 @@ namespace GameControllers
 
         private void RenderRandomObstacles()
         {
-            var obstaclesTotal = 10;
+            var obstaclesTotal = 5;
             List<Utils.GridPos> cellPosList = new();
             var count = 0;
 
