@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class Utils
@@ -34,19 +35,37 @@ public static class Utils
             return new Vector2(x, y);
         }
     }
-    
-    
+
+
     public struct SettingsGrid
     {
         public int Width;
         public int Height;
         public float CellSize;
 
-        public SettingsGrid(int width, int height, float cellSize)
+        // private Cell cell;
+        // private Transform backgroundBlock;
+        // private Transform gridBlock;
+        // private Vector2[] obstacles;
+        // private float avatarSize;
+        // private float backgroundSize;
+        // private float fillTime;
+        // private List<Utils.GridPos> cellTypes;
+        // private bool isProcessing;
+        //
+        // private Cell[,] _grid;
+        // private bool _isRevertFill;
+
+        public SettingsGrid(int width, int height, float cellSize) : this()
         {
             this.Width = width;
             this.Height = height;
             this.CellSize = cellSize;
         }
+    }
+
+    public static Vector2 GetPositionCell(int x, int y, int width, int height, float cellSize)
+    {
+        return new Vector2(x - (width - 1) * 0.5f, y - (height - 1) * 0.5f) * cellSize;
     }
 }
