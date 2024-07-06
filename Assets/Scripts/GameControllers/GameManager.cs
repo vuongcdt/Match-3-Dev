@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Commands;
+using Interfaces;
 using QFramework;
 using Queries;
 using UnityEngine;
@@ -21,7 +22,7 @@ namespace GameControllers
         [SerializeField] private float avatarSize;
         [SerializeField] private float backgroundSize;
         [SerializeField] private float fillTime;
-        [SerializeField] private List<CellPos> cellTypes;
+        [SerializeField] private List<Utils.GridPos> cellTypes;
         [SerializeField] private bool isProcessing;
 
         private Cell[,] _grid;
@@ -29,28 +30,29 @@ namespace GameControllers
 
         private void Start()
         {
-            this.SendCommand(new InitGridCommand(width, height, obstacles));
-            _grid = this.SendQuery(new GetGridQuery());
+            this.SendCommand(new InitSettingsGridModelCommand(width, height, cellSize));
             _grid = new Cell[width, height];
+
             RenderBackgroundGrid();
             RenderCellGrid();
             RenderRandomObstacles();
-
-            StartCoroutine(FillIE());
+            StartCoroutine(ProcessingIE());
+            
+            this.SendCommand(new InitGridModelCommand(_grid));
         }
 
-        private IEnumerator FillIE()
+        private IEnumerator ProcessingIE()
         {
             do
             {
                 isProcessing = false;
                 yield return new WaitForSeconds(fillTime);
-                Shoot();
+                AddCellToGrid();
                 StartCoroutine(Fill());
             } while (isProcessing);
         }
 
-        private void Shoot()
+        private void AddCellToGrid()
         {
             for (int x = 0; x < width; x++)
             {
@@ -134,8 +136,8 @@ namespace GameControllers
 
         private void RenderRandomObstacles()
         {
-            var obstaclesTotal = 25;
-            List<CellPos> cellPosList = new();
+            var obstaclesTotal = 10;
+            List<Utils.GridPos> cellPosList = new();
             var count = 0;
 
             while (cellPosList.Count < obstaclesTotal)
@@ -143,12 +145,12 @@ namespace GameControllers
                 count++;
                 var randomX = Random.Range(0, width);
                 var randomY = Random.Range(0, height - 2);
-                var cellPos = new CellPos(randomX, randomY);
+                var cellPos = new Utils.GridPos(randomX, randomY);
                 var isNoInList = cellPosList.IndexOf(cellPos) == -1;
-                var isNearByInList =
-                    (cellPosList.IndexOf(new CellPos(randomX + 1, randomY)) > -1 && randomX == width - 2) ||
-                    (cellPosList.IndexOf(new CellPos(randomX - 1, randomY)) > -1 && randomX == 1);
-                if (isNoInList && !isNearByInList)
+                // var isNearByInList =
+                //     (cellPosList.IndexOf(new CellPos(randomX + 1, randomY)) > -1 && randomX == width - 2) ||
+                //     (cellPosList.IndexOf(new CellPos(randomX - 1, randomY)) > -1 && randomX == 1);
+                if (isNoInList)
                 {
                     cellPosList.Add(cellPos);
                 }
@@ -190,38 +192,17 @@ namespace GameControllers
 
         private void PrintGrint()
         {
-            List<CellPos> cells = new();
+            List<Utils.GridPos> cells = new();
             for (int x = 0; x < _grid.GetLength(0); x++)
             {
                 for (int y = 0; y < _grid.GetLength(1); y++)
                 {
-                    cells.Add(new CellPos(x, y, _grid[x, y].Type));
+                    cells.Add(new Utils.GridPos(x, y, _grid[x, y].Type));
                 }
             }
 
             cells.Reverse();
             cellTypes = cells;
-        }
-    }
-
-    [Serializable]
-    public struct CellPos
-    {
-        public int x;
-        public int y;
-        public CONSTANTS.CellType type;
-
-        public CellPos(int x, int y) : this()
-        {
-            this.x = x;
-            this.y = y;
-        }
-
-        public CellPos(int x, int y, CONSTANTS.CellType type)
-        {
-            this.x = x;
-            this.y = y;
-            this.type = type;
         }
     }
 }
