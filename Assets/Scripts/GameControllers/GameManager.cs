@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using Commands;
 using Events;
 using QFramework;
@@ -60,7 +59,7 @@ namespace GameControllers
                 var cellBelow = _grid[x, height - 1];
                 if (cellBelow.Type == CONSTANTS.CellType.None)
                 {
-                    var random = Random.Range(3, 6);
+                    var random = Random.Range(3, 9);
                     isProcessing = true;
                     var newCell = cell.Create(
                         Utils.GetPositionCell(x, height, width, height, cellSize),

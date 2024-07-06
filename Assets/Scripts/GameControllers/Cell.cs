@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Commands;
 using QFramework;
 using Queries;
 using UnityEngine;
@@ -13,6 +14,7 @@ public class Cell : MonoBehaviour, IController
     private Vector2 _currentPos;
     private SpriteRenderer _avatar;
     private Utils.SettingsGrid _settingsGrid;
+    private float _sensitivity = 2f;
 
     public CONSTANTS.CellType Type
     {
@@ -98,10 +100,8 @@ public class Cell : MonoBehaviour, IController
         var offset = GetOffset();
         this.transform.position =
             Vector3.ClampMagnitude(offset, _settingsGrid.CellSize) + (Vector3)_currentPos + Vector3.back;
-        // this.transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
     }
 
-    private float _sensitivity = 2f;
 
     private void OnMouseUp()
     {
@@ -111,45 +111,15 @@ public class Cell : MonoBehaviour, IController
 
         var directionAxis = (offset - new Vector2(min, min)) * _sensitivity;
         directionAxis.Normalize();
-        Debug.Log($"directionAxis {directionAxis} {_settingsGrid.CellSize}");
-        InvertedCell(_currentPos, _currentPos + directionAxis * _settingsGrid.CellSize);
+        
+        this.SendCommand(new InvertedCellCommand(_currentPos, _currentPos + directionAxis * _settingsGrid.CellSize));
+        StartCoroutine(ProcessingIE());
     }
 
-    private void InvertedCell(Vector2 sourcePos, Vector2 targetPos)
+    private IEnumerator ProcessingIE()
     {
-        Debug.Log($"targetPos {targetPos}");
-        // if (Mathf.Abs(targetPos.x) < 1 && Mathf.Abs(targetPos.y) < 1)
-        // {
-        //     Debug.Log($"return @@@@@@@@@@@@ {targetPos}");
-        //     this.transform.position = _currentPos;
-        //     return;
-        // }
-
-        var grid = this.SendQuery(new GetGridQuery());
-        var sourceGridPos = GetGridPos(sourcePos);
-        var targetGridPos = GetGridPos(targetPos);
-        Debug.Log($"sourceGridPos {sourceGridPos.ToVector2()} targetGridPos {targetGridPos.ToVector2()}");
-
-        var sourceCell = grid[sourceGridPos.x, sourceGridPos.y];
-        var targetCell = grid[targetGridPos.x, targetGridPos.y];
-
-        sourceCell.Move(targetPos, 0.1f);
-        targetCell.Move(sourcePos, 0.1f);
-
-        grid[sourceGridPos.x, sourceGridPos.y] = targetCell;
-        grid[targetGridPos.x, targetGridPos.y] = sourceCell;
-    }
-
-    private Utils.GridPos GetGridPos(Vector2 pos)
-    {
-        var width = (-pos.x / _settingsGrid.CellSize + (_settingsGrid.Width - 1) * 0.5f);
-        var height = (-pos.y / _settingsGrid.CellSize + (_settingsGrid.Height - 1) * 0.5f);
-
-        var gridWidth = _settingsGrid.Width - 1 - (int)width;
-        var gridHeight = _settingsGrid.Height - 1 - (int)height;
-        Debug.Log(new Vector2(gridWidth, gridHeight));
-
-        return new Utils.GridPos(gridWidth, gridHeight);
+        yield return new WaitForSeconds(1f);
+        this.SendCommand<MatchGridCommand>();
     }
 
     private Vector2 GetOffset()

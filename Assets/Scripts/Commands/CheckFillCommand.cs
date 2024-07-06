@@ -10,8 +10,8 @@ namespace Commands
         private float cellSize;
         private float fillTime;
         private bool isProcessing;
+        
         private Cell[,] _grid;
-
         private int width;
         private int height;
         private bool _isRevertFill;
@@ -25,12 +25,6 @@ namespace Commands
             this.isProcessing = isProcessing;
             _grid = grid;
             _isRevertFill = isRevertFill;
-        }
-
-        public CheckFillCommand(int x, int y)
-        {
-            this.x = x;
-            this.y = y;
         }
 
         protected override void OnExecute()

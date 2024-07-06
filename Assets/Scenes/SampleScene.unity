@@ -338,24 +338,12 @@ MonoBehaviour:
   cell: {fileID: 8616923916065429660, guid: 6fb716449f0b8fb429c6f762154ffa43, type: 3}
   backgroundBlock: {fileID: 730674053}
   gridBlock: {fileID: 720087986}
-  obstacles:
-  - {x: 0, y: 0}
-  - {x: 1, y: 3}
-  - {x: 3, y: 5}
-  - {x: 6, y: 2}
-  - {x: 7, y: 3}
-  - {x: 3, y: 7}
-  - {x: 0, y: 4}
-  - {x: 4, y: 5}
-  - {x: 8, y: 5}
-  - {x: 9, y: 5}
   width: 10
   height: 8
   cellSize: 1.2
   avatarSize: 0.9
   backgroundSize: 1.1
-  fillTime: 1
-  cellTypes: []
+  fillTime: 0.5
   isProcessing: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
