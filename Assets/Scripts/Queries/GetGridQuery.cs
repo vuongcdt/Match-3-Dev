@@ -1,5 +1,4 @@
-﻿using BaseScripts;
-using Interfaces;
+﻿using Interfaces;
 using QFramework;
 
 namespace Queries

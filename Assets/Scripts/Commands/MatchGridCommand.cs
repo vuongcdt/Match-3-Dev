@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Events;
 using QFramework;
 using Queries;
@@ -25,7 +26,7 @@ namespace Commands
             List<Utils.MatchCell> cellsList = new();
             for (int x = 0; x < _grid.GetLength(0); x++)
             {
-                int index = 0;
+                int index = -1;
                 for (int y = 0; y < _grid.GetLength(1) - 2; y++)
                 {
                     if (index >= y)
@@ -40,7 +41,7 @@ namespace Commands
 
             for (int y = 0; y < _grid.GetLength(1); y++)
             {
-                int index = 0;
+                int index = -1;
                 for (int x = 0; x < _grid.GetLength(0) - 2; x++)
                 {
                     if (index >= x)
@@ -73,7 +74,7 @@ namespace Commands
                 {
                     if (index == random && cellList.Count == 4)
                     {
-                        SetTriggerAndSpecialType(cells, index);
+                        // SetTriggerAndSpecialType(cells, index);
                         continue;
                     }
 
@@ -92,7 +93,7 @@ namespace Commands
 
             if (cellsList.Count > 0)
             {
-                this.SendEvent<ProcessingEvent>();
+                this.SendEvent<ProcessingGridEvent>();
             }
         }
 
@@ -124,7 +125,10 @@ namespace Commands
             for (int newY = y + 1; newY < _grid.GetLength(1); newY++)
             {
                 var upCell = _grid[x, newY];
-                if (upCell.Type == currentCell.Type && currentCell.Type != CONSTANTS.CellType.Obstacle)
+                var isNotObstacle = currentCell.Type != CONSTANTS.CellType.Obstacle;
+                var isNotNone = currentCell.Type != CONSTANTS.CellType.None;
+                
+                if (upCell.Type == currentCell.Type && isNotObstacle && isNotNone)
                 {
                     cells.Add(upCell);
                 }
@@ -149,7 +153,10 @@ namespace Commands
             for (int newX = x + 1; newX < _grid.GetLength(0); newX++)
             {
                 var upCell = _grid[newX, y];
-                if (upCell.Type == currentCell.Type && currentCell.Type != CONSTANTS.CellType.Obstacle)
+                var isNotObstacle = currentCell.Type != CONSTANTS.CellType.Obstacle;
+                var isNotNone = currentCell.Type != CONSTANTS.CellType.None;
+                
+                if (upCell.Type == currentCell.Type && isNotObstacle && isNotNone)
                 {
                     cells.Add(upCell);
                 }

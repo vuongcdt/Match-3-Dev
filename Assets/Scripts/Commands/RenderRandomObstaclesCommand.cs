@@ -10,7 +10,7 @@ namespace Commands
         private Cell[,] _grid;
         private int _width;
         private int _height;
-        private const int OBSTACLES_TOTAL = 5;
+        private const int OBSTACLES_TOTAL = 20;
 
         protected override void OnExecute()
         {
@@ -30,8 +30,9 @@ namespace Commands
             {
                 count++;
                 var randomX = Random.Range(0, _width);
-                var randomY = Random.Range(0, _height - 2);
+                var randomY = Random.Range(0, _height-2);
                 var cellPos = new Utils.GridPos(randomX, randomY);
+                // var cellPos = new Utils.GridPos(randomX, 3);
                 var isNoInList = cellPosList.IndexOf(cellPos) == -1;
           
                 if (isNoInList)

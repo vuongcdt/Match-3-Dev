@@ -47,30 +47,20 @@ public static class Utils
             Type = type;
         }
     }
+
     public struct SettingsGrid
     {
         public int Width;
         public int Height;
         public float CellSize;
+        public float FillTime;
 
-        // private Cell cell;
-        // private Transform backgroundBlock;
-        // private Transform gridBlock;
-        // private Vector2[] obstacles;
-        // private float avatarSize;
-        // private float backgroundSize;
-        // private float fillTime;
-        // private List<Utils.GridPos> cellTypes;
-        // private bool isProcessing;
-        //
-        // private Cell[,] _grid;
-        // private bool _isRevertFill;
-
-        public SettingsGrid(int width, int height, float cellSize) : this()
+        public SettingsGrid(int width, int height, float cellSize, float fillTime) : this()
         {
-            this.Width = width;
-            this.Height = height;
-            this.CellSize = cellSize;
+            Width = width;
+            Height = height;
+            CellSize = cellSize;
+            FillTime = fillTime;
         }
     }
 

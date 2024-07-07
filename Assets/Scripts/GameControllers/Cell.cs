@@ -21,7 +21,6 @@ public class Cell : MonoBehaviour, IController
     private const float SENSITIVITY = 5f;
     private const float MIN_SENSITIVITY = 0.2f;
     private Vector3 _clampMagnitude;
-    private IGameCommand _invertedCellCommand;
     private bool _isDragged;
 
     public Vector3 Position => _currentCellPos;
@@ -72,7 +71,6 @@ public class Cell : MonoBehaviour, IController
     public void ReSetAvatar()
     {
         SetAvatar(sprite[(int)Type]);
-        // this.gameObject.name = _type.ToString();
     }
 
     private void SetAvatar(Sprite image)
@@ -93,9 +91,9 @@ public class Cell : MonoBehaviour, IController
         {
             StopCoroutine(_moveIE);
         }
-
+        
         _moveIE = MoveIE(pos, time);
-        StartCoroutine(_moveIE);
+        StartCoroutine(_moveIE ?? MoveIE(pos, time));
     }
 
     private IEnumerator MoveIE(Vector2 pos, float time)
@@ -113,7 +111,6 @@ public class Cell : MonoBehaviour, IController
 
     private void OnMouseDown()
     {
-        Debug.Log($"OnMouseDown {Position}");
         if (_isDragged)
         {
             return;
@@ -135,32 +132,10 @@ public class Cell : MonoBehaviour, IController
         }
         var offset = GetOffset();
 
-        _clampMagnitude = GetClampMagnitudeVector(offset);
+        _clampMagnitude = this.SendCommand(new GetClampMagnitudeVectorCommand(offset,MIN_SENSITIVITY));
         var newPoint = _clampMagnitude * _settingsGrid.CellSize * 0.9f + _currentCellPos;
+        
         this.transform.position = newPoint;
-    }
-    private Vector3 GetClampMagnitudeVector(Vector3 offset)
-    {
-        if ((Mathf.Abs(offset.x) < MIN_SENSITIVITY && Mathf.Abs(offset.y) < MIN_SENSITIVITY) ||
-            Mathf.Abs(Mathf.Abs(offset.x) - Mathf.Abs(offset.y)) < MIN_SENSITIVITY)
-        {
-            return Vector3.zero;
-        }
-
-        var min = Mathf.Abs(offset.x) - Mathf.Abs(offset.y) > 0 ? offset.y : offset.x;
-
-        var directionAxis = offset - new Vector3(min, min);
-        return new Vector3(GetClampMagnitude(directionAxis.x), GetClampMagnitude(directionAxis.y));
-    }
-
-    private float GetClampMagnitude(float value)
-    {
-        return value switch
-        {
-            > 1 => 1,
-            < -1 => -1,
-            _ => value
-        };
     }
 
     private Vector3 GetOffset()
@@ -175,43 +150,31 @@ public class Cell : MonoBehaviour, IController
         {
             return;
         }
-        Debug.Log($"OnMouseUp {Position}");
+        
         _isDragged = false;
         this.transform.position = _currentCellPos;
         var directionAxis = _clampMagnitude * SENSITIVITY;
 
         directionAxis.Normalize();
 
-        Debug.Log($"directionAxis {directionAxis}");
         var targetPos = _currentCellPos + directionAxis * _settingsGrid.CellSize;
 
-        _invertedCellCommand = new InvertedCellCommand(_currentCellPos, targetPos);
-
         StartCoroutine(InvertedCellIE(targetPos));
-        StartCoroutine(ProcessingIE());
     }
 
     private IEnumerator InvertedCellIE(Vector3 targetPos)
     {
-        Debug.Log($"Pos {_currentCellPos - targetPos}");
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(_settingsGrid.FillTime);
 
-        _invertedCellCommand = new InvertedCellCommand(_currentCellPos, targetPos);
-        this.SendCommand(_invertedCellCommand);
+        this.SendCommand(new InvertedCellCommand(_currentCellPos, targetPos));
+        StartCoroutine(ProcessingCellIE());
     }
 
-    private IEnumerator UndoIE()
+    private IEnumerator ProcessingCellIE()
     {
-        yield return new WaitForSeconds(0.1f);
-        // _invertedCellCommand.Undo();
-    }
-
-    private IEnumerator ProcessingIE()
-    {
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(_settingsGrid.FillTime);
         this.SendCommand<MatchGridCommand>();
     }
-
 
     public IArchitecture GetArchitecture()
     {

@@ -1,6 +1,6 @@
 ﻿namespace Events
 {
-    public struct ProcessingEvent
+    public struct ProcessingGridEvent
     {
         
     }

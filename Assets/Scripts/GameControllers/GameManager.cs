@@ -2,8 +2,8 @@ using System.Collections;
 using Commands;
 using Events;
 using QFramework;
+using Queries;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace GameControllers
 {
@@ -25,51 +25,43 @@ namespace GameControllers
 
         private void Start()
         {
-            this.SendCommand(new InitSettingsGridModelCommand(width, height, cellSize));
-            _grid = new Cell[width, height];
-
-            this.RegisterEvent<ProcessingEvent>(e => { StartCoroutine(ProcessingIE()); })
+            this.RegisterEvent<ProcessingGridEvent>(e => { StartCoroutine(ProcessingGridIE()); })
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
+
+            this.SendCommand(new InitSettingsGridModelCommand(width, height, cellSize, fillTime));
+            _grid = new Cell[width, height];
 
             this.SendCommand(new InitGridModelCommand(_grid));
             this.SendCommand(new RenderBackgroundGridCommand(cell, cellSize, backgroundBlock, backgroundSize));
             this.SendCommand(new RenderCellGridCommand(cell, cellSize, gridBlock, avatarSize));
             this.SendCommand<RenderRandomObstaclesCommand>();
-            
-            StartCoroutine(ProcessingIE());
+
+            StartCoroutine(ProcessingGridIE());
         }
 
-        private IEnumerator ProcessingIE()
+        private IEnumerator ProcessingGridIE()
         {
             do
             {
-                isProcessing = false;
+                this.SendQuery(new SetIsProcessingQuery(false));
                 yield return new WaitForSeconds(fillTime);
-                AddCellToGrid();
+
+                this.SendCommand(new AddCellToGridCommand(cell, avatarSize, gridBlock));
+
                 StartCoroutine(FillIE());
+
+                isProcessing = this.SendQuery(new GetIsProcessingQuery());
             } while (isProcessing);
 
-            this.SendCommand<MatchGridCommand>();
+            // this.SendCommand(new FillSpecialPositionCommand());
+
+            StartCoroutine(MatchGridIE());
         }
 
-        private void AddCellToGrid()
+        private IEnumerator MatchGridIE()
         {
-            for (int x = 0; x < width; x++)
-            {
-                var cellBelow = _grid[x, height - 1];
-                if (cellBelow.Type == CONSTANTS.CellType.None)
-                {
-                    var random = Random.Range(3, 9);
-                    isProcessing = true;
-                    var newCell = cell.Create(
-                        Utils.GetPositionCell(x, height, width, height, cellSize),
-                        gridBlock,
-                        avatarSize,
-                        (CONSTANTS.CellType)random);
-                    newCell.Move(Utils.GetPositionCell(x, height - 1, width, height, cellSize), fillTime);
-                    _grid[x, height - 1] = newCell;
-                }
-            }
+            yield return new WaitForSeconds(fillTime);
+            this.SendCommand<MatchGridCommand>();
         }
 
         private IEnumerator FillIE()
@@ -78,52 +70,13 @@ namespace GameControllers
             {
                 for (int x = 0; x < width; x++)
                 {
-                    CheckFill(x, y);
+                    this.SendCommand(new CheckFillCommand(x, y));
                 }
 
-                _isRevertFill = !_isRevertFill;
+                _isRevertFill = this.SendQuery(new SetIsRevertFillQuery(!_isRevertFill));
 
-                yield return new WaitForSeconds(fillTime);
+                yield return new WaitForSeconds(fillTime * 2f);
             }
-        }
-
-        private void CheckFill(int x, int y)
-        {
-            int[] checkArr = _isRevertFill ? new[] { 0, 1, -1 } : new[] { 0, -1, 1 };
-
-            foreach (var index in checkArr)
-            {
-                if (x + index < 0 || x + index >= width)
-                {
-                    continue;
-                }
-
-                var source = _grid[x, y];
-                var target = _grid[x + index, y - 1];
-                var isSourceFish = source.Type != CONSTANTS.CellType.None &&
-                                   source.Type != CONSTANTS.CellType.Obstacle;
-                var isTargetEmpty = target.Type == CONSTANTS.CellType.None;
-                var isNextToObstacle = _grid[x + index, y].Type == CONSTANTS.CellType.Obstacle;
-                if (index != 0 && !isNextToObstacle)
-                {
-                    continue;
-                }
-
-                if (isSourceFish && isTargetEmpty)
-                {
-                    MoveToBelow(source, target, x, y, index);
-                    break;
-                }
-            }
-        }
-
-        private void MoveToBelow(Cell cellSource, Cell cellTarget, int x, int y, int index = 0)
-        {
-            isProcessing = true;
-            cellSource.Move(Utils.GetPositionCell(x + index, y - 1, width, height, cellSize), fillTime);
-            _grid[x + index, y - 1] = cellSource;
-            _grid[x, y] = cellTarget;
-            cellTarget.gameObject.SetActive(false);
         }
 
         public IArchitecture GetArchitecture()
