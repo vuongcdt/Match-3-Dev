@@ -3,9 +3,10 @@ using QFramework;
 
 namespace Interfaces
 {
-    public interface IGameModel
+    public interface IGameModel : IModel
     {
-        public BindableProperty<int[,]> GridArray { get; }
-        public BindableProperty<CellBase[,]> CellArray { get; }
+        BindableProperty<Cell[,]> GridArray { get; set; }
+        BindableProperty<Utils.SettingsGrid> SettingsGrid { get; }
+        BindableProperty<int> Count { get; }
     }
 }
