@@ -9,21 +9,20 @@ namespace Commands
         private Vector2 _sourcePos;
         private Vector2 _targetPos;
         private Utils.SettingsGrid _settingsGrid;
+        private Cell _currentCell;
 
         public InvertedCellCommand(Vector2 sourcePos, Vector2 targetPos)
         {
             this._sourcePos = sourcePos;
             this._targetPos = targetPos;
         }
-
         protected override void OnExecute()
         {
             _settingsGrid = this.SendQuery(new GetSettingsGridQuery());
 
-            Debug.Log($"_sourcePos{_sourcePos}, _targetPos {_targetPos}");
             InvertedCell(_sourcePos, _targetPos);
         }
-
+        
         private void InvertedCell(Vector2 sourcePos, Vector2 targetPos)
         {
             var grid = this.SendQuery(new GetGridQuery());

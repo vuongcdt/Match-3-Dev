@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Commands;
 using QFramework;
 using Queries;
@@ -11,10 +12,14 @@ public class Cell : MonoBehaviour, IController
     [SerializeField] private BoxCollider2D box2D;
 
     private IEnumerator _moveIE;
-    private Vector2 _currentPos;
+    private Vector3 _currentCellPos;
+    private Vector3 _currentPointPos;
     private SpriteRenderer _avatar;
     private Utils.SettingsGrid _settingsGrid;
-    private float _sensitivity = 2f;
+    private const float SENSITIVITY = 5f;
+    private const float MIN_SENSITIVITY = 0.2f;
+
+    public Vector3 Positive => _currentCellPos;
 
     public CONSTANTS.CellType Type
     {
@@ -45,10 +50,10 @@ public class Cell : MonoBehaviour, IController
         var cell = Instantiate(this, pos, Quaternion.identity, transformParent);
 
         cell._type = cellType;
-        cell.SetAvatar(sprite[(int)cellType]);
         cell.name = cellType.ToString();
+        cell.SetAvatar(sprite[(int)cellType]);
 
-        _currentPos = pos;
+        _currentCellPos = pos;
 
         return cell;
     }
@@ -91,42 +96,107 @@ public class Cell : MonoBehaviour, IController
             yield return null;
         }
 
-        _currentPos = pos;
+        _currentCellPos = pos;
         this.transform.position = pos;
+    }
+
+
+    private void OnMouseDown()
+    {
+        _currentPointPos = GetWorldPoint();
+    }
+
+    private Vector3 GetWorldPoint()
+    {
+        return Camera.main.ScreenToWorldPoint(Input.mousePosition);
     }
 
     private void OnMouseDrag()
     {
         var offset = GetOffset();
-        this.transform.position =
-            Vector3.ClampMagnitude(offset, _settingsGrid.CellSize) + (Vector3)_currentPos + Vector3.back;
+
+        var clampMagnitude = GetClampMagnitudeVector(offset) * _settingsGrid.CellSize * 0.9f;
+        var newPoint = clampMagnitude + _currentCellPos + Vector3.back;
+        this.transform.position = newPoint;
     }
 
+    private Vector3 GetClampMagnitudeVector(Vector3 offset)
+    {
+        if ((Mathf.Abs(offset.x) < MIN_SENSITIVITY && Mathf.Abs(offset.y) < MIN_SENSITIVITY) ||
+            Mathf.Abs(Mathf.Abs(offset.x) - Mathf.Abs(offset.y)) < MIN_SENSITIVITY)
+        {
+            return Vector3.zero;
+        }
+
+        var min = Mathf.Abs(offset.x) - Mathf.Abs(offset.y) > 0 ? offset.y : offset.x;
+
+        var directionAxis = offset - new Vector3(min, min);
+        return new Vector3(GetClampMagnitude(directionAxis.x), GetClampMagnitude(directionAxis.y));
+    }
+
+    private float GetClampMagnitude(float value)
+    {
+        return value switch
+        {
+            > 1 => 1,
+            < -1 => -1,
+            _ => value
+        };
+    }
+
+    private Vector3 GetOffset()
+    {
+        var input = GetWorldPoint();
+        return input - _currentPointPos;
+    }
 
     private void OnMouseUp()
     {
+        this.transform.position = _currentCellPos;
         var offset = GetOffset();
-        offset.Normalize();
-        var min = Mathf.Abs(offset.x) - Mathf.Abs(offset.y) > 0 ? offset.y : offset.x;
+        var directionAxis = GetClampMagnitudeVector(offset) * SENSITIVITY;
 
-        var directionAxis = (offset - new Vector2(min, min)) * _sensitivity;
         directionAxis.Normalize();
+
+        Debug.Log($"directionAxis {directionAxis}");
+        var targetPos = _currentCellPos + directionAxis * _settingsGrid.CellSize;
         
-        this.SendCommand(new InvertedCellCommand(_currentPos, _currentPos + directionAxis * _settingsGrid.CellSize));
+        StartCoroutine(InvertedCellIE(targetPos));
         StartCoroutine(ProcessingIE());
+
+
+        // var offset = GetOffset();
+        // offset.Normalize();
+        // var min = Mathf.Abs(offset.x) - Mathf.Abs(offset.y) > 0 ? offset.y : offset.x;
+        //
+        // var directionAxis = (offset - new Vector3(min, min)) * SENSITIVITY;
+        // directionAxis.Normalize();
+
+        // var offset = GetOffset();
+        // var directionAxis = GetClampMagnitudeVector(offset) * SENSITIVITY;
+        // directionAxis.Normalize();
+        //
+        // var targetPos = _currentCellPos + directionAxis * _settingsGrid.CellSize;
+        //
+        // // this.SendCommand(new InvertedCellCommand(_currentCellPos, targetPos));
+        //
+        // StartCoroutine(InvertedCellIE(targetPos));
+        // StartCoroutine(ProcessingIE());
+    }
+
+    private IEnumerator InvertedCellIE(Vector3 targetPos)
+    {
+        Debug.Log($"Pos {_currentCellPos - targetPos}");
+        yield return new WaitForSeconds(0.1f);
+        this.SendCommand(new InvertedCellCommand(_currentCellPos, targetPos));
     }
 
     private IEnumerator ProcessingIE()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.1f);
         this.SendCommand<MatchGridCommand>();
     }
 
-    private Vector2 GetOffset()
-    {
-        Vector2 input = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        return input - _currentPos;
-    }
 
     public IArchitecture GetArchitecture()
     {
