@@ -9,9 +9,10 @@ using UnityEngine;
 public class Cell : MonoBehaviour, IController
 {
     [SerializeField] private Sprite[] sprite;
-    [SerializeField] private CONSTANTS.CellType _type;
     [SerializeField] private BoxCollider2D box2D;
-
+    
+    private CONSTANTS.CellType _type;
+    private CONSTANTS.CellSpecialType _specialType;
     private IEnumerator _moveIE;
     private Vector3 _currentCellPos;
     private Vector3 _currentPointPos;
@@ -24,6 +25,12 @@ public class Cell : MonoBehaviour, IController
     private bool _isDragged;
 
     public Vector3 Position => _currentCellPos;
+
+    public CONSTANTS.CellSpecialType SpecialType
+    {
+        get => _specialType;
+        set => _specialType = value;
+    }
 
     public CONSTANTS.CellType Type
     {

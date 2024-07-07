@@ -6,6 +6,13 @@
         Column
     }
 
+    public enum CellSpecialType
+    {
+        Row,
+        Column,
+        Color
+    }
+
     public enum CellType
     {
         Background,

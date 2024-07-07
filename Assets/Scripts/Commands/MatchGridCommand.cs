@@ -11,8 +11,8 @@ namespace Commands
     public class MatchGridCommand : AbstractCommand
     {
         private Cell[,] _grid;
-        private static readonly int Row = Animator.StringToHash("Row");
-        private static readonly int Column = Animator.StringToHash("Column");
+        private static readonly int RowAnimator = Animator.StringToHash("Row");
+        private static readonly int ColumnAnimator = Animator.StringToHash("Column");
 
         protected override void OnExecute()
         {
@@ -61,22 +61,30 @@ namespace Commands
             cellsList.Sort((listA, listB) => listB.CellList.Count - listA.CellList.Count);
             foreach (var cells in cellsList)
             {
-                var isActiveAll = IsActiveAll(cells.CellList);
+                var cellList = cells.CellList;
+                var isActiveAll = IsActiveAll(cellList);
                 if (!isActiveAll)
                 {
                     continue;
                 }
 
-                var random = Random.Range(0, cells.CellList.Count);
-                for (var index = 0; index < cells.CellList.Count; index++)
+                var random = Random.Range(0, cellList.Count);
+                for (var index = 0; index < cellList.Count; index++)
                 {
-                    if (index == random && cells.CellList.Count > 3)
+                    if (index == random && cellList.Count == 4)
                     {
-                        SetTrigger(cells, index);
+                        SetTriggerAndSpecialType(cells, index);
                         continue;
                     }
 
-                    var cellMerge = cells.CellList[index];
+                    if (index == random && cellList.Count > 5)
+                    {
+                        cellList[index].SpecialType = CONSTANTS.CellSpecialType.Color;
+                        cellList[index].Type = CONSTANTS.CellType.Rainbow;
+                        continue;
+                    }
+
+                    var cellMerge = cellList[index];
                     cellMerge.gameObject.SetActive(false);
                     cellMerge.Type = CONSTANTS.CellType.None;
                 }
@@ -88,12 +96,13 @@ namespace Commands
             }
         }
 
-        private static void SetTrigger(Utils.MatchCell matchCell, int index)
+        private static void SetTriggerAndSpecialType(Utils.MatchCell matchCell, int index)
         {
             var cells = matchCell.CellList;
             var isTriggerRow = matchCell.Type == CONSTANTS.GridType.Row;
 
-            cells[index].GetComponentInChildren<Animator>().SetTrigger(isTriggerRow ? Row : Column);
+            cells[index].GetComponentInChildren<Animator>().SetTrigger(isTriggerRow ? RowAnimator : ColumnAnimator);
+            cells[index].SpecialType = isTriggerRow ? CONSTANTS.CellSpecialType.Row : CONSTANTS.CellSpecialType.Column;
         }
 
         private bool IsActiveAll(List<Cell> cells)
@@ -115,7 +124,7 @@ namespace Commands
             for (int newY = y + 1; newY < _grid.GetLength(1); newY++)
             {
                 var upCell = _grid[x, newY];
-                if (upCell.Type == currentCell.Type)
+                if (upCell.Type == currentCell.Type && currentCell.Type != CONSTANTS.CellType.Obstacle)
                 {
                     cells.Add(upCell);
                 }
@@ -140,7 +149,7 @@ namespace Commands
             for (int newX = x + 1; newX < _grid.GetLength(0); newX++)
             {
                 var upCell = _grid[newX, y];
-                if (upCell.Type == currentCell.Type)
+                if (upCell.Type == currentCell.Type && currentCell.Type != CONSTANTS.CellType.Obstacle)
                 {
                     cells.Add(upCell);
                 }
