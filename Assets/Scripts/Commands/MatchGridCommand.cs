@@ -1,13 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Events;
 using QFramework;
 using Queries;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Commands
 {
     public class MatchGridCommand : AbstractCommand
     {
         private Cell[,] _grid;
+        private static readonly int Row = Animator.StringToHash("Row");
+        private static readonly int Column = Animator.StringToHash("Column");
 
         protected override void OnExecute()
         {
@@ -17,7 +22,7 @@ namespace Commands
 
         private void MatchGrid()
         {
-            List<List<Cell>> cellsList = new();
+            List<Utils.MatchCell> cellsList = new();
             for (int x = 0; x < _grid.GetLength(0); x++)
             {
                 int index = 0;
@@ -51,19 +56,27 @@ namespace Commands
             MergeCells(cellsList);
         }
 
-        private void MergeCells(List<List<Cell>> cellsList)
+        private void MergeCells(List<Utils.MatchCell> cellsList)
         {
-            cellsList.Sort((listA, listB) => listB.Count - listA.Count);
+            cellsList.Sort((listA, listB) => listB.CellList.Count - listA.CellList.Count);
             foreach (var cells in cellsList)
             {
-                var isActiveAll = IsActiveAll(cells);
+                var isActiveAll = IsActiveAll(cells.CellList);
                 if (!isActiveAll)
                 {
                     continue;
                 }
 
-                foreach (var cellMerge in cells)
+                var random = Random.Range(0, cells.CellList.Count);
+                for (var index = 0; index < cells.CellList.Count; index++)
                 {
+                    if (index == random && cells.CellList.Count > 3)
+                    {
+                        SetTrigger(cells, index);
+                        continue;
+                    }
+
+                    var cellMerge = cells.CellList[index];
                     cellMerge.gameObject.SetActive(false);
                     cellMerge.Type = CONSTANTS.CellType.None;
                 }
@@ -73,6 +86,14 @@ namespace Commands
             {
                 this.SendEvent<ProcessingEvent>();
             }
+        }
+
+        private static void SetTrigger(Utils.MatchCell matchCell, int index)
+        {
+            var cells = matchCell.CellList;
+            var isTriggerRow = matchCell.Type == CONSTANTS.GridType.Row;
+
+            cells[index].GetComponentInChildren<Animator>().SetTrigger(isTriggerRow ? Row : Column);
         }
 
         private bool IsActiveAll(List<Cell> cells)
@@ -88,7 +109,7 @@ namespace Commands
             return true;
         }
 
-        private int MatchCellX(int x, int y, Cell currentCell, List<List<Cell>> cellsList)
+        private int MatchCellX(int x, int y, Cell currentCell, List<Utils.MatchCell> cellsList)
         {
             List<Cell> cells = new();
             for (int newY = y + 1; newY < _grid.GetLength(1); newY++)
@@ -107,13 +128,13 @@ namespace Commands
             if (cells.Count >= 2)
             {
                 cells.Add(currentCell);
-                cellsList.Add(cells);
+                cellsList.Add(new Utils.MatchCell(cells, CONSTANTS.GridType.Row));
             }
 
             return cells.Count + y;
         }
 
-        private int MatchCellY(int x, int y, Cell currentCell, List<List<Cell>> cellsList)
+        private int MatchCellY(int x, int y, Cell currentCell, List<Utils.MatchCell> cellsList)
         {
             List<Cell> cells = new();
             for (int newX = x + 1; newX < _grid.GetLength(0); newX++)
@@ -132,7 +153,7 @@ namespace Commands
             if (cells.Count >= 2)
             {
                 cells.Add(currentCell);
-                cellsList.Add(cells);
+                cellsList.Add(new Utils.MatchCell(cells, CONSTANTS.GridType.Column));
             }
 
             return cells.Count + x;

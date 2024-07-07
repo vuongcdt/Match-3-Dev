@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using Commands;
+using Interfaces;
 using QFramework;
 using Queries;
 using UnityEngine;
@@ -18,8 +19,11 @@ public class Cell : MonoBehaviour, IController
     private Utils.SettingsGrid _settingsGrid;
     private const float SENSITIVITY = 5f;
     private const float MIN_SENSITIVITY = 0.2f;
+    private Vector3 _clampMagnitude;
+    private IGameCommand _invertedCellCommand;
+    private bool _isDragged;
 
-    public Vector3 Positive => _currentCellPos;
+    public Vector3 Position => _currentCellPos;
 
     public CONSTANTS.CellType Type
     {
@@ -100,9 +104,14 @@ public class Cell : MonoBehaviour, IController
         this.transform.position = pos;
     }
 
-
     private void OnMouseDown()
     {
+        Debug.Log($"OnMouseDown {Position}");
+        if (_isDragged)
+        {
+            return;
+        }
+        _isDragged = true;
         _currentPointPos = GetWorldPoint();
     }
 
@@ -113,13 +122,16 @@ public class Cell : MonoBehaviour, IController
 
     private void OnMouseDrag()
     {
+        if (!_isDragged)
+        {
+            return;
+        }
         var offset = GetOffset();
 
-        var clampMagnitude = GetClampMagnitudeVector(offset) * _settingsGrid.CellSize * 0.9f;
-        var newPoint = clampMagnitude + _currentCellPos + Vector3.back;
+        _clampMagnitude = GetClampMagnitudeVector(offset);
+        var newPoint = _clampMagnitude * _settingsGrid.CellSize * 0.9f + _currentCellPos;
         this.transform.position = newPoint;
     }
-
     private Vector3 GetClampMagnitudeVector(Vector3 offset)
     {
         if ((Mathf.Abs(offset.x) < MIN_SENSITIVITY && Mathf.Abs(offset.y) < MIN_SENSITIVITY) ||
@@ -152,43 +164,39 @@ public class Cell : MonoBehaviour, IController
 
     private void OnMouseUp()
     {
+        if (!_isDragged)
+        {
+            return;
+        }
+        Debug.Log($"OnMouseUp {Position}");
+        _isDragged = false;
         this.transform.position = _currentCellPos;
-        var offset = GetOffset();
-        var directionAxis = GetClampMagnitudeVector(offset) * SENSITIVITY;
+        var directionAxis = _clampMagnitude * SENSITIVITY;
 
         directionAxis.Normalize();
 
         Debug.Log($"directionAxis {directionAxis}");
         var targetPos = _currentCellPos + directionAxis * _settingsGrid.CellSize;
-        
+
+        _invertedCellCommand = new InvertedCellCommand(_currentCellPos, targetPos);
+
         StartCoroutine(InvertedCellIE(targetPos));
         StartCoroutine(ProcessingIE());
-
-
-        // var offset = GetOffset();
-        // offset.Normalize();
-        // var min = Mathf.Abs(offset.x) - Mathf.Abs(offset.y) > 0 ? offset.y : offset.x;
-        //
-        // var directionAxis = (offset - new Vector3(min, min)) * SENSITIVITY;
-        // directionAxis.Normalize();
-
-        // var offset = GetOffset();
-        // var directionAxis = GetClampMagnitudeVector(offset) * SENSITIVITY;
-        // directionAxis.Normalize();
-        //
-        // var targetPos = _currentCellPos + directionAxis * _settingsGrid.CellSize;
-        //
-        // // this.SendCommand(new InvertedCellCommand(_currentCellPos, targetPos));
-        //
-        // StartCoroutine(InvertedCellIE(targetPos));
-        // StartCoroutine(ProcessingIE());
     }
 
     private IEnumerator InvertedCellIE(Vector3 targetPos)
     {
         Debug.Log($"Pos {_currentCellPos - targetPos}");
         yield return new WaitForSeconds(0.1f);
-        this.SendCommand(new InvertedCellCommand(_currentCellPos, targetPos));
+
+        _invertedCellCommand = new InvertedCellCommand(_currentCellPos, targetPos);
+        this.SendCommand(_invertedCellCommand);
+    }
+
+    private IEnumerator UndoIE()
+    {
+        yield return new WaitForSeconds(0.1f);
+        // _invertedCellCommand.Undo();
     }
 
     private IEnumerator ProcessingIE()

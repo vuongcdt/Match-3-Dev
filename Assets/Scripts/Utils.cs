@@ -36,7 +36,17 @@ public static class Utils
         }
     }
 
+    public struct MatchCell
+    {
+        public readonly List<Cell> CellList;
+        public readonly CONSTANTS.GridType Type;
 
+        public MatchCell(List<Cell> cellList, CONSTANTS.GridType type)
+        {
+            CellList = cellList;
+            Type = type;
+        }
+    }
     public struct SettingsGrid
     {
         public int Width;

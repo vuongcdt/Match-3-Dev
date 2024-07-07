@@ -10,7 +10,8 @@ namespace Commands
         private Cell[,] _grid;
         private int _width;
         private int _height;
-        
+        private const int OBSTACLES_TOTAL = 5;
+
         protected override void OnExecute()
         {
             _grid = this.SendQuery(new GetGridQuery());
@@ -22,29 +23,20 @@ namespace Commands
         
         private void RenderRandomObstacles()
         {
-            var obstaclesTotal = 5;
             List<Utils.GridPos> cellPosList = new();
             var count = 0;
 
-            while (cellPosList.Count < obstaclesTotal)
+            while (cellPosList.Count < OBSTACLES_TOTAL)
             {
                 count++;
                 var randomX = Random.Range(0, _width);
                 var randomY = Random.Range(0, _height - 2);
                 var cellPos = new Utils.GridPos(randomX, randomY);
                 var isNoInList = cellPosList.IndexOf(cellPos) == -1;
-                // var isNearByInList =
-                //     (cellPosList.IndexOf(new CellPos(randomX + 1, randomY)) > -1 && randomX == width - 2) ||
-                //     (cellPosList.IndexOf(new CellPos(randomX - 1, randomY)) > -1 && randomX == 1);
+          
                 if (isNoInList)
                 {
                     cellPosList.Add(cellPos);
-                }
-
-                if (count > 100)
-                {
-                    Debug.Log("VAR");
-                    break;
                 }
             }
 

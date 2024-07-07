@@ -1,5 +1,11 @@
 ﻿public class CONSTANTS
 {
+    public enum GridType
+    {
+        Row,
+        Column
+    }
+
     public enum CellType
     {
         Background,

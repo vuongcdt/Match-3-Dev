@@ -1,42 +1,62 @@
-﻿using QFramework;
+﻿using Interfaces;
+using QFramework;
 using Queries;
 using UnityEngine;
 
 namespace Commands
 {
-    public class InvertedCellCommand : AbstractCommand
+    public class InvertedCellCommand : AbstractCommand, IGameCommand
     {
         private Vector2 _sourcePos;
         private Vector2 _targetPos;
         private Utils.SettingsGrid _settingsGrid;
-        private Cell _currentCell;
+        private Cell _sourceCell;
+        private Cell _targetCell;
+        private Cell[,] _grid;
+        private Utils.GridPos _sourceGridPos;
+        private Utils.GridPos _targetGridPos;
 
         public InvertedCellCommand(Vector2 sourcePos, Vector2 targetPos)
         {
             this._sourcePos = sourcePos;
             this._targetPos = targetPos;
         }
+
+        public void Undo()
+        {
+            _sourceCell.Move(_sourcePos, 0.1f);
+            _targetCell.Move(_targetPos, 0.1f);
+
+            // _grid[_sourceGridPos.x, _sourceGridPos.y] = _sourceCell;
+            // _grid[_targetGridPos.x, _targetGridPos.y] = _targetCell;
+        }
+
         protected override void OnExecute()
         {
             _settingsGrid = this.SendQuery(new GetSettingsGridQuery());
 
             InvertedCell(_sourcePos, _targetPos);
         }
-        
+
         private void InvertedCell(Vector2 sourcePos, Vector2 targetPos)
         {
             var grid = this.SendQuery(new GetGridQuery());
-            var sourceGridPos = GetGridPos(sourcePos);
-            var targetGridPos = GetGridPos(targetPos);
+            _sourceGridPos = GetGridPos(sourcePos);
+            _targetGridPos = GetGridPos(targetPos);
 
-            var sourceCell = grid[sourceGridPos.x, sourceGridPos.y];
-            var targetCell = grid[targetGridPos.x, targetGridPos.y];
+            _sourceCell = grid[_sourceGridPos.x, _sourceGridPos.y];
+            _targetCell = grid[_targetGridPos.x, _targetGridPos.y];
 
-            sourceCell.Move(targetPos, 0.1f);
-            targetCell.Move(sourcePos, 0.1f);
+            if (_targetCell is { Type : CONSTANTS.CellType.Obstacle } or { Type: CONSTANTS.CellType.None })
+            {
+                return;
+            }
 
-            grid[sourceGridPos.x, sourceGridPos.y] = targetCell;
-            grid[targetGridPos.x, targetGridPos.y] = sourceCell;
+            _sourceCell.Move(targetPos, 0.1f);
+            _targetCell.Move(sourcePos, 0.1f);
+
+            grid[_sourceGridPos.x, _sourceGridPos.y] = _targetCell;
+            grid[_targetGridPos.x, _targetGridPos.y] = _sourceCell;
         }
 
         private Utils.GridPos GetGridPos(Vector2 pos)
