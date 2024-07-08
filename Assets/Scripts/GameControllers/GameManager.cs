@@ -2,9 +2,7 @@ using System.Collections;
 using Commands;
 using Events;
 using QFramework;
-using Queries;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace GameControllers
 {
@@ -58,7 +56,7 @@ namespace GameControllers
 
         public void OnRestartClick()
         {
-            InitGame();
+            // InitGame();
         }
 
         public IArchitecture GetArchitecture()

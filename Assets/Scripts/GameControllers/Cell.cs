@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using Commands;
 using QFramework;
-using Queries;
 using UnityEngine;
 
 public class Cell : MonoBehaviour, IController
@@ -61,6 +60,12 @@ public class Cell : MonoBehaviour, IController
         return cell;
     }
 
+    public void DeActive()
+    {
+        this.Type = CONSTANTS.CellType.None;
+        this.gameObject.SetActive(false);
+    }
+
     public void ReSetAvatar()
     {
         SetAvatar(sprite[(int)Type]);
@@ -86,7 +91,10 @@ public class Cell : MonoBehaviour, IController
         }
 
         _moveIE = MoveIE(pos, time);
-        StartCoroutine(_moveIE);
+        if (this.gameObject.activeSelf)
+        {
+            StartCoroutine(_moveIE ?? MoveIE(pos, time));
+        }
     }
 
     private IEnumerator MoveIE(Vector2 pos, float time)
@@ -184,7 +192,6 @@ public class Cell : MonoBehaviour, IController
         var matchGridCommandIE = this.SendCommand(new MatchGridCommandIE());
         StartCoroutine(matchGridCommandIE);
     }
-
 
     public IArchitecture GetArchitecture()
     {
