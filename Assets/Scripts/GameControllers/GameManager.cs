@@ -2,9 +2,8 @@ using System.Collections;
 using Commands;
 using Events;
 using QFramework;
-using Queries;
 using UnityEngine;
-using UnityEngine.UI;
+using uPools;
 
 namespace GameControllers
 {
@@ -21,7 +20,7 @@ namespace GameControllers
             _configGame = ConfigGame.Instance;
             _configGame.ButtonReset.onClick.RemoveAllListeners();
             _configGame.ButtonReset.onClick.AddListener(OnRestartClick);
-
+            SharedGameObjectPool.Prewarm(_configGame.Cell.gameObject, _configGame.Width * _configGame.Height);
             InitGame();
         }
 

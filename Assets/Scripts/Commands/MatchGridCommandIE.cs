@@ -4,6 +4,7 @@ using Events;
 using QFramework;
 using Queries;
 using UnityEngine;
+using uPools;
 using Random = UnityEngine.Random;
 
 namespace Commands
@@ -81,17 +82,7 @@ namespace Commands
             for (int newY = y + 1; newY < _grid.GetLength(1); newY++)
             {
                 var upCell = _grid[x, newY];
-                var isNotObstacle = currentCell.Type != CONSTANTS.CellType.Obstacle;
-                var isNotNone = currentCell.Type != CONSTANTS.CellType.None;
-
-                if (upCell.Type == currentCell.Type && isNotObstacle && isNotNone)
-                {
-                    cells.Add(upCell);
-                }
-                else
-                {
-                    break;
-                }
+                if (GetValue(currentCell, upCell, cells)) break;
             }
 
             if (cells.Count >= 2)
@@ -109,17 +100,7 @@ namespace Commands
             for (int newX = x + 1; newX < _grid.GetLength(0); newX++)
             {
                 var upCell = _grid[newX, y];
-                var isNotObstacle = currentCell.Type != CONSTANTS.CellType.Obstacle;
-                var isNotNone = currentCell.Type != CONSTANTS.CellType.None;
-
-                if (upCell.Type == currentCell.Type && isNotObstacle && isNotNone)
-                {
-                    cells.Add(upCell);
-                }
-                else
-                {
-                    break;
-                }
+                if (GetValue(currentCell, upCell, cells)) break;
             }
 
             if (cells.Count >= 2)
@@ -129,6 +110,23 @@ namespace Commands
             }
 
             return cells.Count + x;
+        }
+
+        private static bool GetValue(Cell currentCell, Cell upCell, List<Cell> cells)
+        {
+            var isNotObstacle = currentCell.Type != CONSTANTS.CellType.Obstacle;
+            var isNotNone = currentCell.Type != CONSTANTS.CellType.None;
+
+            if (upCell.Type == currentCell.Type && isNotObstacle && isNotNone)
+            {
+                cells.Add(upCell);
+            }
+            else
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private void MergeCells(List<Utils.MatchCell> cellsList)
@@ -160,15 +158,9 @@ namespace Commands
                     }
 
                     var cellMerge = cellList[index];
-                    cellMerge.gameObject.SetActive(false);
-                    cellMerge.Type = CONSTANTS.CellType.None;
+                    cellMerge.DeActive();
                 }
             }
-
-            // if (cellsList.Count > 0)
-            // {
-            //     this.SendEvent<ProcessingGridEvent>();
-            // }
         }
 
         private static void SetTriggerAndSpecialType(Utils.MatchCell matchCell, int index)

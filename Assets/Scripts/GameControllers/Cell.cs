@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Commands;
 using QFramework;
 using Queries;
 using UnityEngine;
+using uPools;
 
 public class Cell : MonoBehaviour, IController
 {
@@ -49,8 +51,10 @@ public class Cell : MonoBehaviour, IController
 
         box2D.enabled = isCellNormal;
 
-        this.transform.localScale = Vector2.one * cellSize;
-        var cell = Instantiate(this, pos, Quaternion.identity, transformParent);
+        var newCell = SharedGameObjectPool.Rent(this.gameObject, pos, Quaternion.identity, transformParent);
+        newCell.transform.localScale = Vector2.one * cellSize;
+
+        var cell = newCell.GetComponent<Cell>();
 
         cell._type = cellType;
         cell.name = cellType.ToString();
@@ -59,6 +63,13 @@ public class Cell : MonoBehaviour, IController
         _currentCellPos = pos;
 
         return cell;
+    }
+
+    public void DeActive()
+    {
+        this.Type = CONSTANTS.CellType.None;
+
+        SharedGameObjectPool.Return(this.gameObject);
     }
 
     public void ReSetAvatar()
@@ -86,7 +97,10 @@ public class Cell : MonoBehaviour, IController
         }
 
         _moveIE = MoveIE(pos, time);
-        StartCoroutine(_moveIE);
+        if (this.gameObject.activeSelf)
+        {
+            StartCoroutine(_moveIE ?? MoveIE(pos, time));
+        }
     }
 
     private IEnumerator MoveIE(Vector2 pos, float time)
@@ -184,7 +198,6 @@ public class Cell : MonoBehaviour, IController
         var matchGridCommandIE = this.SendCommand(new MatchGridCommandIE());
         StartCoroutine(matchGridCommandIE);
     }
-
 
     public IArchitecture GetArchitecture()
     {
