@@ -43,7 +43,6 @@ namespace GameControllers
 
                 var fillCommandIE = this.SendCommand(new FillCommandIE());
 
-
                 StartCoroutine(fillCommandIE);
                 yield return new WaitForSeconds(_configGame.FillTime);
             } while (_configGame.IsProcessing);
