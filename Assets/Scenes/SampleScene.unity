@@ -328,10 +328,11 @@ MonoBehaviour:
   backgroundSize: 1.3
   fillTime: 0.2
   isProcessing: 0
-  obstaclesTotal: 5
+  obstaclesTotal: 20
   maxListImage: 9
   sensitivity: 5
   minSensitivity: 0.2
+  isRevertFill: 0
 --- !u!4 &1174744653
 Transform:
   m_ObjectHideFlags: 0

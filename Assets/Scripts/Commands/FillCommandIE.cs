@@ -1,28 +1,36 @@
-﻿using QFramework;
+﻿using System.Collections;
+using QFramework;
 using Queries;
 using UnityEngine;
 
 namespace Commands
 {
-    public class CheckFillCommand : AbstractCommand
+    public class FillCommandIE : AbstractCommand<IEnumerator>
     {
-        private int _x;
-        private int _y;
         private Cell[,] _grid;
         private ConfigGame _configGame;
 
-        public CheckFillCommand(int x, int y)
-        {
-            _x = x;
-            _y = y;
-        }
-
-        protected override void OnExecute()
+        protected override IEnumerator OnExecute()
         {
             _grid = this.SendQuery(new GetGridQuery());
             _configGame = ConfigGame.Instance;
 
-            CheckFill(_x, _y);
+            return FillIE();
+        }
+
+        private IEnumerator FillIE()
+        {
+            for (int y = _configGame.Height - 1; y > 0; y--)
+            {
+                for (int x = 0; x < _configGame.Width; x++)
+                {
+                    CheckFill(x, y);
+                }
+
+                _configGame.IsRevertFill = !_configGame.IsRevertFill;
+                
+                yield return new WaitForSeconds(_configGame.FillTime);
+            }
         }
 
         private void CheckFill(int x, int y)
@@ -47,7 +55,7 @@ namespace Commands
                 var isNextToObstacle = _grid[x + index, y].Type == CONSTANTS.CellType.Obstacle;
 
                 var isSpecial = y + 1 < _configGame.Height &&
-                                _grid[x + index, y + 1].Type == CONSTANTS.CellType.Obstacle &&
+                                // _grid[x + index, y + 1].Type == CONSTANTS.CellType.Obstacle &&
                                 _grid[x, y + 1].Type == CONSTANTS.CellType.Obstacle;
 
                 if (index != 0 && !isNextToObstacle && !isSpecial)
@@ -57,14 +65,12 @@ namespace Commands
 
                 if (isSourceFish && isTargetEmpty)
                 {
-                    Debug.Log("MoveToBelow");
                     MoveToBelow(source, target, x, y, index);
                     break;
                 }
 
                 if (index != 0 && isSourceFish && isSpecial && _grid[x + index, y].Type == CONSTANTS.CellType.None)
                 {
-                    Debug.Log("MoveToNextTo");
                     target = _grid[x + index, y];
                     MoveToNextTo(source, target, x, y, index);
                     break;

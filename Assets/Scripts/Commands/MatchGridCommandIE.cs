@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using Events;
 using QFramework;
 using Queries;
@@ -7,15 +8,19 @@ using Random = UnityEngine.Random;
 
 namespace Commands
 {
-    public class MatchGridCommand : AbstractCommand
+    public class MatchGridCommandIE : AbstractCommand<IEnumerator>
     {
         private Cell[,] _grid;
+        private ConfigGame _configGame;
         private static readonly int RowAnimator = Animator.StringToHash("Row");
         private static readonly int ColumnAnimator = Animator.StringToHash("Column");
 
-        protected override void OnExecute()
+        protected override IEnumerator OnExecute()
         {
             _grid = this.SendQuery(new GetGridQuery());
+            _configGame = ConfigGame.Instance;
+
+            yield return new WaitForSeconds(_configGame.FillTime * 2);
             MatchGrid();
         }
 
@@ -53,6 +58,77 @@ namespace Commands
             }
 
             MergeCells(cellsList);
+            this.SendEvent<ProcessingGridEvent>();
+        }
+
+
+        private bool IsActiveAll(List<Cell> cells)
+        {
+            foreach (var cellMerge in cells)
+            {
+                if (!cellMerge.gameObject.activeSelf)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private int MatchCellX(int x, int y, Cell currentCell, List<Utils.MatchCell> cellsList)
+        {
+            List<Cell> cells = new();
+            for (int newY = y + 1; newY < _grid.GetLength(1); newY++)
+            {
+                var upCell = _grid[x, newY];
+                var isNotObstacle = currentCell.Type != CONSTANTS.CellType.Obstacle;
+                var isNotNone = currentCell.Type != CONSTANTS.CellType.None;
+
+                if (upCell.Type == currentCell.Type && isNotObstacle && isNotNone)
+                {
+                    cells.Add(upCell);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (cells.Count >= 2)
+            {
+                cells.Add(currentCell);
+                cellsList.Add(new Utils.MatchCell(cells, CONSTANTS.GridType.Row));
+            }
+
+            return cells.Count + y;
+        }
+
+        private int MatchCellY(int x, int y, Cell currentCell, List<Utils.MatchCell> cellsList)
+        {
+            List<Cell> cells = new();
+            for (int newX = x + 1; newX < _grid.GetLength(0); newX++)
+            {
+                var upCell = _grid[newX, y];
+                var isNotObstacle = currentCell.Type != CONSTANTS.CellType.Obstacle;
+                var isNotNone = currentCell.Type != CONSTANTS.CellType.None;
+
+                if (upCell.Type == currentCell.Type && isNotObstacle && isNotNone)
+                {
+                    cells.Add(upCell);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (cells.Count >= 2)
+            {
+                cells.Add(currentCell);
+                cellsList.Add(new Utils.MatchCell(cells, CONSTANTS.GridType.Column));
+            }
+
+            return cells.Count + x;
         }
 
         private void MergeCells(List<Utils.MatchCell> cellsList)
@@ -89,11 +165,10 @@ namespace Commands
                 }
             }
 
-            if (cellsList.Count > 0)
-            {
-                Debug.Log($"cellsList.Count {cellsList.Count}");
-                this.SendEvent<ProcessingGridEvent>();
-            }
+            // if (cellsList.Count > 0)
+            // {
+            //     this.SendEvent<ProcessingGridEvent>();
+            // }
         }
 
         private static void SetTriggerAndSpecialType(Utils.MatchCell matchCell, int index)
@@ -103,75 +178,6 @@ namespace Commands
 
             cells[index].GetComponentInChildren<Animator>().SetTrigger(isTriggerRow ? RowAnimator : ColumnAnimator);
             cells[index].SpecialType = isTriggerRow ? CONSTANTS.CellSpecialType.Row : CONSTANTS.CellSpecialType.Column;
-        }
-
-        private bool IsActiveAll(List<Cell> cells)
-        {
-            foreach (var cellMerge in cells)
-            {
-                if (!cellMerge.gameObject.activeSelf)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private int MatchCellX(int x, int y, Cell currentCell, List<Utils.MatchCell> cellsList)
-        {
-            List<Cell> cells = new();
-            for (int newY = y + 1; newY < _grid.GetLength(1); newY++)
-            {
-                var upCell = _grid[x, newY];
-                var isNotObstacle = currentCell.Type != CONSTANTS.CellType.Obstacle;
-                var isNotNone = currentCell.Type != CONSTANTS.CellType.None;
-                
-                if (upCell.Type == currentCell.Type && isNotObstacle && isNotNone)
-                {
-                    cells.Add(upCell);
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            if (cells.Count >= 2)
-            {
-                cells.Add(currentCell);
-                cellsList.Add(new Utils.MatchCell(cells, CONSTANTS.GridType.Row));
-            }
-
-            return cells.Count + y;
-        }
-
-        private int MatchCellY(int x, int y, Cell currentCell, List<Utils.MatchCell> cellsList)
-        {
-            List<Cell> cells = new();
-            for (int newX = x + 1; newX < _grid.GetLength(0); newX++)
-            {
-                var upCell = _grid[newX, y];
-                var isNotObstacle = currentCell.Type != CONSTANTS.CellType.Obstacle;
-                var isNotNone = currentCell.Type != CONSTANTS.CellType.None;
-                
-                if (upCell.Type == currentCell.Type && isNotObstacle && isNotNone)
-                {
-                    cells.Add(upCell);
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            if (cells.Count >= 2)
-            {
-                cells.Add(currentCell);
-                cellsList.Add(new Utils.MatchCell(cells, CONSTANTS.GridType.Column));
-            }
-
-            return cells.Count + x;
         }
     }
 }

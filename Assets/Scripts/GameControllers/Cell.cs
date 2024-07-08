@@ -153,7 +153,7 @@ public class Cell : MonoBehaviour, IController
         directionAxis.Normalize();
 
         var targetPos = _currentCellPos + directionAxis * _configGame.CellSize;
-        
+
         // var targetGrid = Utils.GetGridPos(targetPos.x, targetPos.y, _configGame.Width, _configGame.Height,
         //     _configGame.CellSize);
         // var grid = this.SendQuery(new GetGridQuery());
@@ -165,8 +165,8 @@ public class Cell : MonoBehaviour, IController
         // spriteTarget.color = Color.black;
         //
         // StartCoroutine(SetColorIE(spriteSource, spriteTarget));
-        
-        StartCoroutine(InvertedCellIE( targetPos));
+
+        StartCoroutine(InvertedCellIE(targetPos));
     }
 
     private IEnumerator SetColorIE(SpriteRenderer spriteSource, SpriteRenderer spriteTarget)
@@ -181,14 +181,10 @@ public class Cell : MonoBehaviour, IController
         yield return new WaitForSeconds(_configGame.FillTime);
 
         this.SendCommand(new InvertedCellCommand(_currentCellPos, targetPos));
-        StartCoroutine(ProcessingCellIE());
+        var matchGridCommandIE = this.SendCommand(new MatchGridCommandIE());
+        StartCoroutine(matchGridCommandIE);
     }
 
-    private IEnumerator ProcessingCellIE()
-    {
-        yield return new WaitForSeconds(_configGame.FillTime);
-        this.SendCommand<MatchGridCommand>();
-    }
 
     public IArchitecture GetArchitecture()
     {

@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 public class ConfigGame : Singleton<ConfigGame>
 {
     [SerializeField] private Cell cell;
     [SerializeField] private Transform backgroundBlock;
     [SerializeField] private Transform gridBlock;
-    
+    [SerializeField] private Button buttonReset;
+
     [SerializeField] private int width;
     [SerializeField] private int height;
     [SerializeField] private float cellSize;
@@ -22,71 +23,33 @@ public class ConfigGame : Singleton<ConfigGame>
 
     private Cell[,] _grid;
 
-    public float Sensitivity
-    {
-        get => sensitivity;
-        set => sensitivity = value;
-    }
+    public Button ButtonReset => buttonReset;
 
-    public float MinSensitivity
-    {
-        get => minSensitivity;
-        set => minSensitivity = value;
-    }
+    public float Sensitivity => sensitivity;
 
-    public Cell Cell
-    {
-        get => cell;
-        set => cell = value;
-    }
+    public float MinSensitivity => minSensitivity;
 
-    public Transform BackgroundBlock
-    {
-        get => backgroundBlock;
-        set => backgroundBlock = value;
-    }
+    public Cell Cell => cell;
 
-    public Transform GridBlock
-    {
-        get => gridBlock;
-        set => gridBlock = value;
-    }
+    public Transform BackgroundBlock => backgroundBlock;
 
-    public int Width
-    {
-        get => width;
-        set => width = value;
-    }
+    public Transform GridBlock => gridBlock;
 
-    public int Height
-    {
-        get => height;
-        set => height = value;
-    }
+    public int Width => width;
 
-    public float CellSize
-    {
-        get => cellSize;
-        set => cellSize = value;
-    }
+    public int Height => height;
 
-    public float AvatarSize
-    {
-        get => avatarSize;
-        set => avatarSize = value;
-    }
+    public float CellSize => cellSize;
 
-    public float BackgroundSize
-    {
-        get => backgroundSize;
-        set => backgroundSize = value;
-    }
+    public float AvatarSize => avatarSize;
 
-    public float FillTime
-    {
-        get => fillTime;
-        set => fillTime = value;
-    }
+    public float BackgroundSize => backgroundSize;
+
+    public float FillTime => fillTime;
+
+    public int ObstaclesTotal => obstaclesTotal;
+
+    public int MaxListImage => maxListImage;
 
     public bool IsProcessing
     {
@@ -94,40 +57,9 @@ public class ConfigGame : Singleton<ConfigGame>
         set => isProcessing = value;
     }
 
-    public int ObstaclesTotal
-    {
-        get => obstaclesTotal;
-        set => obstaclesTotal = value;
-    }
-
-    public int MaxListImage
-    {
-        get => maxListImage;
-        set => maxListImage = value;
-    }
-
     public bool IsRevertFill
     {
         get => isRevertFill;
         set => isRevertFill = value;
-    }
-
-    public void Deconstruct(out Cell cell, out Transform backgroundBlock, out Transform gridBlock, out int width,
-        out int height, out float cellSize, out float avatarSize, out float backgroundSize, out float fillTime,
-        out bool isProcessing, out int obstaclesTotal, out int maxListImage, out bool isRevertFill)
-    {
-        cell = this.cell;
-        backgroundBlock = this.backgroundBlock;
-        gridBlock = this.gridBlock;
-        width = this.width;
-        height = this.height;
-        cellSize = this.cellSize;
-        avatarSize = this.avatarSize;
-        backgroundSize = this.backgroundSize;
-        fillTime = this.fillTime;
-        isProcessing = this.isProcessing;
-        obstaclesTotal = this.obstaclesTotal;
-        maxListImage = this.maxListImage;
-        isRevertFill = this.isRevertFill;
     }
 }
