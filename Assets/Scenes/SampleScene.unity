@@ -289,6 +289,64 @@ SortingGroup:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_SortAtRoot: 0
+--- !u!1 &1174744651
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1174744653}
+  - component: {fileID: 1174744652}
+  m_Layer: 0
+  m_Name: ConfigGameSingleton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1174744652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1174744651}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a5c77d0f5c04805a6493455c6197db6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cell: {fileID: 8616923916065429660, guid: 6fb716449f0b8fb429c6f762154ffa43, type: 3}
+  backgroundBlock: {fileID: 730674053}
+  gridBlock: {fileID: 720087986}
+  width: 11
+  height: 7
+  cellSize: 1.4
+  avatarSize: 0.9
+  backgroundSize: 1.3
+  fillTime: 0.2
+  isProcessing: 0
+  obstaclesTotal: 5
+  maxListImage: 9
+  sensitivity: 5
+  minSensitivity: 0.2
+--- !u!4 &1174744653
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1174744651}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.81375206, y: -0.09970713, z: -0.063280724}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1412306159
 GameObject:
   m_ObjectHideFlags: 0
@@ -335,16 +393,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba7448139460b5a4bbd0a485f580a161, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cell: {fileID: 8616923916065429660, guid: 6fb716449f0b8fb429c6f762154ffa43, type: 3}
-  backgroundBlock: {fileID: 730674053}
-  gridBlock: {fileID: 720087986}
-  width: 11
-  height: 7
-  cellSize: 1.4
-  avatarSize: 0.9
-  backgroundSize: 1.3
-  fillTime: 0.3
-  isProcessing: 0
 --- !u!1 &2051496727
 GameObject:
   m_ObjectHideFlags: 0
@@ -522,3 +570,4 @@ SceneRoots:
   - {fileID: 1412306161}
   - {fileID: 2051496731}
   - {fileID: 2112532890}
+  - {fileID: 1174744653}

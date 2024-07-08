@@ -3,25 +3,27 @@ using UnityEngine;
 
 namespace Commands
 {
-    public class GetClampMagnitudeVectorCommand:AbstractCommand<Vector3>
+    public class GetClampMagnitudeVectorCommand : AbstractCommand<Vector3>
     {
         private Vector3 _offset;
-        private float _minSensitivity;
+        private ConfigGame _configGame;
 
-        public GetClampMagnitudeVectorCommand(Vector3 offset, float minSensitivity)
+        public GetClampMagnitudeVectorCommand(Vector3 offset)
         {
             _offset = offset;
-            _minSensitivity = minSensitivity;
         }
 
         protected override Vector3 OnExecute()
         {
-           return GetClampMagnitudeVector(_offset);
+            _configGame = ConfigGame.Instance;
+            return GetClampMagnitudeVector(_offset);
         }
+
         private Vector3 GetClampMagnitudeVector(Vector3 offset)
         {
-            if ((Mathf.Abs(offset.x) < _minSensitivity && Mathf.Abs(offset.y) < _minSensitivity) ||
-                Mathf.Abs(Mathf.Abs(offset.x) - Mathf.Abs(offset.y)) < _minSensitivity)
+            if ((Mathf.Abs(offset.x) < _configGame.MinSensitivity &&
+                 Mathf.Abs(offset.y) < _configGame.MinSensitivity) ||
+                Mathf.Abs(Mathf.Abs(offset.x) - Mathf.Abs(offset.y)) < _configGame.MinSensitivity)
             {
                 return Vector3.zero;
             }

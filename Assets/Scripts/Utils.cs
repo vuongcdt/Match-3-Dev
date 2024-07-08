@@ -68,4 +68,15 @@ public static class Utils
     {
         return new Vector2(x - (width - 1) * 0.5f, y - (height - 1) * 0.5f) * cellSize;
     }
+
+    public static Utils.GridPos GetGridPos(float x, float y, int width, int height, float cellSize)
+    {
+        var gridX = (-x / cellSize + (width - 1) * 0.5f);
+        var gridY = (-y / cellSize + (height - 1) * 0.5f);
+
+        var gridWidth = width - 1 - (int)gridX;
+        var gridHeight = height - 1 - (int)gridY;
+
+        return new Utils.GridPos(gridWidth, gridHeight);
+    }
 }

@@ -7,6 +7,7 @@ namespace Commands
     public class FillSpecialPositionCommand : AbstractCommand
     {
         private Cell[,] _grid;
+        private ConfigGame _configGame;
 
         protected override void OnExecute()
         {
@@ -20,7 +21,7 @@ namespace Commands
             {
                 if (cell.Type == CONSTANTS.CellType.None)
                 {
-                    var random = Random.Range(3, 9);
+                    var random = Random.Range(3, _configGame.MaxListImage);
                     cell.Type = (CONSTANTS.CellType)random;
                     cell.ReSetAvatar();
                 }

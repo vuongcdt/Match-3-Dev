@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using Commands;
-using Interfaces;
 using QFramework;
 using Queries;
 using UnityEngine;
@@ -10,16 +8,15 @@ public class Cell : MonoBehaviour, IController
 {
     [SerializeField] private Sprite[] sprite;
     [SerializeField] private BoxCollider2D box2D;
-    
+
     private CONSTANTS.CellType _type;
     private CONSTANTS.CellSpecialType _specialType;
     private IEnumerator _moveIE;
     private Vector3 _currentCellPos;
     private Vector3 _currentPointPos;
     private SpriteRenderer _avatar;
-    private Utils.SettingsGrid _settingsGrid;
-    private const float SENSITIVITY = 5f;
-    private const float MIN_SENSITIVITY = 0.2f;
+    private ConfigGame _configGame;
+
     private Vector3 _clampMagnitude;
     private bool _isDragged;
 
@@ -41,11 +38,7 @@ public class Cell : MonoBehaviour, IController
     private void Awake()
     {
         _avatar = this.GetComponentInChildren<SpriteRenderer>();
-    }
-
-    private void Start()
-    {
-        _settingsGrid = this.SendQuery(new GetSettingsGridQuery());
+        _configGame = ConfigGame.Instance;
     }
 
     public Cell Create(Vector2 pos, Transform transformParent, float cellSize,
@@ -91,9 +84,9 @@ public class Cell : MonoBehaviour, IController
         {
             StopCoroutine(_moveIE);
         }
-        
+
         _moveIE = MoveIE(pos, time);
-        StartCoroutine(_moveIE ?? MoveIE(pos, time));
+        StartCoroutine(_moveIE);
     }
 
     private IEnumerator MoveIE(Vector2 pos, float time)
@@ -115,6 +108,7 @@ public class Cell : MonoBehaviour, IController
         {
             return;
         }
+
         _isDragged = true;
         _currentPointPos = GetWorldPoint();
     }
@@ -130,11 +124,12 @@ public class Cell : MonoBehaviour, IController
         {
             return;
         }
+
         var offset = GetOffset();
 
-        _clampMagnitude = this.SendCommand(new GetClampMagnitudeVectorCommand(offset,MIN_SENSITIVITY));
-        var newPoint = _clampMagnitude * _settingsGrid.CellSize * 0.9f + _currentCellPos;
-        
+        _clampMagnitude = this.SendCommand(new GetClampMagnitudeVectorCommand(offset));
+        var newPoint = _clampMagnitude * _configGame.CellSize * 0.9f + _currentCellPos;
+
         this.transform.position = newPoint;
     }
 
@@ -150,21 +145,40 @@ public class Cell : MonoBehaviour, IController
         {
             return;
         }
-        
+
         _isDragged = false;
         this.transform.position = _currentCellPos;
-        var directionAxis = _clampMagnitude * SENSITIVITY;
+        var directionAxis = _clampMagnitude * _configGame.Sensitivity;
 
         directionAxis.Normalize();
 
-        var targetPos = _currentCellPos + directionAxis * _settingsGrid.CellSize;
+        var targetPos = _currentCellPos + directionAxis * _configGame.CellSize;
+        
+        // var targetGrid = Utils.GetGridPos(targetPos.x, targetPos.y, _configGame.Width, _configGame.Height,
+        //     _configGame.CellSize);
+        // var grid = this.SendQuery(new GetGridQuery());
+        // var targetCell = grid[targetGrid.x, targetGrid.y];
+        //
+        // var spriteSource = this.GetComponentInChildren<SpriteRenderer>();
+        // spriteSource.color = Color.black;
+        // var spriteTarget = targetCell.GetComponentInChildren<SpriteRenderer>();
+        // spriteTarget.color = Color.black;
+        //
+        // StartCoroutine(SetColorIE(spriteSource, spriteTarget));
+        
+        StartCoroutine(InvertedCellIE( targetPos));
+    }
 
-        StartCoroutine(InvertedCellIE(targetPos));
+    private IEnumerator SetColorIE(SpriteRenderer spriteSource, SpriteRenderer spriteTarget)
+    {
+        yield return new WaitForSeconds(_configGame.FillTime * 5);
+        spriteSource.color = Color.white;
+        spriteTarget.color = Color.white;
     }
 
     private IEnumerator InvertedCellIE(Vector3 targetPos)
     {
-        yield return new WaitForSeconds(_settingsGrid.FillTime);
+        yield return new WaitForSeconds(_configGame.FillTime);
 
         this.SendCommand(new InvertedCellCommand(_currentCellPos, targetPos));
         StartCoroutine(ProcessingCellIE());
@@ -172,7 +186,7 @@ public class Cell : MonoBehaviour, IController
 
     private IEnumerator ProcessingCellIE()
     {
-        yield return new WaitForSeconds(_settingsGrid.FillTime);
+        yield return new WaitForSeconds(_configGame.FillTime);
         this.SendCommand<MatchGridCommand>();
     }
 

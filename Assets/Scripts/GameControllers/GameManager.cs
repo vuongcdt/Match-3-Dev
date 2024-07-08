@@ -7,33 +7,21 @@ using UnityEngine;
 
 namespace GameControllers
 {
-    public class GameManager : MonoBehaviour, IController
+    public class GameManager : Singleton<GameManager>, IController
     {
-        [SerializeField] private Cell cell;
-        [SerializeField] private Transform backgroundBlock;
-        [SerializeField] private Transform gridBlock;
-        [SerializeField] private int width;
-        [SerializeField] private int height;
-        [SerializeField] private float cellSize;
-        [SerializeField] private float avatarSize;
-        [SerializeField] private float backgroundSize;
-        [SerializeField] private float fillTime;
-        [SerializeField] private bool isProcessing;
-
         private Cell[,] _grid;
-        private bool _isRevertFill;
-
+        private ConfigGame _configGame;
         private void Start()
         {
             this.RegisterEvent<ProcessingGridEvent>(e => { StartCoroutine(ProcessingGridIE()); })
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
-
-            this.SendCommand(new InitSettingsGridModelCommand(width, height, cellSize, fillTime));
-            _grid = new Cell[width, height];
+            
+            _configGame = ConfigGame.Instance;
+            _grid = new Cell[_configGame.Width, _configGame.Height];
 
             this.SendCommand(new InitGridModelCommand(_grid));
-            this.SendCommand(new RenderBackgroundGridCommand(cell, cellSize, backgroundBlock, backgroundSize));
-            this.SendCommand(new RenderCellGridCommand(cell, cellSize, gridBlock, avatarSize));
+            this.SendCommand(new RenderBackgroundGridCommand());
+            this.SendCommand(new RenderCellGridCommand());
             this.SendCommand<RenderRandomObstaclesCommand>();
 
             StartCoroutine(ProcessingGridIE());
@@ -43,15 +31,15 @@ namespace GameControllers
         {
             do
             {
-                this.SendQuery(new SetIsProcessingQuery(false));
-                yield return new WaitForSeconds(fillTime);
+                _configGame.IsProcessing = false;
+                yield return new WaitForSeconds(_configGame.FillTime);
 
-                this.SendCommand(new AddCellToGridCommand(cell, avatarSize, gridBlock));
+                this.SendCommand(new AddCellToGridCommand());
 
                 StartCoroutine(FillIE());
+                Debug.Log($"IsProcessing {_configGame.IsProcessing}");
 
-                isProcessing = this.SendQuery(new GetIsProcessingQuery());
-            } while (isProcessing);
+            } while (_configGame.IsProcessing);
 
             // this.SendCommand(new FillSpecialPositionCommand());
 
@@ -60,22 +48,22 @@ namespace GameControllers
 
         private IEnumerator MatchGridIE()
         {
-            yield return new WaitForSeconds(fillTime);
+            yield return new WaitForSeconds(_configGame.FillTime);
             this.SendCommand<MatchGridCommand>();
         }
 
         private IEnumerator FillIE()
         {
-            for (int y = height - 1; y > 0; y--)
+            for (int y = _configGame.Height - 1; y > 0; y--)
             {
-                for (int x = 0; x < width; x++)
+                for (int x = 0; x < _configGame.Width; x++)
                 {
                     this.SendCommand(new CheckFillCommand(x, y));
                 }
 
-                _isRevertFill = this.SendQuery(new SetIsRevertFillQuery(!_isRevertFill));
+                _configGame.IsRevertFill = !_configGame.IsRevertFill;
 
-                yield return new WaitForSeconds(fillTime * 2f);
+                yield return new WaitForSeconds(_configGame.FillTime * 2f);
             }
         }
 

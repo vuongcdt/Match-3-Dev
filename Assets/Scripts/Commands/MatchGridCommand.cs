@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Events;
 using QFramework;
 using Queries;
@@ -93,6 +91,7 @@ namespace Commands
 
             if (cellsList.Count > 0)
             {
+                Debug.Log($"cellsList.Count {cellsList.Count}");
                 this.SendEvent<ProcessingGridEvent>();
             }
         }
