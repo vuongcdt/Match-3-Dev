@@ -46,7 +46,6 @@ namespace Commands
                 }
 
                 _grid[obstacle.x, obstacle.y].Type = CONSTANTS.CellType.Obstacle;
-                // _grid[obstacle.x, obstacle.y].ReSetAvatar();
             }
         }
     }

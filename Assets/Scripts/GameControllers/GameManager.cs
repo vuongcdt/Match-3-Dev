@@ -51,7 +51,7 @@ namespace GameControllers
 
             // var matchGridCommandIE = this.SendCommand(new MatchGridCommandIE());
             // StartCoroutine(matchGridCommandIE);
-            this.SendCommand(new MatchGridCommandIE());
+            this.SendCommand(new MatchGridCommand());
         }
 
         public void OnRestartClick()

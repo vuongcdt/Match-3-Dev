@@ -17,6 +17,7 @@ public class Cell : MonoBehaviour, IController
 
     private Vector3 _clampMagnitude;
     private bool _isDragged;
+    private Utils.GridPos _cellDraggedGridPos;
 
     public Utils.GridPos GridPosition
     {
@@ -65,9 +66,8 @@ public class Cell : MonoBehaviour, IController
     private void SetWorldPosition(Vector3 value)
     {
         var gridPos = GetGridPos(value);
-        var configGame = ConfigGame.Instance;
 
-        if (gridPos.x >= 0 && gridPos.x < configGame.Width && gridPos.y >= 0 && gridPos.y < configGame.Height)
+        if (IsPositionInGrid(gridPos))
         {
             _gridPos = gridPos;
         }
@@ -156,7 +156,7 @@ public class Cell : MonoBehaviour, IController
         }
 
         _configGame.IsDragged = true;
-        _worldPos = GetWorldPoint();
+        _cellDraggedGridPos = _gridPos;
     }
 
     private Vector3 GetWorldPoint()
@@ -196,33 +196,28 @@ public class Cell : MonoBehaviour, IController
         var directionAxis = _clampMagnitude * _configGame.Sensitivity;
 
         directionAxis.Normalize();
+        var targetGridPos = new Utils.GridPos((int)(_gridPos.x + directionAxis.x), (int)(_gridPos.y + directionAxis.y));
 
-        var targetPos = _worldPos + directionAxis * _configGame.CellSize;
-
-        var targetGrid = Utils.GetGridPos(targetPos.x, targetPos.y, _configGame.Width, _configGame.Height,
-            _configGame.CellSize);
-        var grid = this.SendQuery(new GetGridQuery());
-        var targetCell = grid[targetGrid.x, targetGrid.y];
-
-        var spriteSource = this.GetComponentInChildren<SpriteRenderer>();
-        spriteSource.color = Color.black;
-        var spriteTarget = targetCell.GetComponentInChildren<SpriteRenderer>();
-        spriteTarget.color = Color.black;
-
-        StartCoroutine(SetColorIE(spriteSource, spriteTarget));
+        if (IsPositionInGrid(targetGridPos))
+        {
+            StartCoroutine(InvertedCell(targetGridPos));
+        }
     }
 
-    private IEnumerator SetColorIE(SpriteRenderer spriteSource, SpriteRenderer spriteTarget)
+    private bool IsPositionInGrid(Utils.GridPos targetGridPos)
     {
-        yield return new WaitForSeconds(_configGame.FillTime * 3);
-        spriteSource.color = Color.white;
-        spriteTarget.color = Color.white;
+        var configGame = ConfigGame.Instance;
+
+        return targetGridPos.x >= 0 && targetGridPos.x < configGame.Width &&
+               targetGridPos.y >= 0 && targetGridPos.y < configGame.Height;
     }
 
-    private void InvertedCell(Vector3 targetPos)
+    private IEnumerator InvertedCell(Utils.GridPos targetGridPos)
     {
-        this.SendCommand(new InvertedCellCommand(_worldPos, targetPos));
-        this.SendCommand(new MatchGridCommandIE());
+        this.SendCommand(new InvertedCellCommand(_gridPos, targetGridPos));
+        yield return new WaitForSeconds(_configGame.FillTime);
+        
+        this.SendCommand(new MatchGridCommand());
         _configGame.IsDragged = false;
     }
 

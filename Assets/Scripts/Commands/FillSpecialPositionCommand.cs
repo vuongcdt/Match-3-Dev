@@ -23,7 +23,6 @@ namespace Commands
                 {
                     var random = Random.Range(3, _configGame.MaxListImage);
                     cell.Type = (CONSTANTS.CellType)random;
-                    // cell.ReSetAvatar();
                 }
             }
         }

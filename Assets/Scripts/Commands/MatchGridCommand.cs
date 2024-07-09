@@ -7,7 +7,7 @@ using Random = UnityEngine.Random;
 
 namespace Commands
 {
-    public class MatchGridCommandIE : AbstractCommand
+    public class MatchGridCommand : AbstractCommand
     {
         private Cell[,] _grid;
         private ConfigGame _configGame;
