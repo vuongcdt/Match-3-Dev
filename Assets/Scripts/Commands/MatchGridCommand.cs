@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Events;
 using GameControllers;
 using QFramework;
@@ -9,19 +8,22 @@ using Random = UnityEngine.Random;
 
 namespace Commands
 {
-    public class MatchGridCommand : AbstractCommand
+    public class MatchGridCommand : AbstractCommand<bool>
     {
         private Cell[,] _grid;
         private static readonly int RowAnimator = Animator.StringToHash("Row");
         private static readonly int ColumnAnimator = Animator.StringToHash("Column");
 
-        protected override void OnExecute()
+        protected override bool OnExecute()
         {
             _grid = this.SendQuery(new GetGridQuery());
             if (MatchGrid())
             {
                 this.SendEvent<ProcessingGridEvent>();
+                return true;
             }
+
+            return false;
         }
 
         private bool MatchGrid()
@@ -103,7 +105,7 @@ namespace Commands
             for (int newY = y + 1; newY < _grid.GetLength(1); newY++)
             {
                 var upCell = _grid[x, newY];
-                if (GetValue(currentCell, upCell, cells)) break;
+                if (IsCanMerge(currentCell, upCell, cells)) break;
             }
 
             if (cells.Count >= 2)
@@ -121,7 +123,7 @@ namespace Commands
             for (int newX = x + 1; newX < _grid.GetLength(0); newX++)
             {
                 var upCell = _grid[newX, y];
-                if (GetValue(currentCell, upCell, cells)) break;
+                if (IsCanMerge(currentCell, upCell, cells)) break;
             }
 
             if (cells.Count >= 2)
@@ -133,7 +135,7 @@ namespace Commands
             return cells.Count + x;
         }
 
-        private static bool GetValue(Cell currentCell, Cell upCell, List<Cell> cells)
+        private static bool IsCanMerge(Cell currentCell, Cell upCell, List<Cell> cells)
         {
             var isNotObstacle = currentCell.Type != CONSTANTS.CellType.Obstacle;
             var isNotNone = currentCell.Type != CONSTANTS.CellType.None;

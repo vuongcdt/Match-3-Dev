@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Commands;
 using QFramework;
+using Queries;
 using UnityEngine;
 
 namespace GameControllers
@@ -207,6 +208,11 @@ namespace GameControllers
             directionAxis.Normalize();
             var targetGridPos =
                 new Utils.GridPos((int)(_gridPos.x + directionAxis.x), (int)(_gridPos.y + directionAxis.y));
+            
+            if (IsNotInverted(targetGridPos))
+            {
+                return;
+            }
 
             if (IsPositionInGrid(targetGridPos))
             {
@@ -216,11 +222,37 @@ namespace GameControllers
             configGame.IsDragged = false;
         }
 
+        private bool IsNotInverted(Utils.GridPos targetGridPos)
+        {
+            var grid = this.SendQuery(new GetGridQuery());
+
+            var currentCell = grid[_gridPos.x, _gridPos.y];
+            var targetCell = grid[targetGridPos.x, targetGridPos.y];
+
+            var isObstacle = currentCell.Type == CONSTANTS.CellType.Obstacle ||
+                             targetCell.Type == CONSTANTS.CellType.Obstacle;
+            var isEmpty = currentCell.Type == CONSTANTS.CellType.None || targetCell.Type == CONSTANTS.CellType.None;
+
+            if (isObstacle || isEmpty)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         private IEnumerator InvertedAndMatch(Utils.GridPos targetGridPos)
         {
-            this.SendCommand(new InvertedCellCommand(_gridPos, targetGridPos));
+            var sourceGridPos = new Utils.GridPos(_gridPos.x, _gridPos.y);
+            this.SendCommand(new InvertedCellCommand(sourceGridPos, targetGridPos));
             yield return new WaitForSeconds(ConfigGame.Instance.FillTime * 2);
-            this.SendCommand(new MatchGridCommand());
+
+            var isMatch = this.SendCommand(new MatchGridCommand());
+            if (!isMatch)
+            {
+                this.SendCommand(new InvertedCellCommand(targetGridPos, sourceGridPos));
+                yield return new WaitForSeconds(ConfigGame.Instance.FillTime * 2);
+            }
         }
 
         private bool IsPositionInGrid(Utils.GridPos targetGridPos)

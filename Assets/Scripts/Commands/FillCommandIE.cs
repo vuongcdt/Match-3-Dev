@@ -40,7 +40,7 @@ namespace Commands
             }
             else
             {
-                this.SendCommand<MatchGridCommand>();
+                this.SendCommand(new MatchGridCommand());
             }
         }
 
