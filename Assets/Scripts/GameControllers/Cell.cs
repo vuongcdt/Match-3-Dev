@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using Commands;
 using QFramework;
-using Queries;
 using UnityEngine;
 
 public class Cell : MonoBehaviour, IController
@@ -13,11 +12,9 @@ public class Cell : MonoBehaviour, IController
     private IEnumerator _moveIE;
     private Utils.GridPos _gridPos;
     private Vector3 _worldPos;
-    private ConfigGame _configGame;
 
     private Vector3 _clampMagnitude;
     private bool _isDragged;
-    private Utils.GridPos _cellDraggedGridPos;
 
     public Utils.GridPos GridPosition
     {
@@ -56,11 +53,6 @@ public class Cell : MonoBehaviour, IController
             _type = value;
             SetAvatar(value);
         }
-    }
-
-    private void Awake()
-    {
-        _configGame = ConfigGame.Instance;
     }
 
     private void SetWorldPosition(Vector3 value)
@@ -150,13 +142,13 @@ public class Cell : MonoBehaviour, IController
 
     private void OnMouseDown()
     {
-        if (_configGame.IsDragged)
+        var configGame = ConfigGame.Instance;
+        if (configGame.IsDragged)
         {
             return;
         }
 
-        _configGame.IsDragged = true;
-        _cellDraggedGridPos = _gridPos;
+        configGame.IsDragged = true;
     }
 
     private Vector3 GetWorldPoint()
@@ -166,7 +158,8 @@ public class Cell : MonoBehaviour, IController
 
     private void OnMouseDrag()
     {
-        if (!_configGame.IsDragged)
+        var configGame = ConfigGame.Instance;
+        if (!configGame.IsDragged)
         {
             return;
         }
@@ -174,7 +167,7 @@ public class Cell : MonoBehaviour, IController
         var offset = GetOffset();
 
         _clampMagnitude = this.SendCommand(new GetClampMagnitudeVectorCommand(offset));
-        var newPoint = _clampMagnitude * _configGame.CellSize * 0.9f + _worldPos;
+        var newPoint = _clampMagnitude * configGame.CellSize * 0.9f + _worldPos;
 
         this.transform.position = newPoint;
     }
@@ -187,21 +180,31 @@ public class Cell : MonoBehaviour, IController
 
     private void OnMouseUp()
     {
-        if (!_configGame.IsDragged)
+        var configGame = ConfigGame.Instance;
+        if (!configGame.IsDragged)
         {
             return;
         }
 
         this.transform.position = _worldPos;
-        var directionAxis = _clampMagnitude * _configGame.Sensitivity;
+        var directionAxis = _clampMagnitude * configGame.Sensitivity;
 
         directionAxis.Normalize();
         var targetGridPos = new Utils.GridPos((int)(_gridPos.x + directionAxis.x), (int)(_gridPos.y + directionAxis.y));
 
         if (IsPositionInGrid(targetGridPos))
         {
-            StartCoroutine(InvertedCell(targetGridPos));
+            StartCoroutine(InvertedAndMatch(targetGridPos));
         }
+
+        configGame.IsDragged = false;
+    }
+
+    private IEnumerator InvertedAndMatch(Utils.GridPos targetGridPos)
+    {
+        this.SendCommand(new InvertedCellCommand(_gridPos, targetGridPos));
+        yield return new WaitForSeconds(ConfigGame.Instance.FillTime * 2);
+        this.SendCommand(new MatchGridCommand());
     }
 
     private bool IsPositionInGrid(Utils.GridPos targetGridPos)
@@ -210,15 +213,6 @@ public class Cell : MonoBehaviour, IController
 
         return targetGridPos.x >= 0 && targetGridPos.x < configGame.Width &&
                targetGridPos.y >= 0 && targetGridPos.y < configGame.Height;
-    }
-
-    private IEnumerator InvertedCell(Utils.GridPos targetGridPos)
-    {
-        this.SendCommand(new InvertedCellCommand(_gridPos, targetGridPos));
-        yield return new WaitForSeconds(_configGame.FillTime);
-        
-        this.SendCommand(new MatchGridCommand());
-        _configGame.IsDragged = false;
     }
 
     public IArchitecture GetArchitecture()

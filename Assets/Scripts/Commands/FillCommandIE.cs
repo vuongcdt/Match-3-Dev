@@ -8,40 +8,40 @@ namespace Commands
     public class FillCommandIE : AbstractCommand<IEnumerator>
     {
         private Cell[,] _grid;
-        private ConfigGame _configGame;
 
         protected override IEnumerator OnExecute()
         {
             _grid = this.SendQuery(new GetGridQuery());
-            _configGame = ConfigGame.Instance;
 
             return FillIE();
         }
 
         private IEnumerator FillIE()
         {
-            for (int y = _configGame.Height - 1; y > 0; y--)
+            var configGame = ConfigGame.Instance;
+            for (int y = configGame.Height - 1; y > 0; y--)
             {
-                for (int x = 0; x < _configGame.Width; x++)
+                for (int x = 0; x < configGame.Width; x++)
                 {
                     CheckFill(x, y);
                 }
 
-                _configGame.IsRevertFill = !_configGame.IsRevertFill;
+                configGame.IsRevertFill = !configGame.IsRevertFill;
 
-                yield return new WaitForSeconds(_configGame.FillTime);
+                yield return new WaitForSeconds(configGame.FillTime);
             }
         }
 
         private void CheckFill(int x, int y)
         {
-            int[] checkArr = _configGame.IsRevertFill
+            var configGame = ConfigGame.Instance;
+            int[] checkArr = configGame.IsRevertFill
                 ? new[] { 0, 1, -1 }
                 : new[] { 0, -1, 1 };
 
             foreach (var index in checkArr)
             {
-                if (x + index < 0 || x + index >= _configGame.Width)
+                if (x + index < 0 || x + index >= configGame.Width)
                 {
                     continue;
                 }
@@ -54,7 +54,7 @@ namespace Commands
                 var isTargetEmpty = target.Type == CONSTANTS.CellType.None;
                 var isNextToObstacle = _grid[x + index, y].Type == CONSTANTS.CellType.Obstacle;
 
-                var isSpecial = y + 1 < _configGame.Height &&
+                var isSpecial = y + 1 < configGame.Height &&
                                 // _grid[x + index, y + 1].Type == CONSTANTS.CellType.Obstacle &&
                                 _grid[x, y + 1].Type == CONSTANTS.CellType.Obstacle;
 
@@ -80,7 +80,7 @@ namespace Commands
 
         private void MoveToNextTo(Cell cellSource, Cell cellTarget, int x, int y, int index)
         {
-            _configGame.IsProcessing = true;
+            ConfigGame.Instance.IsProcessing = true;
 
             cellSource.GridPosition = new Utils.GridPos(x + index, y);
             _grid[x + index, y] = cellSource;
@@ -91,7 +91,7 @@ namespace Commands
 
         private void MoveToBelow(Cell cellSource, Cell cellTarget, int x, int y, int index = 0)
         {
-            _configGame.IsProcessing = true;
+            ConfigGame.Instance.IsProcessing = true;
 
             cellSource.GridPosition = new Utils.GridPos(x + index, y - 1);
             _grid[x + index, y - 1] = cellSource;

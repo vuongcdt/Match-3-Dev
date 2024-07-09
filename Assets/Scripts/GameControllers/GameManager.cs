@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace GameControllers
 {
-    public class GameManager : Singleton<GameManager>, IController
+    public class GameManager : MonoBehaviour, IController
     {
         private Cell[,] _grid;
         private ConfigGame _configGame;
@@ -36,21 +36,16 @@ namespace GameControllers
 
         private IEnumerator ProcessingGridIE()
         {
+            var configGame = ConfigGame.Instance;
             do
             {
-                _configGame.IsProcessing = false;
+                configGame.IsProcessing = false;
                 this.SendCommand(new AddCellToGridCommand());
 
-                var fillCommandIE = this.SendCommand(new FillCommandIE());
+                yield return new WaitForSeconds(configGame.FillTime);
+                StartCoroutine(this.SendCommand(new FillCommandIE()));
+            } while (configGame.IsProcessing);
 
-                StartCoroutine(fillCommandIE);
-                yield return new WaitForSeconds(_configGame.FillTime);
-            } while (_configGame.IsProcessing);
-
-            // this.SendCommand(new FillSpecialPositionCommand());
-
-            // var matchGridCommandIE = this.SendCommand(new MatchGridCommandIE());
-            // StartCoroutine(matchGridCommandIE);
             this.SendCommand(new MatchGridCommand());
         }
 

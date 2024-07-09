@@ -1,15 +1,12 @@
-﻿using Interfaces;
-using QFramework;
+﻿using QFramework;
 using Queries;
 
 namespace Commands
 {
-    public class InvertedCellCommand : AbstractCommand, IGameCommand
+    public class InvertedCellCommand : AbstractCommand
     {
         private Utils.GridPos _sourcePos;
         private Utils.GridPos _targetPos;
-
-        private ConfigGame _configGame;
 
         public InvertedCellCommand(Utils.GridPos sourcePos, Utils.GridPos targetPos)
         {
@@ -19,14 +16,13 @@ namespace Commands
 
         protected override void OnExecute()
         {
-            _configGame = ConfigGame.Instance;
             InvertedCell(_sourcePos, _targetPos);
         }
 
         private void InvertedCell(Utils.GridPos sourceGridPos, Utils.GridPos targetGridPos)
         {
             var grid = this.SendQuery(new GetGridQuery());
-            
+
             var sourceCell = grid[sourceGridPos.x, sourceGridPos.y];
             var targetCell = grid[targetGridPos.x, targetGridPos.y];
 

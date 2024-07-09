@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using Events;
 using QFramework;
 using Queries;
@@ -10,20 +11,19 @@ namespace Commands
     public class MatchGridCommand : AbstractCommand
     {
         private Cell[,] _grid;
-        private ConfigGame _configGame;
         private static readonly int RowAnimator = Animator.StringToHash("Row");
         private static readonly int ColumnAnimator = Animator.StringToHash("Column");
 
         protected override void OnExecute()
         {
             _grid = this.SendQuery(new GetGridQuery());
-            _configGame = ConfigGame.Instance;
-
-            // yield return new WaitForSeconds(_configGame.FillTime * 2);
-            MatchGrid();
+            if (MatchGrid())
+            {
+                this.SendEvent<ProcessingGridEvent>();
+            }
         }
 
-        private void MatchGrid()
+        private bool MatchGrid()
         {
             List<Utils.MatchCell> cellsList = new();
             for (int x = 0; x < _grid.GetLength(0); x++)
@@ -56,8 +56,44 @@ namespace Commands
                 }
             }
 
-            MergeCells(cellsList);
-            this.SendEvent<ProcessingGridEvent>();
+            return MergeCells(cellsList);
+        }
+
+        private bool MergeCells(List<Utils.MatchCell> cellsList)
+        {
+            cellsList.Sort((listA, listB) => listB.CellList.Count - listA.CellList.Count);
+            foreach (var cells in cellsList)
+            {
+                var cellList = cells.CellList;
+                var isActiveAll = IsActiveAll(cellList);
+
+                if (!isActiveAll)
+                {
+                    continue;
+                }
+
+                var random = Random.Range(0, cellList.Count);
+                for (var index = 0; index < cellList.Count; index++)
+                {
+                    if (index == random && cellList.Count == 4)
+                    {
+                        // SetTriggerAndSpecialType(cells, index);
+                        continue;
+                    }
+
+                    if (index == random && cellList.Count > 5)
+                    {
+                        cellList[index].SpecialType = CONSTANTS.CellSpecialType.Color;
+                        cellList[index].Type = CONSTANTS.CellType.Rainbow;
+                        continue;
+                    }
+
+                    var cellMerge = cellList[index];
+                    cellMerge.DeActive();
+                }
+            }
+
+            return cellsList.Count > 0;
         }
 
         private int MatchCellX(int x, int y, Cell currentCell, List<Utils.MatchCell> cellsList)
@@ -111,41 +147,6 @@ namespace Commands
             }
 
             return false;
-        }
-
-        private void MergeCells(List<Utils.MatchCell> cellsList)
-        {
-            cellsList.Sort((listA, listB) => listB.CellList.Count - listA.CellList.Count);
-            foreach (var cells in cellsList)
-            {
-                var cellList = cells.CellList;
-                var isActiveAll = IsActiveAll(cellList);
-
-                if (!isActiveAll)
-                {
-                    continue;
-                }
-
-                var random = Random.Range(0, cellList.Count);
-                for (var index = 0; index < cellList.Count; index++)
-                {
-                    if (index == random && cellList.Count == 4)
-                    {
-                        // SetTriggerAndSpecialType(cells, index);
-                        continue;
-                    }
-
-                    if (index == random && cellList.Count > 5)
-                    {
-                        cellList[index].SpecialType = CONSTANTS.CellSpecialType.Color;
-                        cellList[index].Type = CONSTANTS.CellType.Rainbow;
-                        continue;
-                    }
-
-                    var cellMerge = cellList[index];
-                    cellMerge.DeActive();
-                }
-            }
         }
 
         private bool IsActiveAll(List<Cell> cells)
