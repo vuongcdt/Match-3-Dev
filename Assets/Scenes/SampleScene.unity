@@ -300,7 +300,7 @@ GameObject:
   - component: {fileID: 1174744653}
   - component: {fileID: 1174744652}
   m_Layer: 0
-  m_Name: ConfigGameSingleton
+  m_Name: ConfigGame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -77,7 +77,7 @@ namespace Commands
                 {
                     if (index == random && cellList.Count == 4)
                     {
-                        // SetTriggerAndSpecialType(cells, index);
+                        SetTriggerAndSpecialType(cells, index);
                         continue;
                     }
 

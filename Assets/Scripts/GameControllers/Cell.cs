@@ -137,6 +137,7 @@ public class Cell : MonoBehaviour, IController
         }
 
         _worldPos = pos;
+        _gridPos = GetGridPos(pos);
         this.transform.position = pos;
     }
 

@@ -13,7 +13,7 @@ namespace GameControllers
 
         private void Start()
         {
-            this.RegisterEvent<ProcessingGridEvent>(e => { StartCoroutine(ProcessingGridIE()); })
+            this.RegisterEvent<ProcessingGridEvent>(e => { ProcessingGrid(); })
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
 
             _configGame = ConfigGame.Instance;
@@ -31,22 +31,13 @@ namespace GameControllers
             this.SendCommand(new RenderCellGridCommand());
             this.SendCommand<RenderRandomObstaclesCommand>();
 
-            StartCoroutine(ProcessingGridIE());
+            ProcessingGrid();
         }
 
-        private IEnumerator ProcessingGridIE()
+        private void ProcessingGrid()
         {
-            var configGame = ConfigGame.Instance;
-            do
-            {
-                configGame.IsProcessing = false;
-                this.SendCommand(new AddCellToGridCommand());
-
-                yield return new WaitForSeconds(configGame.FillTime);
-                StartCoroutine(this.SendCommand(new FillCommandIE()));
-            } while (configGame.IsProcessing);
-
-            this.SendCommand(new MatchGridCommand());
+            this.SendCommand(new AddCellToGridCommand());
+            StartCoroutine(this.SendCommand(new FillCommandIE()));
         }
 
         public void OnRestartClick()
