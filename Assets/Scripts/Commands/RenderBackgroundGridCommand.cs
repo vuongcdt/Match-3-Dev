@@ -21,12 +21,11 @@ namespace Commands
             {
                 for (int y = 0; y < _grid.GetLength(1); y++)
                 {
-                    var background = _configGame.Cell.Create(
-                        Utils.GetPositionCell(x, y, _configGame.Width, _configGame.Height, _configGame.CellSize),
+                    _configGame.Cell.Create(
+                        new Utils.GridPos(x, y),
                         _configGame.BackgroundBlock,
                         _configGame.BackgroundSize,
                         CONSTANTS.CellType.Background);
-                    // background.name = nameof(CONSTANTS.CellType.Background);
                 }
             }
         }

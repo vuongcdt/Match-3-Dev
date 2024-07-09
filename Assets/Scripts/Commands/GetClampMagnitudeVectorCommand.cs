@@ -22,8 +22,9 @@ namespace Commands
         private Vector3 GetClampMagnitudeVector(Vector3 offset)
         {
             if ((Mathf.Abs(offset.x) < _configGame.MinSensitivity &&
-                 Mathf.Abs(offset.y) < _configGame.MinSensitivity) ||
-                Mathf.Abs(Mathf.Abs(offset.x) - Mathf.Abs(offset.y)) < _configGame.MinSensitivity)
+                 Mathf.Abs(offset.y) < _configGame.MinSensitivity) 
+                // || Mathf.Abs(Mathf.Abs(offset.x) - Mathf.Abs(offset.y)) < _configGame.MinSensitivity
+                )
             {
                 return Vector3.zero;
             }

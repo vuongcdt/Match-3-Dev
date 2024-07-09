@@ -22,11 +22,13 @@ namespace Commands
                 for (int y = 0; y < _grid.GetLength(1); y++)
                 {
                     _configGame.Cell.Type = CONSTANTS.CellType.None;
+                    
                     var newCell = _configGame.Cell.Create(
-                        Utils.GetPositionCell(x, y, _configGame.Width, _configGame.Height, _configGame.CellSize),
+                        new Utils.GridPos(x,y),
                         _configGame.GridBlock,
                         _configGame.AvatarSize,
                         CONSTANTS.CellType.None);
+                    
                     _grid[x, y] = newCell;
                 }
             }

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
+using UnityEditor;
 using UnityEngine;
 
 public static class Utils
@@ -17,22 +20,11 @@ public static class Utils
             this.y = y;
         }
 
-        public GridPos(Vector2 pos) : this()
-        {
-            this.x = (int)pos.x;
-            this.y = (int)pos.y;
-        }
-
         public GridPos(int x, int y, CONSTANTS.CellType type)
         {
             this.x = x;
             this.y = y;
             this.type = type;
-        }
-
-        public Vector2 ToVector2()
-        {
-            return new Vector2(x, y);
         }
     }
 
@@ -48,28 +40,12 @@ public static class Utils
         }
     }
 
-    public struct SettingsGrid
-    {
-        public int Width;
-        public int Height;
-        public float CellSize;
-        public float FillTime;
-
-        public SettingsGrid(int width, int height, float cellSize, float fillTime) : this()
-        {
-            Width = width;
-            Height = height;
-            CellSize = cellSize;
-            FillTime = fillTime;
-        }
-    }
-
-    public static Vector2 GetPositionCell(int x, int y, int width, int height, float cellSize)
+    public static Vector2 GetWorldPosition(int x, int y, int width, int height, float cellSize)
     {
         return new Vector2(x - (width - 1) * 0.5f, y - (height - 1) * 0.5f) * cellSize;
     }
 
-    public static Utils.GridPos GetGridPos(float x, float y, int width, int height, float cellSize)
+    public static GridPos GetGridPos(float x, float y, int width, int height, float cellSize)
     {
         var gridX = (-x / cellSize + (width - 1) * 0.5f);
         var gridY = (-y / cellSize + (height - 1) * 0.5f);
@@ -77,6 +53,15 @@ public static class Utils
         var gridWidth = width - 1 - (int)gridX;
         var gridHeight = height - 1 - (int)gridY;
 
-        return new Utils.GridPos(gridWidth, gridHeight);
+        return new GridPos(gridWidth, gridHeight);
+    }
+    
+    public static IEnumerator ClearConsoleIE()
+    {
+        yield return new WaitForSeconds(3);
+        var assembly = Assembly.GetAssembly(typeof(SceneView));
+        var type = assembly.GetType("UnityEditor.LogEntries");
+        var method = type.GetMethod("Clear");
+        method.Invoke(new object(), null);
     }
 }

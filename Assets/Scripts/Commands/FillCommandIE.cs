@@ -28,7 +28,7 @@ namespace Commands
                 }
 
                 _configGame.IsRevertFill = !_configGame.IsRevertFill;
-                
+
                 yield return new WaitForSeconds(_configGame.FillTime);
             }
         }
@@ -82,28 +82,22 @@ namespace Commands
         {
             _configGame.IsProcessing = true;
 
-            cellSource.Move(
-                Utils.GetPositionCell(x + index, y, _configGame.Width, _configGame.Height, _configGame.CellSize),
-                _configGame.FillTime);
-
+            cellSource.GridPosition = new Utils.GridPos(x + index, y);
             _grid[x + index, y] = cellSource;
             _grid[x, y] = cellTarget;
 
-            cellTarget.gameObject.SetActive(false);
+            cellTarget.DeActive();
         }
 
         private void MoveToBelow(Cell cellSource, Cell cellTarget, int x, int y, int index = 0)
         {
             _configGame.IsProcessing = true;
 
-            cellSource.Move(
-                Utils.GetPositionCell(x + index, y - 1, _configGame.Width, _configGame.Height, _configGame.CellSize),
-                _configGame.FillTime);
-
+            cellSource.GridPosition = new Utils.GridPos(x + index, y - 1);
             _grid[x + index, y - 1] = cellSource;
             _grid[x, y] = cellTarget;
 
-            cellTarget.gameObject.SetActive(false);
+            cellTarget.DeActive();
         }
     }
 }

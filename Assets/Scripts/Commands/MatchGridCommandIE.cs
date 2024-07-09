@@ -1,27 +1,25 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Events;
 using QFramework;
 using Queries;
 using UnityEngine;
-using uPools;
 using Random = UnityEngine.Random;
 
 namespace Commands
 {
-    public class MatchGridCommandIE : AbstractCommand<IEnumerator>
+    public class MatchGridCommandIE : AbstractCommand
     {
         private Cell[,] _grid;
         private ConfigGame _configGame;
         private static readonly int RowAnimator = Animator.StringToHash("Row");
         private static readonly int ColumnAnimator = Animator.StringToHash("Column");
 
-        protected override IEnumerator OnExecute()
+        protected override void OnExecute()
         {
             _grid = this.SendQuery(new GetGridQuery());
             _configGame = ConfigGame.Instance;
 
-            yield return new WaitForSeconds(_configGame.FillTime * 2);
+            // yield return new WaitForSeconds(_configGame.FillTime * 2);
             MatchGrid();
         }
 
@@ -60,20 +58,6 @@ namespace Commands
 
             MergeCells(cellsList);
             this.SendEvent<ProcessingGridEvent>();
-        }
-
-
-        private bool IsActiveAll(List<Cell> cells)
-        {
-            foreach (var cellMerge in cells)
-            {
-                if (!cellMerge.gameObject.activeSelf)
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         private int MatchCellX(int x, int y, Cell currentCell, List<Utils.MatchCell> cellsList)
@@ -136,6 +120,7 @@ namespace Commands
             {
                 var cellList = cells.CellList;
                 var isActiveAll = IsActiveAll(cellList);
+
                 if (!isActiveAll)
                 {
                     continue;
@@ -161,6 +146,19 @@ namespace Commands
                     cellMerge.DeActive();
                 }
             }
+        }
+
+        private bool IsActiveAll(List<Cell> cells)
+        {
+            foreach (var cellMerge in cells)
+            {
+                if (!cellMerge.gameObject.activeSelf)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private static void SetTriggerAndSpecialType(Utils.MatchCell matchCell, int index)

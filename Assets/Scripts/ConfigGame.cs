@@ -20,6 +20,21 @@ public class ConfigGame : Singleton<ConfigGame>
     [SerializeField] private float sensitivity;
     [SerializeField] private float minSensitivity;
     [SerializeField] private bool isRevertFill;
+    [SerializeField] private Sprite[] sprites;
+
+    private bool _isDragged;
+
+    public Sprite[] Sprites
+    {
+        get => sprites;
+        set => sprites = value;
+    }
+
+    public bool IsDragged
+    {
+        get => _isDragged;
+        set => _isDragged = value;
+    }
 
     private Cell[,] _grid;
 

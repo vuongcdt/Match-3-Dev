@@ -22,20 +22,19 @@ namespace Commands
             for (int x = 0; x < _configGame.Width; x++)
             {
                 var cellBelow = _grid[x, _configGame.Height - 1];
+                
                 if (cellBelow.Type == CONSTANTS.CellType.None)
                 {
                     var random = Random.Range(3, _configGame.MaxListImage);
                     _configGame.IsProcessing = true;
+                    
                     var newCell = _configGame.Cell.Create(
-                        Utils.GetPositionCell(x, _configGame.Height, _configGame.Width, _configGame.Height,
-                            _configGame.CellSize),
+                        new Utils.GridPos(x, _configGame.Height),
                         _configGame.GridBlock,
                         _configGame.AvatarSize,
                         (CONSTANTS.CellType)random);
 
-                    newCell.Move(
-                        Utils.GetPositionCell(x, _configGame.Height - 1, _configGame.Width, _configGame.Height,
-                            _configGame.CellSize), _configGame.FillTime);
+                    newCell.GridPosition = new Utils.GridPos(x, _configGame.Height - 1);
                     _grid[x, _configGame.Height - 1] = newCell;
                 }
             }

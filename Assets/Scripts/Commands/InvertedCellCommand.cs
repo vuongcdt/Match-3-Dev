@@ -38,8 +38,8 @@ namespace Commands
                 return;
             }
 
-            sourceCell.Move(targetPos, 0.1f);
-            targetCell.Move(sourcePos, 0.1f);
+            sourceCell.WorldPosition = targetPos;
+            targetCell.WorldPosition = sourcePos;
 
             grid[sourceGridPos.x, sourceGridPos.y] = targetCell;
             grid[targetGridPos.x, targetGridPos.y] = sourceCell;

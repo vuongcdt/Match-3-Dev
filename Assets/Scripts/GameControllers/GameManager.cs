@@ -49,8 +49,9 @@ namespace GameControllers
 
             // this.SendCommand(new FillSpecialPositionCommand());
 
-            var matchGridCommandIE = this.SendCommand(new MatchGridCommandIE());
-            StartCoroutine(matchGridCommandIE);
+            // var matchGridCommandIE = this.SendCommand(new MatchGridCommandIE());
+            // StartCoroutine(matchGridCommandIE);
+            this.SendCommand(new MatchGridCommandIE());
         }
 
         public void OnRestartClick()
