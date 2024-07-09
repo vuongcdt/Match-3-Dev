@@ -20,10 +20,30 @@ namespace Commands
 
         private void RenderRandomObstacles()
         {
+            var obstacleGridPosList = RandomObstacleGridPosList();
+
+            foreach (var gridPos in obstacleGridPosList)
+            {
+                if (gridPos.x < 0 || gridPos.x > _configGame.Width - 1 || gridPos.y < 0 ||
+                    gridPos.y > _configGame.Height - 1)
+                {
+                    continue;
+                }
+
+                _grid[gridPos.x, gridPos.y].Type = CONSTANTS.CellType.Obstacle;
+                _grid[gridPos.x, gridPos.y].name = CONSTANTS.CellType.Obstacle.ToString();
+                _grid[gridPos.x, gridPos.y].GridPosition = gridPos;
+            }
+        }
+
+        private List<Utils.GridPos> RandomObstacleGridPosList()
+        {
             List<Utils.GridPos> obstacleGridPosList = new();
             var count = 0;
+            var randomObstaclesTotal = Random.Range(5, 20);
 
-            while (obstacleGridPosList.Count < _configGame.ObstaclesTotal)
+            // while (obstacleGridPosList.Count < _configGame.ObstaclesTotal)
+            while (obstacleGridPosList.Count < randomObstaclesTotal)
             {
                 count++;
                 var randomX = Random.Range(0, _configGame.Width);
@@ -38,27 +58,7 @@ namespace Commands
                 }
             }
 
-            foreach (var gridPos in obstacleGridPosList)
-            {
-                if (gridPos.x < 0 || gridPos.x > _configGame.Width - 1 || gridPos.y < 0 ||
-                    gridPos.y > _configGame.Height - 1)
-                {
-                    continue;
-                }
-
-                _grid[gridPos.x, gridPos.y].Type = CONSTANTS.CellType.Obstacle;
-                _grid[gridPos.x, gridPos.y].name = CONSTANTS.CellType.Obstacle.ToString();
-                
-                // _configGame.Cell.Type = CONSTANTS.CellType.Obstacle;
-                //
-                // var newObstacle = _configGame.Cell.Create(
-                //     gridPos,
-                //     _configGame.GridBlock,
-                //     _configGame.AvatarSize,
-                //     CONSTANTS.CellType.None);
-                //
-                // _grid[gridPos.x, gridPos.y] = newObstacle;
-            }
+            return obstacleGridPosList;
         }
     }
 }

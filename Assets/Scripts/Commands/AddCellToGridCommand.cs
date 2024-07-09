@@ -45,6 +45,7 @@ namespace Commands
         private static void ReturnPool(Cell cellBelow, ConfigGame configGame)
         {
             cellBelow.GetComponentInChildren<Animator>().SetTrigger(DefaultAnimator);
+            cellBelow.SpecialType = CONSTANTS.CellSpecialType.Normal;
             configGame.Pool.Push(cellBelow);
         }
     }

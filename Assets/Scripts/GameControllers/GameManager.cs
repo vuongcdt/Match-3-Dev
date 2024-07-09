@@ -19,15 +19,16 @@ namespace GameControllers
             _configGame = ConfigGame.Instance;
             _configGame.ButtonReset.onClick.RemoveAllListeners();
             _configGame.ButtonReset.onClick.AddListener(OnRestartClick);
+            
+            _grid = new Cell[_configGame.Width, _configGame.Height];
+            this.SendCommand(new InitGridModelCommand(_grid));
+            this.SendCommand(new RenderBackgroundGridCommand());
 
             InitGame();
         }
 
         private void InitGame()
         {
-            _grid = new Cell[_configGame.Width, _configGame.Height];
-            this.SendCommand(new InitGridModelCommand(_grid));
-            this.SendCommand(new RenderBackgroundGridCommand());
             this.SendCommand(new RenderCellGridCommand());
             this.SendCommand<RenderRandomObstaclesCommand>();
 
@@ -42,7 +43,7 @@ namespace GameControllers
 
         public void OnRestartClick()
         {
-            // InitGame();
+            InitGame();
         }
 
         public IArchitecture GetArchitecture()

@@ -53,6 +53,10 @@ namespace GameControllers
             get => _type;
             set
             {
+                if (_type == CONSTANTS.CellType.Obstacle)
+                {
+                    // Debug.Log($"set type {_gridPos.x} {_gridPos.y}");
+                }
                 _type = value;
                 SetAvatar(value);
             }

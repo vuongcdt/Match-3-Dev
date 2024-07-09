@@ -8,9 +8,10 @@
 
     public enum CellSpecialType
     {
+        Normal,
         Row,
         Column,
-        Color
+        Color,
     }
 
     public enum CellType

@@ -1,6 +1,7 @@
 ﻿using GameControllers;
 using QFramework;
 using Queries;
+using UnityEngine;
 
 namespace Commands
 {
@@ -22,16 +23,22 @@ namespace Commands
             {
                 for (int y = 0; y < _grid.GetLength(1); y++)
                 {
-                    _configGame.Cell.Type = CONSTANTS.CellType.None;
-                    
-                    var newCell = _configGame.Cell.Create(
-                        new Utils.GridPos(x,y),
-                        _configGame.GridBlock,
-                        _configGame.AvatarSize,
-                        CONSTANTS.CellType.None);
-                    
-                    _grid[x, y] = newCell;
-                    // _grid[x, y] = null;
+                    if(_grid[x, y] is null)
+                    {
+                        _configGame.Cell.Type = CONSTANTS.CellType.None;
+
+                        var newCell = _configGame.Cell.Create(
+                            new Utils.GridPos(x, y),
+                            _configGame.GridBlock,
+                            _configGame.AvatarSize,
+                            CONSTANTS.CellType.None);
+
+                        _grid[x, y] = newCell;
+                    }
+                    else
+                    {
+                        _grid[x, y].Type = CONSTANTS.CellType.None;
+                    }
                 }
             }
         }

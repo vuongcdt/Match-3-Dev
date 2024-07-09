@@ -68,14 +68,10 @@ namespace Commands
             foreach (var cells in cellsList)
             {
                 var cellList = cells.CellList;
-                var isActiveAll = IsActiveAll(cellList);
-
-                if (!isActiveAll)
-                {
-                    continue;
-                }
 
                 var random = Random.Range(0, cellList.Count);
+                RemoveObstacle(cellList);
+
                 for (var index = 0; index < cellList.Count; index++)
                 {
                     if (index == random && cellList.Count == 4)
@@ -97,6 +93,36 @@ namespace Commands
             }
 
             return cellsList.Count > 0;
+        }
+
+        private void RemoveObstacle(List<Cell> cellList)
+        {
+            var configGame = ConfigGame.Instance;
+
+            foreach (var currentCell in cellList)
+            {
+                int[] checkArr = { 1, -1 };
+                foreach (var index in checkArr)
+                {
+                    Cell cellObstacle = null;
+                    if (currentCell.GridPosition.x + index >= 0 &&
+                        currentCell.GridPosition.x + index < configGame.Width)
+                    {
+                        cellObstacle = _grid[currentCell.GridPosition.x + index, currentCell.GridPosition.y];
+                    }
+
+                    if (currentCell.GridPosition.y + index >= 0 &&
+                        currentCell.GridPosition.y + index < configGame.Height)
+                    {
+                        cellObstacle = _grid[currentCell.GridPosition.x, currentCell.GridPosition.y + index];
+                    }
+
+                    if (cellObstacle != null && cellObstacle.Type == CONSTANTS.CellType.Obstacle)
+                    {
+                        cellObstacle.Type = CONSTANTS.CellType.None;
+                    }
+                }
+            }
         }
 
         private int MatchCellX(int x, int y, Cell currentCell, List<Utils.MatchCell> cellsList)
@@ -150,19 +176,6 @@ namespace Commands
             }
 
             return false;
-        }
-
-        private bool IsActiveAll(List<Cell> cells)
-        {
-            foreach (var cellMerge in cells)
-            {
-                if (!cellMerge.gameObject.activeSelf)
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         private static void SetTriggerAndSpecialType(Utils.MatchCell matchCell, int index)
