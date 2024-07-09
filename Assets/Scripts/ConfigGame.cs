@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using GameControllers;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class ConfigGame : Singleton<ConfigGame>
