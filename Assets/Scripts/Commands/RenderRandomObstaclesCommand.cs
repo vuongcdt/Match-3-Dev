@@ -20,33 +20,44 @@ namespace Commands
 
         private void RenderRandomObstacles()
         {
-            List<Utils.GridPos> cellPosList = new();
+            List<Utils.GridPos> obstacleGridPosList = new();
             var count = 0;
 
-            while (cellPosList.Count < _configGame.ObstaclesTotal)
+            while (obstacleGridPosList.Count < _configGame.ObstaclesTotal)
             {
                 count++;
                 var randomX = Random.Range(0, _configGame.Width);
                 var randomY = Random.Range(0, _configGame.Height - 2);
                 var cellPos = new Utils.GridPos(randomX, randomY);
                 // var cellPos = new Utils.GridPos(randomX, 3);
-                var isNoInList = cellPosList.IndexOf(cellPos) == -1;
+                var isNoInList = obstacleGridPosList.IndexOf(cellPos) == -1;
 
                 if (isNoInList)
                 {
-                    cellPosList.Add(cellPos);
+                    obstacleGridPosList.Add(cellPos);
                 }
             }
 
-            foreach (var obstacle in cellPosList)
+            foreach (var gridPos in obstacleGridPosList)
             {
-                if (obstacle.x < 0 || obstacle.x > _configGame.Width - 1 || obstacle.y < 0 ||
-                    obstacle.y > _configGame.Height - 1)
+                if (gridPos.x < 0 || gridPos.x > _configGame.Width - 1 || gridPos.y < 0 ||
+                    gridPos.y > _configGame.Height - 1)
                 {
                     continue;
                 }
 
-                _grid[obstacle.x, obstacle.y].Type = CONSTANTS.CellType.Obstacle;
+                _grid[gridPos.x, gridPos.y].Type = CONSTANTS.CellType.Obstacle;
+                _grid[gridPos.x, gridPos.y].name = CONSTANTS.CellType.Obstacle.ToString();
+                
+                // _configGame.Cell.Type = CONSTANTS.CellType.Obstacle;
+                //
+                // var newObstacle = _configGame.Cell.Create(
+                //     gridPos,
+                //     _configGame.GridBlock,
+                //     _configGame.AvatarSize,
+                //     CONSTANTS.CellType.None);
+                //
+                // _grid[gridPos.x, gridPos.y] = newObstacle;
             }
         }
     }

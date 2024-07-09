@@ -31,6 +31,7 @@ namespace Commands
                         CONSTANTS.CellType.None);
                     
                     _grid[x, y] = newCell;
+                    // _grid[x, y] = null;
                 }
             }
         }

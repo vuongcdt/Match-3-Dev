@@ -8,6 +8,7 @@ namespace Commands
     public class AddCellToGridCommand : AbstractCommand
     {
         private Cell[,] _grid;
+        private static readonly int DefaultAnimator = Animator.StringToHash("Default");
 
         protected override void OnExecute()
         {
@@ -35,8 +36,16 @@ namespace Commands
 
                     newCell.GridPosition = new Utils.GridPos(x, configGame.Height - 1);
                     _grid[x, configGame.Height - 1] = newCell;
+                    
+                    ReturnPool(cellBelow, configGame);
                 }
             }
+        }
+
+        private static void ReturnPool(Cell cellBelow, ConfigGame configGame)
+        {
+            cellBelow.GetComponentInChildren<Animator>().SetTrigger(DefaultAnimator);
+            configGame.Pool.Push(cellBelow);
         }
     }
 }

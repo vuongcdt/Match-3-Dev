@@ -75,15 +75,27 @@ namespace GameControllers
 
         private Cell Create(Vector2 pos, Transform transformParent, float cellSize, CONSTANTS.CellType cellType)
         {
+            var configGame = ConfigGame.Instance;
             var isCellNormal =
-                cellType is not (CONSTANTS.CellType.Background or CONSTANTS.CellType.Obstacle or CONSTANTS.CellType.None);
-
-            box2D.enabled = isCellNormal;
+                cellType is not (CONSTANTS.CellType.Background or CONSTANTS.CellType.Obstacle
+                    or CONSTANTS.CellType.None);
 
             this.transform.localScale = Vector2.one * cellSize;
-            var cell = Instantiate(this, pos, Quaternion.identity, transformParent);
+
+            Cell cell = null;
+            if (configGame.Pool.Count > 0)
+            {
+                cell = configGame.Pool.Pop();
+                cell.GetComponent<BoxCollider2D>().enabled = true;
+            }
+            else
+            {
+                box2D.enabled = isCellNormal;
+                cell = Instantiate(this, pos, Quaternion.identity, transformParent);
+            }
 
             cell._worldPos = pos;
+            cell.transform.position = pos;
             cell.Type = cellType;
             cell.name = cellType.ToString();
 
@@ -106,7 +118,7 @@ namespace GameControllers
         public void DeActive()
         {
             this.Type = CONSTANTS.CellType.None;
-            this.gameObject.SetActive(false);
+            // this.gameObject.SetActive(false);
         }
 
         private void Move(Utils.GridPos pos, float time)
@@ -193,7 +205,8 @@ namespace GameControllers
             var directionAxis = _clampMagnitude * configGame.Sensitivity;
 
             directionAxis.Normalize();
-            var targetGridPos = new Utils.GridPos((int)(_gridPos.x + directionAxis.x), (int)(_gridPos.y + directionAxis.y));
+            var targetGridPos =
+                new Utils.GridPos((int)(_gridPos.x + directionAxis.x), (int)(_gridPos.y + directionAxis.y));
 
             if (IsPositionInGrid(targetGridPos))
             {

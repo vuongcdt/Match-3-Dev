@@ -1,4 +1,5 @@
-﻿using GameControllers;
+﻿using System.Collections.Generic;
+using GameControllers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,6 +25,13 @@ public class ConfigGame : Singleton<ConfigGame>
     [SerializeField] private Sprite[] sprites;
 
     private bool _isDragged;
+    private Stack<Cell> _pool = new();
+
+    public Stack<Cell> Pool
+    {
+        get => _pool;
+        set => _pool = value;
+    }
 
     public Sprite[] Sprites
     {
