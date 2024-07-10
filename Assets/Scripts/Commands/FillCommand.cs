@@ -1,25 +1,20 @@
-﻿using System.Collections;
-using Events;
-using GameControllers;
+﻿using GameControllers;
 using QFramework;
 using Queries;
-using UnityEngine;
 
 namespace Commands
 {
-    public class FillCommandIE : AbstractCommand<IEnumerator>
+    public class FillCommand : AbstractCommand
     {
         private Cell[,] _grid;
-        private bool _isFill;
 
-        protected override IEnumerator OnExecute()
+        protected override void OnExecute()
         {
             _grid = this.SendQuery(new GetGridQuery());
-            _isFill = false;
-            return FillIE();
+            Fill();
         }
 
-        private IEnumerator FillIE()
+        private void Fill()
         {
             var configGame = ConfigGame.Instance;
             for (int y = 1; y < configGame.Height; y++)
@@ -30,17 +25,6 @@ namespace Commands
                 }
 
                 configGame.IsRevertFill = !configGame.IsRevertFill;
-            }
-
-            yield return new WaitForSeconds(configGame.FillTime);
-
-            if (_isFill)
-            {
-                this.SendEvent<ProcessingGridEvent>();
-            }
-            else
-            {
-                this.SendCommand(new MatchGridCommand());
             }
         }
 
@@ -66,30 +50,42 @@ namespace Commands
                 var isTargetEmpty = target.Type == CONSTANTS.CellType.None;
                 var isNextToObstacle = _grid[x + index, y].Type == CONSTANTS.CellType.Obstacle;
 
-                var isSpecial = y + 1 < configGame.Height &&
-                                _grid[x + index, y + 1].Type == CONSTANTS.CellType.Obstacle &&
-                                _grid[x, y + 1].Type == CONSTANTS.CellType.Obstacle;
-
-                if (index != 0 && !isNextToObstacle && !isSpecial)
+                var isUpObstacle = IsUpObstacle(x, y);
+                // var isSpecial = y + 1 < configGame.Height &&
+                //                 _grid[x + index, y + 1].Type == CONSTANTS.CellType.Obstacle &&
+                //                 _grid[x, y + 1].Type == CONSTANTS.CellType.Obstacle;     
+                // if (index != 0 && !isNextToObstacle && !isSpecial)
+                // {
+                //     continue;
+                // }
+                if (index != 0 && !isNextToObstacle && !isUpObstacle)
                 {
                     continue;
                 }
 
                 if (isSourceFish && isTargetEmpty)
                 {
-                    _isFill = true;
                     MoveToBelow(source, target, x, y, index);
                     break;
                 }
 
-                if (index != 0 && isSourceFish && isSpecial && _grid[x + index, y].Type == CONSTANTS.CellType.None)
-                {
-                    _isFill = true;
-                    target = _grid[x + index, y];
-                    MoveToNextTo(source, target, x, y, index);
-                    break;
-                }
+                // if (index != 0 && isSourceFish && isSpecial && _grid[x + index, y].Type == CONSTANTS.CellType.None)
+                // {
+                //     target = _grid[x + index, y];
+                //     MoveToNextTo(source, target, x, y, index);
+                //     break;
+                // }
             }
+        }
+
+        private bool IsUpObstacle(int x, int y)
+        {
+            if (y + 1 > ConfigGame.Instance.Height - 1)
+            {
+                return false;
+            }
+
+            return _grid[x, y + 1].Type == CONSTANTS.CellType.Obstacle;
         }
 
         private void MoveToNextTo(Cell cellSource, Cell cellTarget, int x, int y, int index)

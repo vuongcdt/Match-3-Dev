@@ -22,6 +22,8 @@ namespace Commands
         {
             var obstacleGridPosList = RandomObstacleGridPosList();
 
+            _configGame.ObstaclesTotal = obstacleGridPosList.Count;
+            // Debug.Log(obstacleGridPosList.Count);
             foreach (var gridPos in obstacleGridPosList)
             {
                 if (gridPos.x < 0 || gridPos.x > _configGame.Width - 1 || gridPos.y < 0 ||
@@ -38,27 +40,60 @@ namespace Commands
 
         private List<Utils.GridPos> RandomObstacleGridPosList()
         {
+            int count = 0;
             List<Utils.GridPos> obstacleGridPosList = new();
-            var count = 0;
-            var randomObstaclesTotal = Random.Range(5, 20);
 
-            // while (obstacleGridPosList.Count < _configGame.ObstaclesTotal)
+            var isNotNextTo = Random.value > 0.5f;
+
+            var randomObstaclesTotal = Random.Range(15, 22);
+            // var randomObstaclesTotal = _configGame.ObstaclesTotal;
+
             while (obstacleGridPosList.Count < randomObstaclesTotal)
             {
                 count++;
                 var randomX = Random.Range(0, _configGame.Width);
-                var randomY = Random.Range(0, _configGame.Height - 2);
-                var cellPos = new Utils.GridPos(randomX, randomY);
-                // var cellPos = new Utils.GridPos(randomX, 3);
-                var isNoInList = obstacleGridPosList.IndexOf(cellPos) == -1;
+                var randomY = Random.Range(0, _configGame.Height - 1);
 
-                if (isNoInList)
+                var cellPos = new Utils.GridPos(randomX, randomY);
+                var isNoInList = obstacleGridPosList.IndexOf(cellPos) == -1;
+                
+                var isNextTo = IsNextTo(obstacleGridPosList, cellPos);
+                if (isNoInList && !isNextTo && isNotNextTo)
+                {
+                    obstacleGridPosList.Add(cellPos);
+                }   
+                
+                if (isNoInList && !isNotNextTo)
                 {
                     obstacleGridPosList.Add(cellPos);
                 }
+
+                if (count > 100)
+                {
+                    Debug.Log("loop");
+                    break;
+                }
             }
 
+            // Debug.Log($"count {count}");
             return obstacleGridPosList;
+        }
+
+        private static bool IsNextTo(List<Utils.GridPos> obstacleGridPosList, Utils.GridPos cellPos)
+        {
+            bool isNextTo = false;
+            foreach (var gridPos in obstacleGridPosList)
+            {
+                var isSameRow = Mathf.Abs(cellPos.x - gridPos.x) == 1 && cellPos.y == gridPos.y;
+                var isSameColumn = Mathf.Abs(cellPos.y - gridPos.y) == 1 && cellPos.x == gridPos.x;
+                if (isSameRow || isSameColumn)
+                {
+                    isNextTo = true;
+                    break;
+                }
+            }
+
+            return isNextTo;
         }
     }
 }

@@ -12,23 +12,23 @@ namespace GameControllers
 
         private void Start()
         {
-            this.RegisterEvent<ProcessingGridEvent>(e => { ProcessingGrid(); })
+            this.RegisterEvent<ProcessingGridEvent>(e => ProcessingGrid())
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
 
             _configGame = ConfigGame.Instance;
             _configGame.ButtonReset.onClick.RemoveAllListeners();
             _configGame.ButtonReset.onClick.AddListener(OnRestartClick);
-            
+
             _grid = new Cell[_configGame.Width, _configGame.Height];
             this.SendCommand(new InitGridModelCommand(_grid));
-            this.SendCommand(new RenderBackgroundGridCommand());
+            this.SendCommand<RenderBackgroundGridCommand>();
 
             InitGame();
         }
 
         private void InitGame()
         {
-            this.SendCommand(new RenderCellGridCommand());
+            this.SendCommand<RenderCellGridCommand>();
             this.SendCommand<RenderRandomObstaclesCommand>();
 
             ProcessingGrid();
@@ -36,8 +36,13 @@ namespace GameControllers
 
         private void ProcessingGrid()
         {
-            this.SendCommand(new AddCellToGridCommand());
-            StartCoroutine(this.SendCommand(new FillCommandIE()));
+            if (_configGame.ObstaclesTotal == 0)
+            {
+                InitGame();
+                return;
+            }
+            this.SendCommand<FillCommand>();
+            StartCoroutine(this.SendCommand(new AddCellToGridCommand()));
         }
 
         public void OnRestartClick()

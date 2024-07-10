@@ -38,6 +38,7 @@ namespace Commands
                 if (obstacle.Type == CONSTANTS.CellType.Obstacle)
                 {
                     obstacle.Type = CONSTANTS.CellType.None;
+                    _configGame.ObstaclesTotal--;
                 }
             }
 
@@ -52,6 +53,7 @@ namespace Commands
                 if (obstacle.Type == CONSTANTS.CellType.Obstacle)
                 {
                     obstacle.Type = CONSTANTS.CellType.None;
+                    _configGame.ObstaclesTotal--;
                 }
             }
         }

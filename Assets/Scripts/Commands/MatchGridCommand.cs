@@ -20,6 +20,7 @@ namespace Commands
         {
             _grid = this.SendQuery(new GetGridQuery());
             _configGame = ConfigGame.Instance;
+            
             if (MatchGrid())
             {
                 this.SendEvent<ProcessingGridEvent>();
@@ -71,15 +72,14 @@ namespace Commands
             foreach (var matchCell in matchCellList)
             {
                 var cellList = matchCell.CellList;
-
                 var random = Random.Range(0, cellList.Count);
 
+                MergeCellRowColumn(cellList);
+                
                 for (var index = 0; index < cellList.Count; index++)
                 {
                     var cell = cellList[index];
                     this.SendCommand(new RemoveObstacleCommand(cell.GridPosition.x, cell.GridPosition.y));
-
-                    MergeCellSpecial(cell);
 
                     if (MergeCellByCount(index, random, cellList, cell, matchCell)) continue;
 
@@ -88,6 +88,32 @@ namespace Commands
             }
 
             return matchCellList.Count > 0;
+        }
+
+        private void MergeCellRowColumn(List<Cell> cellList)
+        {
+            for (var index = 0; index < cellList.Count; index++)
+            {
+                var cell = cellList[index];
+
+                if (cell.SpecialType == CONSTANTS.CellSpecialType.Column)
+                {
+                    for (int y = 0; y < _configGame.Height; y++)
+                    {
+                        this.SendCommand(new RemoveObstacleCommand(cell.GridPosition.x, cell.GridPosition.y));
+                        _grid[cell.GridPosition.x, y].Type = CONSTANTS.CellType.None;
+                    }
+                }
+
+                if (cell.SpecialType == CONSTANTS.CellSpecialType.Row)
+                {
+                    for (int x = 0; x < _configGame.Width; x++)
+                    {
+                        this.SendCommand(new RemoveObstacleCommand(cell.GridPosition.x, cell.GridPosition.y));
+                        _grid[x, cell.GridPosition.y].Type = CONSTANTS.CellType.None;
+                    }
+                }
+            }
         }
 
         private static bool MergeCellByCount(int index, int random, List<Cell> cellList, Cell cell,
@@ -107,25 +133,6 @@ namespace Commands
             }
 
             return false;
-        }
-
-        private void MergeCellSpecial(Cell cell)
-        {
-            if (cell.SpecialType == CONSTANTS.CellSpecialType.Column)
-            {
-                for (int y = 0; y < _configGame.Height; y++)
-                {
-                    _grid[cell.GridPosition.x, y].Type = CONSTANTS.CellType.None;
-                }
-            }
-
-            if (cell.SpecialType == CONSTANTS.CellSpecialType.Row)
-            {
-                for (int x = 0; x < _configGame.Width; x++)
-                {
-                    _grid[x, cell.GridPosition.y].Type = CONSTANTS.CellType.None;
-                }
-            }
         }
 
         private int MatchCellX(int x, int y, Cell currentCell, List<Utils.MatchCell> matchCellList)

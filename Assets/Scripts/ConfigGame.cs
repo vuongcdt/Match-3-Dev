@@ -23,9 +23,16 @@ public class ConfigGame : Singleton<ConfigGame>
     [SerializeField] private float minSensitivity;
     [SerializeField] private bool isRevertFill;
     [SerializeField] private Sprite[] sprites;
+    [SerializeField]private float _timeScale = 10;
 
     private bool _isDragged;
     private Stack<Cell> _pool = new();
+
+    public float TimeScale
+    {
+        get => _timeScale;
+        set => _timeScale = value;
+    }
 
     public Stack<Cell> Pool
     {
@@ -71,7 +78,11 @@ public class ConfigGame : Singleton<ConfigGame>
 
     public float FillTime => fillTime;
 
-    public int ObstaclesTotal => obstaclesTotal;
+    public int ObstaclesTotal
+    {
+        get => obstaclesTotal;
+        set => obstaclesTotal = value;
+    }
 
     public int MaxListImage => maxListImage;
 

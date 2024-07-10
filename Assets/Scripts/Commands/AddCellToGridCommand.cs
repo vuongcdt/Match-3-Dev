@@ -1,23 +1,26 @@
-﻿using GameControllers;
+﻿using System.Collections;
+using Events;
+using GameControllers;
 using QFramework;
 using Queries;
 using UnityEngine;
 
 namespace Commands
 {
-    public class AddCellToGridCommand : AbstractCommand
+    public class AddCellToGridCommand : AbstractCommand<IEnumerator>
     {
         private Cell[,] _grid;
         private static readonly int DefaultAnimator = Animator.StringToHash("Default");
 
-        protected override void OnExecute()
+        protected override IEnumerator OnExecute()
         {
             _grid = this.SendQuery(new GetGridQuery());
-            AddCellToGrid();
+            return AddCellToGrid();
         }
 
-        private void AddCellToGrid()
+        private IEnumerator AddCellToGrid()
         {
+            var isAdd = false;
             ConfigGame configGame = ConfigGame.Instance;
             for (int x = 0; x < configGame.Width; x++)
             {
@@ -25,6 +28,7 @@ namespace Commands
                 
                 if (cellBelow.Type == CONSTANTS.CellType.None)
                 {
+                    isAdd = true;
                     var random = Random.Range(3, configGame.MaxListImage);
                     configGame.IsProcessing = true;
                     
@@ -34,11 +38,22 @@ namespace Commands
                         configGame.AvatarSize,
                         (CONSTANTS.CellType)random);
 
-                    newCell.GridPosition = new Utils.GridPos(x, configGame.Height - 1);
                     _grid[x, configGame.Height - 1] = newCell;
+                    newCell.GridPosition = new Utils.GridPos(x, configGame.Height - 1);
                     
                     ReturnPool(cellBelow, configGame);
                 }
+            }
+
+            yield return new WaitForSeconds(configGame.FillTime);
+            
+            if (isAdd)
+            {
+                this.SendEvent<ProcessingGridEvent>();
+            }
+            else
+            {
+                this.SendCommand(new MatchGridCommand());
             }
         }
 
