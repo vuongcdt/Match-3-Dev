@@ -134,7 +134,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1, y: 1, z: 0}
-  m_LocalScale: {x: 0.9, y: 0.9, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3395320668681400638}
@@ -153,6 +153,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   box2D: {fileID: -7729765693224309556}
+  _gridPos:
+    x: 0
+    y: 0
+  _worldPos: {x: 0, y: 0, z: 0}
 --- !u!61 &-7729765693224309556
 BoxCollider2D:
   m_ObjectHideFlags: 0

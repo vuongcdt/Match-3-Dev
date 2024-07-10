@@ -13,8 +13,8 @@ namespace GameControllers
         private CONSTANTS.CellType _type;
         private CONSTANTS.CellSpecialType _specialType;
         private IEnumerator _moveIE;
-        private Utils.GridPos _gridPos;
-        private Vector3 _worldPos;
+        [SerializeField] private Utils.GridPos _gridPos;
+        [SerializeField]private Vector3 _worldPos;
 
         private Vector3 _clampMagnitude;
         private bool _isDragged;
@@ -53,10 +53,6 @@ namespace GameControllers
             get => _type;
             set
             {
-                if (_type == CONSTANTS.CellType.Obstacle)
-                {
-                    // Debug.Log($"set type {_gridPos.x} {_gridPos.y}");
-                }
                 _type = value;
                 SetAvatar(value);
             }
@@ -100,9 +96,9 @@ namespace GameControllers
             }
 
             cell._worldPos = pos;
+            cell._gridPos = GetGridPos(pos);
             cell.transform.position = pos;
             cell.Type = cellType;
-            cell.name = cellType.ToString();
 
             return cell;
         }
@@ -123,7 +119,6 @@ namespace GameControllers
         public void DeActive()
         {
             this.Type = CONSTANTS.CellType.None;
-            // this.gameObject.SetActive(false);
         }
 
         private void Move(Utils.GridPos pos, float time)
@@ -142,6 +137,7 @@ namespace GameControllers
             _moveIE = MoveIE(pos, time);
             if (this.gameObject.activeSelf)
             {
+                this.gameObject.name = $"{this._type.ToString()} {this._gridPos.x}_{this._gridPos.y}";
                 StartCoroutine(_moveIE ?? MoveIE(pos, time));
             }
         }
@@ -212,13 +208,8 @@ namespace GameControllers
             directionAxis.Normalize();
             var targetGridPos =
                 new Utils.GridPos((int)(_gridPos.x + directionAxis.x), (int)(_gridPos.y + directionAxis.y));
-            
-            if (IsNotInverted(targetGridPos))
-            {
-                return;
-            }
 
-            if (IsPositionInGrid(targetGridPos))
+            if (IsInverted(targetGridPos))
             {
                 StartCoroutine(InvertedAndMatch(targetGridPos));
             }
@@ -226,8 +217,13 @@ namespace GameControllers
             configGame.IsDragged = false;
         }
 
-        private bool IsNotInverted(Utils.GridPos targetGridPos)
+        private bool IsInverted(Utils.GridPos targetGridPos)
         {
+            if (!IsPositionInGrid(targetGridPos))
+            {
+                return false;
+            }
+
             var grid = this.SendQuery(new GetGridQuery());
 
             var currentCell = grid[_gridPos.x, _gridPos.y];
@@ -237,18 +233,14 @@ namespace GameControllers
                              targetCell.Type == CONSTANTS.CellType.Obstacle;
             var isEmpty = currentCell.Type == CONSTANTS.CellType.None || targetCell.Type == CONSTANTS.CellType.None;
 
-            if (isObstacle || isEmpty)
-            {
-                return true;
-            }
-
-            return false;
+            return !isObstacle && !isEmpty;
         }
 
         private IEnumerator InvertedAndMatch(Utils.GridPos targetGridPos)
         {
             var sourceGridPos = new Utils.GridPos(_gridPos.x, _gridPos.y);
             this.SendCommand(new InvertedCellCommand(sourceGridPos, targetGridPos));
+
             yield return new WaitForSeconds(ConfigGame.Instance.FillTime * 2);
 
             var isMatch = this.SendCommand(new MatchGridCommand());

@@ -1,17 +1,15 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using GameControllers;
-using UnityEditor;
 using UnityEngine;
 
 public static class Utils
 {
+    [Serializable]
     public struct GridPos
     {
         public int x;
         public int y;
-        public CONSTANTS.CellType type;
 
         public GridPos(int x, int y) : this()
         {
@@ -19,11 +17,10 @@ public static class Utils
             this.y = y;
         }
 
-        public GridPos(int x, int y, CONSTANTS.CellType type)
+
+        public new string ToString()
         {
-            this.x = x;
-            this.y = y;
-            this.type = type;
+            return $"x: {x} y: {y}";
         }
     }
 
@@ -54,13 +51,13 @@ public static class Utils
 
         return new GridPos(gridWidth, gridHeight);
     }
-    
-    public static IEnumerator ClearConsoleIE()
-    {
-        yield return new WaitForSeconds(3);
-        var assembly = Assembly.GetAssembly(typeof(SceneView));
-        var type = assembly.GetType("UnityEditor.LogEntries");
-        var method = type.GetMethod("Clear");
-        method.Invoke(new object(), null);
-    }
+
+    // public static IEnumerator ClearConsoleIE()
+    // {
+    //     yield return new WaitForSeconds(3);
+    //     var assembly = Assembly.GetAssembly(typeof(SceneView));
+    //     var type = assembly.GetType("UnityEditor.LogEntries");
+    //     var method = type.GetMethod("Clear");
+    //     method.Invoke(new object(), null);
+    // }
 }

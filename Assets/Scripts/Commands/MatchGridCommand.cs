@@ -14,9 +14,12 @@ namespace Commands
         private static readonly int RowAnimator = Animator.StringToHash("Row");
         private static readonly int ColumnAnimator = Animator.StringToHash("Column");
 
+        private ConfigGame _configGame;
+
         protected override bool OnExecute()
         {
             _grid = this.SendQuery(new GetGridQuery());
+            _configGame = ConfigGame.Instance;
             if (MatchGrid())
             {
                 this.SendEvent<ProcessingGridEvent>();
@@ -28,7 +31,7 @@ namespace Commands
 
         private bool MatchGrid()
         {
-            List<Utils.MatchCell> cellsList = new();
+            List<Utils.MatchCell> matchCellList = new();
             for (int x = 0; x < _grid.GetLength(0); x++)
             {
                 int index = -1;
@@ -40,7 +43,7 @@ namespace Commands
                     }
 
                     var currentCell = _grid[x, y];
-                    index = MatchCellX(x, y, currentCell, cellsList);
+                    index = MatchCellX(x, y, currentCell, matchCellList);
                 }
             }
 
@@ -55,77 +58,108 @@ namespace Commands
                     }
 
                     var currentCell = _grid[x, y];
-                    index = MatchCellY(x, y, currentCell, cellsList);
+                    index = MatchCellY(x, y, currentCell, matchCellList);
                 }
             }
 
-            return MergeCells(cellsList);
+            return MergeCells(matchCellList);
         }
 
-        private bool MergeCells(List<Utils.MatchCell> cellsList)
+        private bool MergeCells(List<Utils.MatchCell> matchCellList)
         {
-            cellsList.Sort((listA, listB) => listB.CellList.Count - listA.CellList.Count);
-            foreach (var cells in cellsList)
+            matchCellList.Sort((listA, listB) => listB.CellList.Count - listA.CellList.Count);
+            foreach (var matchCell in matchCellList)
             {
-                var cellList = cells.CellList;
+                var cellList = matchCell.CellList;
 
                 var random = Random.Range(0, cellList.Count);
-                RemoveObstacle(cellList);
 
                 for (var index = 0; index < cellList.Count; index++)
                 {
-                    if (index == random && cellList.Count == 4)
-                    {
-                        SetTriggerAndSpecialType(cells, index);
-                        continue;
-                    }
+                    var cell = cellList[index];
+                    RemoveObstacle(cell.GridPosition.x, cell.GridPosition.y);
 
-                    if (index == random && cellList.Count > 5)
-                    {
-                        cellList[index].SpecialType = CONSTANTS.CellSpecialType.Color;
-                        cellList[index].Type = CONSTANTS.CellType.Rainbow;
-                        continue;
-                    }
+                    MergeCellSpecial(cell);
 
-                    var cellMerge = cellList[index];
-                    cellMerge.DeActive();
+                    if (MergeCellByCount(index, random, cellList, cell, matchCell)) continue;
+
+                    cell.DeActive();
                 }
             }
 
-            return cellsList.Count > 0;
+            return matchCellList.Count > 0;
         }
 
-        private void RemoveObstacle(List<Cell> cellList)
+        private static bool MergeCellByCount(int index, int random, List<Cell> cellList, Cell cell,
+            Utils.MatchCell matchCell)
         {
-            var configGame = ConfigGame.Instance;
-
-            foreach (var currentCell in cellList)
+            if (index == random && cellList.Count > 5)
             {
-                int[] checkArr = { 1, -1 };
-                foreach (var index in checkArr)
+                cell.SpecialType = CONSTANTS.CellSpecialType.Color;
+                cell.Type = CONSTANTS.CellType.Rainbow;
+                return true;
+            }
+
+            if (index == random && cellList.Count == 4)
+            {
+                SetTriggerAndSpecialType(matchCell, index);
+                return true;
+            }
+
+            return false;
+        }
+
+        private void MergeCellSpecial(Cell cell)
+        {
+            if (cell.SpecialType == CONSTANTS.CellSpecialType.Column)
+            {
+                for (int y = 0; y < _configGame.Height; y++)
                 {
-                    Cell cellObstacle = null;
-                    if (currentCell.GridPosition.x + index >= 0 &&
-                        currentCell.GridPosition.x + index < configGame.Width)
-                    {
-                        cellObstacle = _grid[currentCell.GridPosition.x + index, currentCell.GridPosition.y];
-                    }
+                    _grid[cell.GridPosition.x, y].Type = CONSTANTS.CellType.None;
+                }
+            }
 
-                    if (currentCell.GridPosition.y + index >= 0 &&
-                        currentCell.GridPosition.y + index < configGame.Height)
-                    {
-                        cellObstacle = _grid[currentCell.GridPosition.x, currentCell.GridPosition.y + index];
-                    }
-
-                    if (cellObstacle != null && cellObstacle.Type == CONSTANTS.CellType.Obstacle)
-                    {
-                        cellObstacle.Type = CONSTANTS.CellType.None;
-                    }
+            if (cell.SpecialType == CONSTANTS.CellSpecialType.Row)
+            {
+                for (int x = 0; x < _configGame.Width; x++)
+                {
+                    _grid[x, cell.GridPosition.y].Type = CONSTANTS.CellType.None;
                 }
             }
         }
 
-        private int MatchCellX(int x, int y, Cell currentCell, List<Utils.MatchCell> cellsList)
+        private void RemoveObstacle(int x, int y)
+        {
+            for (int index = x - 1; index <= x + 1; index++)
+            {
+                if (index == x || index < 0 || index >= _configGame.Width)
+                {
+                    continue;
+                }
+
+                var obstacle = _grid[index, y];
+                if (obstacle.Type == CONSTANTS.CellType.Obstacle)
+                {
+                    obstacle.Type = CONSTANTS.CellType.None;
+                }
+            }
+
+            for (int index = y - 1; index <= y + 1; index++)
+            {
+                if (index == y || index < 0 || index >= _configGame.Height)
+                {
+                    continue;
+                }
+
+                var obstacle = _grid[x, index];
+                if (obstacle.Type == CONSTANTS.CellType.Obstacle)
+                {
+                    obstacle.Type = CONSTANTS.CellType.None;
+                }
+            }
+        }
+
+        private int MatchCellX(int x, int y, Cell currentCell, List<Utils.MatchCell> matchCellList)
         {
             List<Cell> cells = new();
             for (int newY = y + 1; newY < _grid.GetLength(1); newY++)
@@ -137,13 +171,13 @@ namespace Commands
             if (cells.Count >= 2)
             {
                 cells.Add(currentCell);
-                cellsList.Add(new Utils.MatchCell(cells, CONSTANTS.GridType.Row));
+                matchCellList.Add(new Utils.MatchCell(cells, CONSTANTS.GridType.Column));
             }
 
             return cells.Count + y;
         }
 
-        private int MatchCellY(int x, int y, Cell currentCell, List<Utils.MatchCell> cellsList)
+        private int MatchCellY(int x, int y, Cell currentCell, List<Utils.MatchCell> matchCellList)
         {
             List<Cell> cells = new();
             for (int newX = x + 1; newX < _grid.GetLength(0); newX++)
@@ -155,7 +189,7 @@ namespace Commands
             if (cells.Count >= 2)
             {
                 cells.Add(currentCell);
-                cellsList.Add(new Utils.MatchCell(cells, CONSTANTS.GridType.Column));
+                matchCellList.Add(new Utils.MatchCell(cells, CONSTANTS.GridType.Row));
             }
 
             return cells.Count + x;

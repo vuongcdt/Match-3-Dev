@@ -77,9 +77,8 @@ namespace Commands
 
                 if (isSourceFish && isTargetEmpty)
                 {
-                    MoveToBelow(source, target, x, y, index);
                     _isFill = true;
-                    // MoveToTarget(source, target);
+                    MoveToBelow(source, target, x, y, index);
                     break;
                 }
 
@@ -88,20 +87,9 @@ namespace Commands
                     _isFill = true;
                     target = _grid[x + index, y];
                     MoveToNextTo(source, target, x, y, index);
-                    // MoveToTarget(source, target);
                     break;
                 }
             }
-        }
-
-
-        private void MoveToTarget(Cell cellSource, Cell cellTarget)
-        {
-            cellSource.GridPosition = cellTarget.GridPosition;
-            _grid[cellTarget.GridPosition.x, cellTarget.GridPosition.y] = cellSource;
-            _grid[cellSource.GridPosition.x, cellSource.GridPosition.y] = cellTarget;
-
-            cellTarget.DeActive();
         }
 
         private void MoveToNextTo(Cell cellSource, Cell cellTarget, int x, int y, int index)
