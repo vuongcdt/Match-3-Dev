@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using Commands;
 using QFramework;
-using Queries;
 using UnityEngine;
 
 namespace GameControllers
@@ -14,7 +13,7 @@ namespace GameControllers
         private CONSTANTS.CellSpecialType _specialType;
         private IEnumerator _moveIE;
         [SerializeField] private Utils.GridPos _gridPos;
-        [SerializeField]private Vector3 _worldPos;
+        [SerializeField] private Vector3 _worldPos;
 
         private Vector3 _clampMagnitude;
         private bool _isDragged;
@@ -99,6 +98,10 @@ namespace GameControllers
             cell._gridPos = GetGridPos(pos);
             cell.transform.position = pos;
             cell.Type = cellType;
+            if (cellType == CONSTANTS.CellType.Rainbow)
+            {
+                cell._specialType = CONSTANTS.CellSpecialType.Rainbow;
+            }
 
             return cell;
         }
@@ -135,11 +138,9 @@ namespace GameControllers
             }
 
             _moveIE = MoveIE(pos, time);
-            if (this.gameObject.activeSelf)
-            {
-                this.gameObject.name = $"{this._type.ToString()} {this._gridPos.x}_{this._gridPos.y}";
-                StartCoroutine(_moveIE ?? MoveIE(pos, time));
-            }
+
+            this.gameObject.name = $"{this._type.ToString()} {this._gridPos.x}_{this._gridPos.y}";
+            StartCoroutine(_moveIE ?? MoveIE(pos, time));
         }
 
         private IEnumerator MoveIE(Vector2 pos, float time)
@@ -209,7 +210,7 @@ namespace GameControllers
             var targetGridPos =
                 new Utils.GridPos((int)(_gridPos.x + directionAxis.x), (int)(_gridPos.y + directionAxis.y));
 
-            if (IsInverted(targetGridPos))
+            if (IsPositionInGrid(targetGridPos))
             {
                 StartCoroutine(InvertedAndMatch(targetGridPos));
             }
@@ -217,34 +218,16 @@ namespace GameControllers
             configGame.IsDragged = false;
         }
 
-        private bool IsInverted(Utils.GridPos targetGridPos)
-        {
-            if (!IsPositionInGrid(targetGridPos))
-            {
-                return false;
-            }
-
-            var grid = this.SendQuery(new GetGridQuery());
-
-            var currentCell = grid[_gridPos.x, _gridPos.y];
-            var targetCell = grid[targetGridPos.x, targetGridPos.y];
-
-            var isObstacle = currentCell.Type == CONSTANTS.CellType.Obstacle ||
-                             targetCell.Type == CONSTANTS.CellType.Obstacle;
-            var isEmpty = currentCell.Type == CONSTANTS.CellType.None || targetCell.Type == CONSTANTS.CellType.None;
-
-            return !isObstacle && !isEmpty;
-        }
-
         private IEnumerator InvertedAndMatch(Utils.GridPos targetGridPos)
         {
             var sourceGridPos = new Utils.GridPos(_gridPos.x, _gridPos.y);
-            this.SendCommand(new InvertedCellCommand(sourceGridPos, targetGridPos));
+            var isSpecial = this.SendCommand(new InvertedCellCommand(sourceGridPos, targetGridPos));
 
+            Debug.Log($"isSpecial {isSpecial}");
             yield return new WaitForSeconds(ConfigGame.Instance.FillTime * 2);
 
             var isMatch = this.SendCommand(new MatchGridCommand());
-            if (!isMatch)
+            if (!isMatch && !isSpecial)
             {
                 this.SendCommand(new InvertedCellCommand(targetGridPos, sourceGridPos));
                 yield return new WaitForSeconds(ConfigGame.Instance.FillTime * 2);

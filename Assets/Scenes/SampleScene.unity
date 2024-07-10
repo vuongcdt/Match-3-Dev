@@ -322,7 +322,7 @@ MonoBehaviour:
   backgroundBlock: {fileID: 730674053}
   gridBlock: {fileID: 720087986}
   buttonReset: {fileID: 2073678262}
-  width: 12
+  width: 11
   height: 7
   cellSize: 1.4
   avatarSize: 1
@@ -330,7 +330,7 @@ MonoBehaviour:
   fillTime: 0.2
   isProcessing: 0
   obstaclesTotal: 5
-  maxListImage: 9
+  maxListImage: 6
   sensitivity: 5
   minSensitivity: 0.2
   isRevertFill: 0

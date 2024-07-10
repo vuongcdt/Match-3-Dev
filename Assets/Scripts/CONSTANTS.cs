@@ -11,7 +11,7 @@
         Normal,
         Row,
         Column,
-        Color,
+        Rainbow,
     }
 
     public enum CellType
@@ -25,6 +25,6 @@
         Blue,
         Green,
         Pink,
-        Rainbow
+        Rainbow,
     }
 }

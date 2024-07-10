@@ -11,10 +11,10 @@ namespace Commands
     public class MatchGridCommand : AbstractCommand<bool>
     {
         private Cell[,] _grid;
+        private ConfigGame _configGame;
         private static readonly int RowAnimator = Animator.StringToHash("Row");
         private static readonly int ColumnAnimator = Animator.StringToHash("Column");
 
-        private ConfigGame _configGame;
 
         protected override bool OnExecute()
         {
@@ -77,7 +77,7 @@ namespace Commands
                 for (var index = 0; index < cellList.Count; index++)
                 {
                     var cell = cellList[index];
-                    RemoveObstacle(cell.GridPosition.x, cell.GridPosition.y);
+                    this.SendCommand(new RemoveObstacleCommand(cell.GridPosition.x, cell.GridPosition.y));
 
                     MergeCellSpecial(cell);
 
@@ -93,9 +93,9 @@ namespace Commands
         private static bool MergeCellByCount(int index, int random, List<Cell> cellList, Cell cell,
             Utils.MatchCell matchCell)
         {
-            if (index == random && cellList.Count > 5)
+            if (index == random && cellList.Count >= 5)
             {
-                cell.SpecialType = CONSTANTS.CellSpecialType.Color;
+                cell.SpecialType = CONSTANTS.CellSpecialType.Rainbow;
                 cell.Type = CONSTANTS.CellType.Rainbow;
                 return true;
             }
@@ -124,37 +124,6 @@ namespace Commands
                 for (int x = 0; x < _configGame.Width; x++)
                 {
                     _grid[x, cell.GridPosition.y].Type = CONSTANTS.CellType.None;
-                }
-            }
-        }
-
-        private void RemoveObstacle(int x, int y)
-        {
-            for (int index = x - 1; index <= x + 1; index++)
-            {
-                if (index == x || index < 0 || index >= _configGame.Width)
-                {
-                    continue;
-                }
-
-                var obstacle = _grid[index, y];
-                if (obstacle.Type == CONSTANTS.CellType.Obstacle)
-                {
-                    obstacle.Type = CONSTANTS.CellType.None;
-                }
-            }
-
-            for (int index = y - 1; index <= y + 1; index++)
-            {
-                if (index == y || index < 0 || index >= _configGame.Height)
-                {
-                    continue;
-                }
-
-                var obstacle = _grid[x, index];
-                if (obstacle.Type == CONSTANTS.CellType.Obstacle)
-                {
-                    obstacle.Type = CONSTANTS.CellType.None;
                 }
             }
         }

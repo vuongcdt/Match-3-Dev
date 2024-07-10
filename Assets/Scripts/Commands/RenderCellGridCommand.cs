@@ -1,6 +1,7 @@
 ﻿using GameControllers;
 using QFramework;
 using Queries;
+using UnityEngine;
 
 namespace Commands
 {
@@ -8,6 +9,7 @@ namespace Commands
     {
         private Cell[,] _grid;
         private ConfigGame _configGame;
+        private static readonly int DefaultAnimator = Animator.StringToHash("Default");
 
         protected override void OnExecute()
         {
@@ -22,7 +24,8 @@ namespace Commands
             {
                 for (int y = 0; y < _grid.GetLength(1); y++)
                 {
-                    if(_grid[x, y] is null)
+                    var cell = _grid[x, y];
+                    if (cell is null)
                     {
                         _configGame.Cell.Type = CONSTANTS.CellType.None;
 
@@ -36,7 +39,9 @@ namespace Commands
                     }
                     else
                     {
-                        _grid[x, y].Type = CONSTANTS.CellType.None;
+                        cell.Type = CONSTANTS.CellType.None;
+                        cell.GetComponentInChildren<Animator>().SetTrigger(DefaultAnimator);
+                        cell.SpecialType = CONSTANTS.CellSpecialType.Normal;
                     }
                 }
             }
