@@ -24,9 +24,23 @@ namespace GameControllers
 
             _grid = new Cell[_configGame.Width, _configGame.Height];
             this.SendCommand(new InitGridModelCommand(_grid));
+            // SpawnPool();
             this.SendCommand<RenderBackgroundGridCommand>();
 
             InitGame();
+        }
+
+        private void SpawnPool()
+        {
+            for (int i = 0; i < _configGame.Width * (_configGame.Height + 1) * 2; i++)
+            {
+                var cell = _configGame.Cell.Create(
+                    new Utils.GridPos(0,_configGame.Height),
+                    this.transform,
+                    _configGame.BackgroundSize,
+                    CONSTANTS.CellType.None);
+                _configGame.Pool.Push(cell);
+            }
         }
 
         private void InitGame()
@@ -44,7 +58,7 @@ namespace GameControllers
                 StartCoroutine(ResetGame());
                 yield return new WaitForSeconds(_configGame.FillTime);
             }
-
+            
             this.SendCommand<FillCommand>();
             var isAdd = this.SendCommand(new AddCellToGridCommand());
             

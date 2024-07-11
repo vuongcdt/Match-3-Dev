@@ -6,11 +6,12 @@ namespace GameControllers
 {
     public class Cell : MonoBehaviour, IController
     {
+        [SerializeField] private Animator animator;
         private PositionCell _positionCell;
         private InvertedCell _invertedCell;
         private CreateCell _createCell;
         private TypeCell _typeCell;
-        
+
         private static readonly int ClearAnimator = Animator.StringToHash("Clear");
 
         public InvertedCell InvertedCell
@@ -53,8 +54,12 @@ namespace GameControllers
 
         public void ClearCell()
         {
-            var animator = this.GetComponentInChildren<Animator>();
             animator.SetTrigger(ClearAnimator);
+            StartCoroutine(SetTypeIE());
+        }
+
+        public void ClearObstacle()
+        {
             StartCoroutine(SetTypeIE());
         }
 
@@ -64,7 +69,7 @@ namespace GameControllers
             _typeCell.Type = CONSTANTS.CellType.None;
         }
 
-        public void DeActive()
+        public void Clear()
         {
             _typeCell.Type = CONSTANTS.CellType.None;
         }

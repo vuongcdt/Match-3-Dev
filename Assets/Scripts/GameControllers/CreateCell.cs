@@ -33,10 +33,9 @@ namespace GameControllers
                 cell = Instantiate(_cell, pos, Quaternion.identity, transformParent);
             }
             
-            cell.GridPosition =  GetGridPos(pos);
+            cell.InvertedCell.StopMoveIE();
             cell.transform.position = pos;
             cell.Type = cellType;
-            cell.InvertedCell.StopMoveIE();
             
             if (cellType == CONSTANTS.CellType.Rainbow)
             {

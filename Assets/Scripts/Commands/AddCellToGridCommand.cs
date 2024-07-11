@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using Events;
-using GameControllers;
+﻿using GameControllers;
 using QFramework;
 using Queries;
 using UnityEngine;
@@ -38,8 +36,8 @@ namespace Commands
                         configGame.AvatarSize,
                         (CONSTANTS.CellType)random);
 
-                    _grid[x, configGame.Height - 1] = newCell;
                     newCell.GridPosition = new Utils.GridPos(x, configGame.Height - 1);
+                    _grid[x, configGame.Height - 1] = newCell;
                     
                     ReturnPool(cellBelow, configGame);
                 }
@@ -52,6 +50,7 @@ namespace Commands
         {
             cellBelow.GetComponentInChildren<Animator>().SetTrigger(DefaultAnimator);
             cellBelow.SpecialType = CONSTANTS.CellSpecialType.Normal;
+
             configGame.Pool.Push(cellBelow);
         }
     }

@@ -143,14 +143,19 @@ namespace Commands
         private static bool MergeCellByCount(int index, int random, List<Cell> cellList, Cell cell,
             Utils.MatchCell matchCell)
         {
-            if (index == random && cellList.Count >= 5)
-            {
-                cell.SpecialType = CONSTANTS.CellSpecialType.Rainbow;
-                cell.Type = CONSTANTS.CellType.Rainbow;
-                return true;
-            }
-
-            if (index == random && cellList.Count == 4)
+            // if (index == random && cellList.Count >= 5)
+            // {
+            //     cell.SpecialType = CONSTANTS.CellSpecialType.Rainbow;
+            //     cell.Type = CONSTANTS.CellType.Rainbow;
+            //     return true;
+            // }
+            //
+            // if (index == random && cellList.Count == 4)
+            // {
+            //     SetTriggerAndSpecialType(matchCell, index);
+            //     return true;
+            // }
+            if (index == random && cellList.Count >= 4)
             {
                 SetTriggerAndSpecialType(matchCell, index);
                 return true;
@@ -217,8 +222,7 @@ namespace Commands
             var cells = matchCell.CellList;
             var isTriggerRow = matchCell.Type == CONSTANTS.GridType.Row;
 
-            cells[index].GetComponentInChildren<Animator>().SetTrigger(isTriggerRow ? RowAnimator : ColumnAnimator);
-            // cells[index].GetComponentInChildren<Animator>().SetTrigger(ClearAnimator);
+            // cells[index].GetComponentInChildren<Animator>().SetTrigger(isTriggerRow ? RowAnimator : ColumnAnimator);
             cells[index].SpecialType = isTriggerRow ? CONSTANTS.CellSpecialType.Row : CONSTANTS.CellSpecialType.Column;
         }
     }

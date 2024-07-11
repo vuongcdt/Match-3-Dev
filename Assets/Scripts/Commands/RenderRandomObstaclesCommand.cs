@@ -47,7 +47,7 @@ namespace Commands
 
             // var randomObstaclesTotal = Random.Range(15, 22);
             // var randomObstaclesTotal = _configGame.ObstaclesTotal;
-            var randomObstaclesTotal = 10;
+            var randomObstaclesTotal = 15;
 
             while (obstacleGridPosList.Count < randomObstaclesTotal)
             {
