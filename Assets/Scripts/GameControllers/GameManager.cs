@@ -49,7 +49,7 @@ namespace GameControllers
 
         private IEnumerator ResetGame()
         {
-            yield return new WaitForSeconds(4);
+            yield return new WaitForSeconds(2);
             InitGame();
         }
 

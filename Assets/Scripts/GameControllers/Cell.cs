@@ -17,6 +17,7 @@ namespace GameControllers
 
         private Vector3 _clampMagnitude;
         private bool _isDragged;
+        private static readonly int ClearAnimator = Animator.StringToHash("Clear");
 
         public Utils.GridPos GridPosition
         {
@@ -52,8 +53,8 @@ namespace GameControllers
             get => _type;
             set
             {
-                _type = value;
                 SetAvatar(value);
+                _type = value;
             }
         }
 
@@ -106,19 +107,51 @@ namespace GameControllers
             return cell;
         }
 
-        private void SetAvatar(CONSTANTS.CellType type)
+        private void SetAvatar(CONSTANTS.CellType newType)
         {
             var avatar = this.GetComponentInChildren<SpriteRenderer>();
-            var image = ConfigGame.Instance.Sprites[(int)type];
-            if (image == null)
+            var image = ConfigGame.Instance.Sprites[(int)newType];
+            
+            if (image == null) //TODO
             {
                 avatar.sprite = null;
                 return;
             }
-
             avatar.sprite = image;
         }
+        
+        public void ClearAvatar()
+        {
+            var animator = this.GetComponentInChildren<Animator>();
+            var avatar = this.GetComponentInChildren<SpriteRenderer>();
 
+            animator.SetTrigger(ClearAnimator);
+            StartCoroutine(SetAvatarIE());
+        }
+        
+        private IEnumerator SetAvatarIE()
+        {
+            yield return new WaitForSeconds(ConfigGame.Instance.FillTime);
+            var avatar = this.GetComponentInChildren<SpriteRenderer>();
+            avatar.sprite = null;
+        }
+
+        private IEnumerator InvertedAndMatch(Utils.GridPos targetGridPos)
+        {
+            var sourceGridPos = new Utils.GridPos(_gridPos.x, _gridPos.y);
+            var isSpecial = this.SendCommand(new InvertedCellCommand(sourceGridPos, targetGridPos));
+
+            yield return new WaitForSeconds(ConfigGame.Instance.FillTime);
+
+            var isMatch = this.SendCommand(new MatchGridCommand());
+            
+            if (!isMatch && !isSpecial)
+            {
+                yield return new WaitForSeconds(ConfigGame.Instance.FillTime);
+                this.SendCommand(new InvertedCellCommand(targetGridPos, sourceGridPos));
+            }
+        }
+        
         public void DeActive()
         {
             this.Type = CONSTANTS.CellType.None;
@@ -139,7 +172,7 @@ namespace GameControllers
         private IEnumerator MoveIE(Vector2 pos, float time)
         {
             time *= ConfigGame.Instance.TimeScale;
-            for (float t = 0; t <=  time; t += Time.deltaTime)
+            for (float t = 0; t <= time; t += Time.deltaTime)
             {
                 this.transform.position = Vector3.Lerp(this.transform.position, pos, t / time);
                 yield return null;
@@ -207,20 +240,6 @@ namespace GameControllers
             configGame.IsDragged = false;
         }
 
-        private IEnumerator InvertedAndMatch(Utils.GridPos targetGridPos)
-        {
-            var sourceGridPos = new Utils.GridPos(_gridPos.x, _gridPos.y);
-            var isSpecial = this.SendCommand(new InvertedCellCommand(sourceGridPos, targetGridPos));
-
-            yield return new WaitForSeconds(ConfigGame.Instance.FillTime);
-
-            var isMatch = this.SendCommand(new MatchGridCommand());
-            if (!isMatch && !isSpecial)
-            {
-                this.SendCommand(new InvertedCellCommand(targetGridPos, sourceGridPos));
-                yield return new WaitForSeconds(ConfigGame.Instance.FillTime);
-            }
-        }
 
         private bool IsPositionInGrid(Utils.GridPos targetGridPos)
         {

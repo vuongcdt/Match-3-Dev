@@ -14,6 +14,7 @@ namespace Commands
         private ConfigGame _configGame;
         private static readonly int RowAnimator = Animator.StringToHash("Row");
         private static readonly int ColumnAnimator = Animator.StringToHash("Column");
+        private static readonly int ClearAnimator = Animator.StringToHash("Clear");
 
 
         protected override bool OnExecute()
@@ -83,6 +84,7 @@ namespace Commands
 
                     if (MergeCellByCount(index, random, cellList, cell, matchCell)) continue;
 
+                    // cell.ClearAvatar();
                     cell.DeActive();
                 }
             }
@@ -200,6 +202,7 @@ namespace Commands
             var isTriggerRow = matchCell.Type == CONSTANTS.GridType.Row;
 
             cells[index].GetComponentInChildren<Animator>().SetTrigger(isTriggerRow ? RowAnimator : ColumnAnimator);
+            // cells[index].GetComponentInChildren<Animator>().SetTrigger(ClearAnimator);
             cells[index].SpecialType = isTriggerRow ? CONSTANTS.CellSpecialType.Row : CONSTANTS.CellSpecialType.Column;
         }
     }

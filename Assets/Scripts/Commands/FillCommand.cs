@@ -50,7 +50,7 @@ namespace Commands
                 var isTargetEmpty = target.Type == CONSTANTS.CellType.None;
                 var isNextToObstacle = _grid[x + index, y].Type == CONSTANTS.CellType.Obstacle;
 
-                var isUpObstacle = IsUpObstacle(x, y);
+                var isUpNotFish = IsUpNotFish(x, y);
                 // var isSpecial = y + 1 < configGame.Height &&
                 //                 _grid[x + index, y + 1].Type == CONSTANTS.CellType.Obstacle &&
                 //                 _grid[x, y + 1].Type == CONSTANTS.CellType.Obstacle;     
@@ -58,7 +58,7 @@ namespace Commands
                 // {
                 //     continue;
                 // }
-                if (index != 0 && !isNextToObstacle && !isUpObstacle)
+                if (index != 0 && !(isNextToObstacle || isUpNotFish))
                 {
                     continue;
                 }
@@ -78,14 +78,16 @@ namespace Commands
             }
         }
 
-        private bool IsUpObstacle(int x, int y)
+        private bool IsUpNotFish(int x, int y)
         {
-            if (y + 1 > ConfigGame.Instance.Height - 1)
+            var configGame = ConfigGame.Instance;
+            if (y + 1 > configGame.Height - 1)
             {
                 return false;
             }
 
-            return _grid[x, y + 1].Type == CONSTANTS.CellType.Obstacle;
+            return _grid[x, y + 1].Type == CONSTANTS.CellType.Obstacle ||
+                   (y + 2 < configGame.Height && _grid[x, y + 2].Type == CONSTANTS.CellType.Obstacle);
         }
 
         private void MoveToNextTo(Cell cellSource, Cell cellTarget, int x, int y, int index)
