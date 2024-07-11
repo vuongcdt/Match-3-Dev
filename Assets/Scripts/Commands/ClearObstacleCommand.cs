@@ -4,14 +4,14 @@ using Queries;
 
 namespace Commands
 {
-    public class RemoveObstacleCommand : AbstractCommand
+    public class ClearObstacleCommand : AbstractCommand
     {
         private Cell[,] _grid;
         private ConfigGame _configGame;
         private int _x;
         private int _y;
 
-        public RemoveObstacleCommand(int x, int y)
+        public ClearObstacleCommand(int x, int y)
         {
             _x = x;
             _y = y;
@@ -35,11 +35,7 @@ namespace Commands
                 }
 
                 var obstacle = _grid[newX, y];
-                if (obstacle.Type == CONSTANTS.CellType.Obstacle)
-                {
-                    obstacle.Type = CONSTANTS.CellType.None;
-                    _configGame.ObstaclesTotal--;
-                }
+                SetObstacleToNone(obstacle);
             }
 
             for (int newY = y - 1; newY <= y + 1; newY++)
@@ -50,11 +46,17 @@ namespace Commands
                 }
 
                 var obstacle = _grid[x, newY];
-                if (obstacle.Type == CONSTANTS.CellType.Obstacle)
-                {
-                    obstacle.Type = CONSTANTS.CellType.None;
-                    _configGame.ObstaclesTotal--;
-                }
+                SetObstacleToNone(obstacle);
+            }
+        }
+
+        private void SetObstacleToNone(Cell obstacle)
+        {
+            if (obstacle.Type == CONSTANTS.CellType.Obstacle)
+            {
+                obstacle.Type = CONSTANTS.CellType.None;
+                _configGame.ObstaclesTotal--;
+                _configGame.ObstaclesTotalText.text = _configGame.ObstaclesTotal.ToString();
             }
         }
     }

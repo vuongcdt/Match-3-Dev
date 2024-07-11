@@ -7,18 +7,18 @@ using UnityEngine;
 
 namespace Commands
 {
-    public class AddCellToGridCommand : AbstractCommand<IEnumerator>
+    public class AddCellToGridCommand : AbstractCommand<bool>
     {
         private Cell[,] _grid;
         private static readonly int DefaultAnimator = Animator.StringToHash("Default");
 
-        protected override IEnumerator OnExecute()
+        protected override bool OnExecute()
         {
             _grid = this.SendQuery(new GetGridQuery());
             return AddCellToGrid();
         }
 
-        private IEnumerator AddCellToGrid()
+        private bool AddCellToGrid()
         {
             var isAdd = false;
             ConfigGame configGame = ConfigGame.Instance;
@@ -45,16 +45,16 @@ namespace Commands
                 }
             }
 
-            yield return new WaitForSeconds(configGame.FillTime);
-            
-            if (isAdd)
-            {
-                this.SendEvent<ProcessingGridEvent>();
-            }
-            else
-            {
-                this.SendCommand(new MatchGridCommand());
-            }
+            // yield return new WaitForSeconds(configGame.FillTime);
+            return isAdd;
+            // if (isAdd)
+            // {
+            //     this.SendEvent<ProcessingGridEvent>();
+            // }
+            // else
+            // {
+            //     this.SendCommand(new MatchGridCommand());
+            // }
         }
 
         private static void ReturnPool(Cell cellBelow, ConfigGame configGame)

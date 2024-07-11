@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using GameControllers;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class ConfigGame : Singleton<ConfigGame>
@@ -9,13 +11,13 @@ public class ConfigGame : Singleton<ConfigGame>
     [SerializeField] private Transform backgroundBlock;
     [SerializeField] private Transform gridBlock;
     [SerializeField] private Button buttonReset;
+    [SerializeField] private TMP_Text obstaclesTotalText;
 
     [SerializeField] private int width;
     [SerializeField] private int height;
     [SerializeField] private float cellSize;
     [SerializeField] private float avatarSize;
     [SerializeField] private float backgroundSize;
-    [SerializeField] private float fillTime;
     [SerializeField] private bool isProcessing;
     [SerializeField] private int obstaclesTotal;
     [SerializeField] private int maxListImage;
@@ -23,15 +25,29 @@ public class ConfigGame : Singleton<ConfigGame>
     [SerializeField] private float minSensitivity;
     [SerializeField] private bool isRevertFill;
     [SerializeField] private Sprite[] sprites;
-    [SerializeField]private float _timeScale = 10;
+    [SerializeField] private float timeScale = 2;
+    [SerializeField] private float fillTime;
+    [SerializeField] private float matchTime;
 
     private bool _isDragged;
     private Stack<Cell> _pool = new();
 
+    public float MatchTime
+    {
+        get => matchTime;
+        set => matchTime = value;
+    }
+
+    public TMP_Text ObstaclesTotalText
+    {
+        get => obstaclesTotalText;
+        set => obstaclesTotalText = value;
+    }
+
     public float TimeScale
     {
-        get => _timeScale;
-        set => _timeScale = value;
+        get => timeScale;
+        set => timeScale = value;
     }
 
     public Stack<Cell> Pool

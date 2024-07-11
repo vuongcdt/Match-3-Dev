@@ -13,7 +13,9 @@ namespace GameControllers
 
         private void Start()
         {
-            this.RegisterEvent<ProcessingGridEvent>(e => ProcessingGrid())
+            Application.targetFrameRate = 60;
+
+            this.RegisterEvent<ProcessingGridEvent>(e => StartCoroutine(ProcessingGrid()))
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
 
             _configGame = ConfigGame.Instance;
@@ -32,23 +34,40 @@ namespace GameControllers
             this.SendCommand<RenderCellGridCommand>();
             this.SendCommand<RenderRandomObstaclesCommand>();
 
-            ProcessingGrid();
+            StartCoroutine(ProcessingGrid());
         }
 
-        private void ProcessingGrid()
+        private IEnumerator ProcessingGrid()
         {
             if (_configGame.ObstaclesTotal == 0)
             {
                 StartCoroutine(ResetGame());
-                return;
+                yield return new WaitForSeconds(_configGame.FillTime);
             }
 
             this.SendCommand<FillCommand>();
-            StartCoroutine(this.SendCommand(new AddCellToGridCommand()));
+            var isAdd = this.SendCommand(new AddCellToGridCommand());
+            
+            if (isAdd)
+            {
+                yield return new WaitForSeconds(_configGame.FillTime);
+                StartCoroutine(ProcessingGrid());
+            }
+            else
+            {
+                var isMatch = this.SendCommand(new MatchGridCommand());
+                yield return new WaitForSeconds(_configGame.MatchTime);
+                
+                if (isMatch)
+                {
+                    StartCoroutine(ProcessingGrid());
+                }
+            }
         }
 
         private IEnumerator ResetGame()
         {
+            Debug.Log("GAME WIN");
             yield return new WaitForSeconds(2);
             InitGame();
         }

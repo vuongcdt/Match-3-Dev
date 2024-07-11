@@ -99,6 +99,7 @@ namespace GameControllers
             cell._gridPos = GetGridPos(pos);
             cell.transform.position = pos;
             cell.Type = cellType;
+            cell.StopMoveIE();
             if (cellType == CONSTANTS.CellType.Rainbow)
             {
                 cell._specialType = CONSTANTS.CellSpecialType.Rainbow;
@@ -111,29 +112,28 @@ namespace GameControllers
         {
             var avatar = this.GetComponentInChildren<SpriteRenderer>();
             var image = ConfigGame.Instance.Sprites[(int)newType];
-            
+
             if (image == null) //TODO
             {
                 avatar.sprite = null;
                 return;
             }
+
             avatar.sprite = image;
         }
-        
-        public void ClearAvatar()
+
+        public void ClearCell()
         {
             var animator = this.GetComponentInChildren<Animator>();
-            var avatar = this.GetComponentInChildren<SpriteRenderer>();
-
             animator.SetTrigger(ClearAnimator);
-            StartCoroutine(SetAvatarIE());
+            // animator.speed = ConfigGame.Instance.FillTime;
+            StartCoroutine(SetTypeIE());
         }
-        
-        private IEnumerator SetAvatarIE()
+
+        private IEnumerator SetTypeIE()
         {
-            yield return new WaitForSeconds(ConfigGame.Instance.FillTime);
-            var avatar = this.GetComponentInChildren<SpriteRenderer>();
-            avatar.sprite = null;
+            yield return new WaitForSeconds(ConfigGame.Instance.MatchTime);
+            this.Type = CONSTANTS.CellType.None;
         }
 
         private IEnumerator InvertedAndMatch(Utils.GridPos targetGridPos)
@@ -144,44 +144,54 @@ namespace GameControllers
             yield return new WaitForSeconds(ConfigGame.Instance.FillTime);
 
             var isMatch = this.SendCommand(new MatchGridCommand());
-            
+
             if (!isMatch && !isSpecial)
             {
-                yield return new WaitForSeconds(ConfigGame.Instance.FillTime);
                 this.SendCommand(new InvertedCellCommand(targetGridPos, sourceGridPos));
             }
+
+            yield return new WaitForSeconds(ConfigGame.Instance.MatchTime);
+            this.SendCommand<ProcessingGridEventCommand>();
         }
-        
+
         public void DeActive()
         {
             this.Type = CONSTANTS.CellType.None;
         }
 
-        private void Move(Utils.GridPos pos, float time)
+        public void StopMoveIE()
         {
-            var worldPos = GetWorldPos(pos);
             if (_moveIE != null)
             {
                 StopCoroutine(_moveIE);
             }
+        }
 
+        private void Move(Utils.GridPos pos, float time)
+        {
+            var worldPos = GetWorldPos(pos);
+            // if (_moveIE != null)
+            // {
+            //     StopCoroutine(_moveIE);
+            // }
             _moveIE = MoveIE(worldPos, time);
             StartCoroutine(_moveIE);
+            this.gameObject.name = $"{this._type.ToString()} {this._gridPos.x}_{this._gridPos.y}";
         }
 
         private IEnumerator MoveIE(Vector2 pos, float time)
         {
-            time *= ConfigGame.Instance.TimeScale;
-            for (float t = 0; t <= time; t += Time.deltaTime)
+            // time *= ConfigGame.Instance.TimeScale;
+            for (float t = 0; t <= time * ConfigGame.Instance.TimeScale; t += Time.deltaTime)
             {
-                this.transform.position = Vector3.Lerp(this.transform.position, pos, t / time);
+                this.transform.position =
+                    Vector3.Lerp(this.transform.position, pos, t / (time));
                 yield return null;
             }
 
             _worldPos = pos;
             _gridPos = GetGridPos(pos);
-            this.transform.position = pos;
-            this.gameObject.name = $"{this._type.ToString()} {this._gridPos.x}_{this._gridPos.y}";
+            // this.transform.position = pos;
         }
 
         private void OnMouseDown()

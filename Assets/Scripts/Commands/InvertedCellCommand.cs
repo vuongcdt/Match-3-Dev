@@ -66,7 +66,7 @@ namespace Commands
                 if (cell.Type == typeFish)
                 {
                     cell.Type = CONSTANTS.CellType.None;
-                    this.SendCommand(new RemoveObstacleCommand(cell.GridPosition.x, cell.GridPosition.y));
+                    this.SendCommand(new ClearObstacleCommand(cell.GridPosition.x, cell.GridPosition.y));
                 }
             }
 

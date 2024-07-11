@@ -23,7 +23,7 @@ namespace Commands
             var obstacleGridPosList = RandomObstacleGridPosList();
 
             _configGame.ObstaclesTotal = obstacleGridPosList.Count;
-            // Debug.Log(obstacleGridPosList.Count);
+            _configGame.ObstaclesTotalText.text = obstacleGridPosList.Count.ToString();
             foreach (var gridPos in obstacleGridPosList)
             {
                 if (gridPos.x < 0 || gridPos.x > _configGame.Width - 1 || gridPos.y < 0 ||
@@ -45,8 +45,9 @@ namespace Commands
 
             var isNotNextTo = Random.value > 0.5f;
 
-            var randomObstaclesTotal = Random.Range(15, 22);
+            // var randomObstaclesTotal = Random.Range(15, 22);
             // var randomObstaclesTotal = _configGame.ObstaclesTotal;
+            var randomObstaclesTotal = 10;
 
             while (obstacleGridPosList.Count < randomObstaclesTotal)
             {
