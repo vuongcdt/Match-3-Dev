@@ -47,7 +47,7 @@ namespace GameControllers
 
             this.SendCommand<FillCommand>();
             var isAdd = this.SendCommand(new AddCellToGridCommand());
-            
+
             if (isAdd)
             {
                 yield return new WaitForSeconds(_configGame.FillTime);
@@ -57,7 +57,7 @@ namespace GameControllers
             {
                 var isMatch = this.SendCommand(new MatchGridCommand());
                 yield return new WaitForSeconds(_configGame.MatchTime);
-                
+
                 if (isMatch)
                 {
                     StartCoroutine(ProcessingGrid());

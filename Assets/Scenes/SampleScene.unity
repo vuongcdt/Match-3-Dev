@@ -122,6 +122,51 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &311509947
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 311509949}
+  - component: {fileID: 311509948}
+  m_Layer: 0
+  m_Name: Pool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &311509948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 311509947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad9055b8689a4ae29db041c36125cd91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cell: {fileID: 8616923916065429660, guid: 6fb716449f0b8fb429c6f762154ffa43, type: 3}
+--- !u!4 &311509949
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 311509947}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 328.885, y: 615.6896, z: -6.4405513}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -329,7 +374,7 @@ MonoBehaviour:
   avatarSize: 1.1
   backgroundSize: 1.3
   isProcessing: 0
-  obstaclesTotal: 10
+  obstaclesTotal: 15
   maxListImage: 7
   sensitivity: 5
   minSensitivity: 0.2
@@ -355,6 +400,7 @@ MonoBehaviour:
   timeScale: 2
   fillTime: 0.2
   matchTime: 0.5
+  isDragged: 0
 --- !u!4 &1174744653
 Transform:
   m_ObjectHideFlags: 0
@@ -1042,3 +1088,4 @@ SceneRoots:
   - {fileID: 2112532890}
   - {fileID: 1174744653}
   - {fileID: 1604046156}
+  - {fileID: 311509949}

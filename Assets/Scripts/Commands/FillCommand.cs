@@ -96,7 +96,7 @@ namespace Commands
             _grid[x + index, y] = cellSource;
             _grid[x, y] = cellTarget;
 
-            cellTarget.DeActive();
+            cellTarget.ClearCell();
         }
 
         private void MoveToBelow(Cell cellSource, Cell cellTarget, int x, int y, int index = 0)
@@ -105,7 +105,7 @@ namespace Commands
             _grid[x + index, y - 1] = cellSource;
             _grid[x, y] = cellTarget;
 
-            cellTarget.DeActive();
+            cellTarget.ClearCell();
         }
     }
 }

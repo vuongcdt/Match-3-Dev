@@ -3,60 +3,43 @@ using UnityEngine;
 
 namespace GameControllers
 {
-    public class CreateCell: MonoBehaviour, IController
+    public class CreateCell : MonoBehaviour, IController
     {
         [SerializeField] private BoxCollider2D box2D;
+        private TypeCell _typeCell;
 
-        private Cell _cell;
-        
-        // public Cell Create(Utils.GridPos pos, Transform transformParent, float cellSize, CONSTANTS.CellType cellType)
-        // {
-        //     var worldPos = GetWorldPos(pos);
-        //     return Create(worldPos, transformParent, cellSize, cellType);
-        // }
+        private BoxCollider2D Box2D => box2D;
 
         public Cell Create(Vector2 pos, Transform transformParent, float cellSize, CONSTANTS.CellType cellType)
         {
-            box2D = this.GetComponent<BoxCollider2D>();
-            _cell = this.GetComponent<Cell>();
-            
-            var configGame = ConfigGame.Instance;
             var isCellNormal =
                 cellType is not (CONSTANTS.CellType.Background or CONSTANTS.CellType.Obstacle
                     or CONSTANTS.CellType.None);
 
-            this.transform.localScale = Vector2.one * cellSize;
+            var cell = Pool.Instance.Rent();
 
-            Cell cell = null;
-            if (configGame.Pool.Count > 0)
-            {
-                cell = configGame.Pool.Pop();
-                cell.GetComponent<BoxCollider2D>().enabled = true;
-            }
-            else
-            {
-                box2D.enabled = isCellNormal;
-                cell = Instantiate(_cell, pos, Quaternion.identity, transformParent);
-            }
-            
-            cell.GridPosition =  GetGridPos(pos);
+            cell.transform.SetParent(transformParent);
             cell.transform.position = pos;
+            cell.transform.localScale = Vector2.one * cellSize;
+            cell.CreateCell.Box2D.enabled = isCellNormal;
+            cell.GridPosition = GetGridPos(pos);
             cell.Type = cellType;
             cell.InvertedCell.StopMoveIE();
-            
+
             if (cellType == CONSTANTS.CellType.Rainbow)
             {
-                // cell._specialType = CONSTANTS.CellSpecialType.Rainbow;
+                cell.SpecialType = CONSTANTS.CellSpecialType.Rainbow;
             }
 
             return cell;
         }
-        
+
         private Utils.GridPos GetGridPos(Vector3 pos)
         {
             var configGame = ConfigGame.Instance;
             return Utils.GetGridPos(pos.x, pos.y, configGame.Width, configGame.Height, configGame.CellSize);
         }
+
         public IArchitecture GetArchitecture()
         {
             return GameApp.Interface;

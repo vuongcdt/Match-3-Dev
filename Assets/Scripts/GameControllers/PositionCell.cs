@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using QFramework;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ namespace GameControllers
         private Utils.GridPos _gridPos;
         private Vector3 _worldPos;
         private IEnumerator _moveIE;
+        private TypeCell _typeCell;
 
         public Vector3 WorldPosition => _worldPos;
 
@@ -23,13 +25,18 @@ namespace GameControllers
             }
         }
 
+        private void Awake()
+        {
+            _typeCell = this.GetComponent<TypeCell>();
+        }
+
         private void Move(Utils.GridPos pos, float time)
         {
             var worldPos = GetWorldPos(pos);
             _moveIE = MoveIE(worldPos, time);
 
             StartCoroutine(_moveIE);
-            // this.gameObject.name = $"{this._type.ToString()} {this._gridPos.x}_{this._gridPos.y}";
+            this.gameObject.name = $"{_typeCell.Type.ToString()} {this._gridPos.x}_{this._gridPos.y}";
         }
 
         private IEnumerator MoveIE(Vector2 pos, float time)

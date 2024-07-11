@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using GameControllers;
+﻿using GameControllers;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class ConfigGame : Singleton<ConfigGame>
@@ -28,44 +26,21 @@ public class ConfigGame : Singleton<ConfigGame>
     [SerializeField] private float timeScale = 2;
     [SerializeField] private float fillTime;
     [SerializeField] private float matchTime;
+    [SerializeField] private bool isDragged;
 
-    private bool _isDragged;
-    private Stack<Cell> _pool = new();
 
-    public float MatchTime
-    {
-        get => matchTime;
-        set => matchTime = value;
-    }
+    public float MatchTime => matchTime;
 
-    public TMP_Text ObstaclesTotalText
-    {
-        get => obstaclesTotalText;
-        set => obstaclesTotalText = value;
-    }
+    public TMP_Text ObstaclesTotalText => obstaclesTotalText;
 
-    public float TimeScale
-    {
-        get => timeScale;
-        set => timeScale = value;
-    }
+    public float TimeScale => timeScale;
 
-    public Stack<Cell> Pool
-    {
-        get => _pool;
-        set => _pool = value;
-    }
-
-    public Sprite[] Sprites
-    {
-        get => sprites;
-        set => sprites = value;
-    }
+    public Sprite[] Sprites => sprites;
 
     public bool IsDragged
     {
-        get => _isDragged;
-        set => _isDragged = value;
+        get => isDragged;
+        set => isDragged = value;
     }
 
     private Cell[,] _grid;
