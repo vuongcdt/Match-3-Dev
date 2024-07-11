@@ -22,12 +22,6 @@ namespace Commands
             {
                 for (int y = 0; y < _grid.GetLength(1); y++)
                 {
-                    // _configGame.Cell.Create(
-                    //     new Utils.GridPos(x, y),
-                    //     _configGame.BackgroundBlock,
-                    //     _configGame.BackgroundSize,
-                    //     CONSTANTS.CellType.Background);
-                    
                     Pool.Instance.Create(
                         new Utils.GridPos(x, y),
                         _configGame.BackgroundBlock,

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using QFramework;
+﻿using QFramework;
 using UnityEngine;
 
 namespace GameControllers
@@ -8,10 +7,7 @@ namespace GameControllers
     {
         private PositionCell _positionCell;
         private InvertedCell _invertedCell;
-        // private CreateCell _createCell;
         private TypeCell _typeCell;
-
-        // public CreateCell CreateCell => _createCell;
 
         public InvertedCell InvertedCell => _invertedCell;
 
@@ -40,18 +36,16 @@ namespace GameControllers
             _positionCell = this.GetComponent<PositionCell>();
             _invertedCell = this.GetComponent<InvertedCell>();
             _typeCell = this.GetComponent<TypeCell>();
-            // _createCell = this.GetComponent<CreateCell>();
         }
-
-        // public Cell Create(Utils.GridPos pos, Transform transformParent, float cellSize, CONSTANTS.CellType cellType)
-        // {
-        //     var worldPos = GetWorldPos(pos);
-        //     return _createCell.Create(worldPos, transformParent, cellSize, cellType);
-        // }
 
         public void ClearFish()
         {
             _typeCell.ClearFish();
+        }
+        
+        public void ClearObstacle()
+        {
+            _typeCell.ClearObstacle();
         }
 
         public void ClearCell()

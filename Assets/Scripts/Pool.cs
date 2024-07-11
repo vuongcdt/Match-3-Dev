@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Pool : Singleton<Pool>
 {
-    [SerializeField]private Cell cell;
-    
     private Stack<Cell> _pool = new();
 
     private Cell Rent()

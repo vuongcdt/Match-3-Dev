@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Events;
 using GameControllers;
 using QFramework;
 using Queries;
@@ -14,8 +13,6 @@ namespace Commands
         private ConfigGame _configGame;
         private static readonly int RowAnimator = Animator.StringToHash("Row");
         private static readonly int ColumnAnimator = Animator.StringToHash("Column");
-        private static readonly int ClearAnimator = Animator.StringToHash("Clear");
-
 
         protected override bool OnExecute()
         {
@@ -64,13 +61,14 @@ namespace Commands
         private bool MergeCells(List<Utils.MatchCell> matchCellList)
         {
             matchCellList.Sort((listA, listB) => listB.CellList.Count - listA.CellList.Count);
+            
             foreach (var matchCell in matchCellList)
             {
                 var cellList = matchCell.CellList;
                 var random = Random.Range(0, cellList.Count);
                 foreach (var cell in cellList)
                 {
-                    MergeCellRowColumn(cell);
+                    MergeCellSpecial(cell);
                 }
 
                 for (var index = 0; index < cellList.Count; index++)
@@ -87,7 +85,7 @@ namespace Commands
             return matchCellList.Count > 0;
         }
 
-        private void MergeCellRowColumn(Cell cell)
+        private void MergeCellSpecial(Cell cell)
         {
             var gridPos = cell.GridPosition;
             if (cell.SpecialType == CONSTANTS.CellSpecialType.Column)
@@ -99,12 +97,12 @@ namespace Commands
                     
                     ClearFish(gridPos.x, newY);
                     
-                    var cellSpecialType = _grid[gridPos.x, newY].SpecialType;
+                    var cellColumnSpecialType = _grid[gridPos.x, newY].SpecialType;
                     
-                    if (cellSpecialType == CONSTANTS.CellSpecialType.Column ||
-                        cellSpecialType == CONSTANTS.CellSpecialType.Row)
+                    if (cellColumnSpecialType == CONSTANTS.CellSpecialType.Column ||
+                        cellColumnSpecialType == CONSTANTS.CellSpecialType.Row)
                     {
-                        MergeCellRowColumn(_grid[gridPos.x, newY]);
+                        MergeCellSpecial(_grid[gridPos.x, newY]);
                     }
                 }
             }
@@ -118,12 +116,12 @@ namespace Commands
                     
                     ClearFish(newX, gridPos.y);
                     
-                    var cellSpecialType = _grid[newX, gridPos.y].SpecialType;
+                    var cellRowSpecialType = _grid[newX, gridPos.y].SpecialType;
                     
-                    if (cellSpecialType == CONSTANTS.CellSpecialType.Column ||
-                        cellSpecialType == CONSTANTS.CellSpecialType.Row)
+                    if (cellRowSpecialType == CONSTANTS.CellSpecialType.Column ||
+                        cellRowSpecialType == CONSTANTS.CellSpecialType.Row)
                     {
-                        MergeCellRowColumn(_grid[newX, gridPos.y]);
+                        MergeCellSpecial(_grid[newX, gridPos.y]);
                     }
                 }
             }
@@ -131,7 +129,7 @@ namespace Commands
 
         private void ClearFish(int x, int y)
         {
-            _grid[x, y].SpecialType = CONSTANTS.CellSpecialType.Normal;
+            // _grid[x, y].SpecialType = CONSTANTS.CellSpecialType.Normal;
             _grid[x, y].ClearFish();
         }
 

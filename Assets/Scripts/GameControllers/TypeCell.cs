@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using QFramework;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace GameControllers
 {
@@ -64,6 +62,21 @@ namespace GameControllers
             StartCoroutine(SetTypeIE());
         }
 
+        public void ClearObstacle()
+        {
+            StartCoroutine(ClearObstacleIE());
+        }
+
+        private IEnumerator ClearObstacleIE()
+        {
+            var configGame = ConfigGame.Instance;
+            yield return new WaitForSeconds(ConfigGame.Instance.MatchTime);
+
+            configGame.ObstaclesTotal--;
+            configGame.ObstaclesTotalText.text = configGame.ObstaclesTotal.ToString();
+            ClearCell();
+        }
+        
         private IEnumerator SetTypeIE()
         {
             yield return new WaitForSeconds(ConfigGame.Instance.MatchTime);
@@ -72,7 +85,6 @@ namespace GameControllers
 
         public void ClearCell()
         {
-            // this.SpecialType = CONSTANTS.CellSpecialType.Normal;
             this.Type = CONSTANTS.CellType.None;
         }
 
