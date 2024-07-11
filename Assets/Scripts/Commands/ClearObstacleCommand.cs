@@ -54,6 +54,10 @@ namespace Commands
         {
             if (obstacle.Type == CONSTANTS.CellType.Obstacle)
             {
+                var configGame = ConfigGame.Instance;
+                configGame.ObstaclesTotal--;
+                configGame.ObstaclesTotalText.text = configGame.ObstaclesTotal.ToString();
+                
                 obstacle.ClearObstacle();
             }
         }

@@ -14,6 +14,7 @@ namespace GameControllers
 
         private static readonly int ClearAnimator = Animator.StringToHash("Clear");
         private static readonly int DefaultAnimator = Animator.StringToHash("Default");
+        private static readonly int ObstacleClearAnimator = Animator.StringToHash("ObstacleClear");
 
         public Animator Animator => _animator;
 
@@ -64,16 +65,14 @@ namespace GameControllers
 
         public void ClearObstacle()
         {
+            _animator.SetTrigger(ObstacleClearAnimator);
             StartCoroutine(ClearObstacleIE());
         }
 
         private IEnumerator ClearObstacleIE()
         {
-            var configGame = ConfigGame.Instance;
             yield return new WaitForSeconds(ConfigGame.Instance.MatchTime);
 
-            configGame.ObstaclesTotal--;
-            configGame.ObstaclesTotalText.text = configGame.ObstaclesTotal.ToString();
             ClearCell();
         }
         

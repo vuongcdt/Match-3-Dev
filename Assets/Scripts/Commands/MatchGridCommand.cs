@@ -76,7 +76,11 @@ namespace Commands
                     var cell = cellList[index];
                     this.SendCommand(new ClearObstacleCommand(cell.GridPosition.x, cell.GridPosition.y));
 
-                    if (MergeCellByCount(index, random, cellList, cell, matchCell)) continue;
+                    var isMerge = MergeCellByCount(index, random, cellList, cell, matchCell);
+                    if (isMerge)
+                    {
+                        continue;
+                    }
 
                     cell.ClearFish();
                 }
@@ -138,7 +142,6 @@ namespace Commands
         {
             if (index == random && cellList.Count >= 5)
             {
-                cell.SpecialType = CONSTANTS.CellSpecialType.Rainbow;
                 cell.Type = CONSTANTS.CellType.Rainbow;
                 return true;
             }

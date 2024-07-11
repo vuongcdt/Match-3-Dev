@@ -33,10 +33,10 @@ public class Pool : Singleton<Pool>
         cell.Type = cellType;
         cell.InvertedCell.StopMoveIE();
 
-        if (cellType == CONSTANTS.CellType.Rainbow)
-        {
-            cell.SpecialType = CONSTANTS.CellSpecialType.Rainbow;
-        }
+        // if (cellType == CONSTANTS.CellType.Rainbow)
+        // {
+        //     cell.SpecialType = CONSTANTS.CellSpecialType.Rainbow;
+        // }
 
         return cell;
     }
