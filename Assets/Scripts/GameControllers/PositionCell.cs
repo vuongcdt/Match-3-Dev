@@ -29,7 +29,7 @@ namespace GameControllers
             _moveIE = MoveIE(worldPos, time);
 
             StartCoroutine(_moveIE);
-            // this.gameObject.name = $"{this._type.ToString()} {this._gridPos.x}_{this._gridPos.y}";
+            this.gameObject.name = $"{this.GetComponent<TypeCell>().Type.ToString()} {this._gridPos.x}_{this._gridPos.y}";
         }
 
         private IEnumerator MoveIE(Vector2 pos, float time)

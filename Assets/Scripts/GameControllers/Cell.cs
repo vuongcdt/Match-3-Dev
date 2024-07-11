@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using Commands;
+﻿using System.Collections;
 using QFramework;
 using UnityEngine;
 
@@ -8,8 +6,6 @@ namespace GameControllers
 {
     public class Cell : MonoBehaviour, IController
     {
-        [SerializeField] private BoxCollider2D box2D;
-
         private PositionCell _positionCell;
         private InvertedCell _invertedCell;
         private CreateCell _createCell;

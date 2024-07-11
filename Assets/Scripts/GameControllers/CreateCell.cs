@@ -9,12 +9,6 @@ namespace GameControllers
 
         private Cell _cell;
         
-        // public Cell Create(Utils.GridPos pos, Transform transformParent, float cellSize, CONSTANTS.CellType cellType)
-        // {
-        //     var worldPos = GetWorldPos(pos);
-        //     return Create(worldPos, transformParent, cellSize, cellType);
-        // }
-
         public Cell Create(Vector2 pos, Transform transformParent, float cellSize, CONSTANTS.CellType cellType)
         {
             box2D = this.GetComponent<BoxCollider2D>();
