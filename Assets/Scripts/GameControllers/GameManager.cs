@@ -1,3 +1,4 @@
+using System.Collections;
 using Commands;
 using Events;
 using QFramework;
@@ -38,11 +39,18 @@ namespace GameControllers
         {
             if (_configGame.ObstaclesTotal == 0)
             {
-                InitGame();
+                StartCoroutine(ResetGame());
                 return;
             }
+
             this.SendCommand<FillCommand>();
             StartCoroutine(this.SendCommand(new AddCellToGridCommand()));
+        }
+
+        private IEnumerator ResetGame()
+        {
+            yield return new WaitForSeconds(4);
+            InitGame();
         }
 
         public void OnRestartClick()

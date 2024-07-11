@@ -27,14 +27,14 @@ namespace Commands
 
         private void RemoveObstacle(int x, int y)
         {
-            for (int index = x - 1; index <= x + 1; index++)
+            for (int newX = x - 1; newX <= x + 1; newX++)
             {
-                if (index == x || index < 0 || index >= _configGame.Width)
+                if (newX == x || newX < 0 || newX >= _configGame.Width)
                 {
                     continue;
                 }
 
-                var obstacle = _grid[index, y];
+                var obstacle = _grid[newX, y];
                 if (obstacle.Type == CONSTANTS.CellType.Obstacle)
                 {
                     obstacle.Type = CONSTANTS.CellType.None;
@@ -42,14 +42,14 @@ namespace Commands
                 }
             }
 
-            for (int index = y - 1; index <= y + 1; index++)
+            for (int newY = y - 1; newY <= y + 1; newY++)
             {
-                if (index == y || index < 0 || index >= _configGame.Height)
+                if (newY == y || newY < 0 || newY >= _configGame.Height)
                 {
                     continue;
                 }
 
-                var obstacle = _grid[x, index];
+                var obstacle = _grid[x, newY];
                 if (obstacle.Type == CONSTANTS.CellType.Obstacle)
                 {
                     obstacle.Type = CONSTANTS.CellType.None;

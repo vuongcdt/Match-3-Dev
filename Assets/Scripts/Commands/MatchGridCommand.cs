@@ -20,7 +20,7 @@ namespace Commands
         {
             _grid = this.SendQuery(new GetGridQuery());
             _configGame = ConfigGame.Instance;
-            
+
             if (MatchGrid())
             {
                 this.SendEvent<ProcessingGridEvent>();
@@ -75,7 +75,7 @@ namespace Commands
                 var random = Random.Range(0, cellList.Count);
 
                 MergeCellRowColumn(cellList);
-                
+
                 for (var index = 0; index < cellList.Count; index++)
                 {
                     var cell = cellList[index];
@@ -92,28 +92,34 @@ namespace Commands
 
         private void MergeCellRowColumn(List<Cell> cellList)
         {
-            for (var index = 0; index < cellList.Count; index++)
+            foreach (var cell in cellList)
             {
-                var cell = cellList[index];
-
                 if (cell.SpecialType == CONSTANTS.CellSpecialType.Column)
                 {
-                    for (int y = 0; y < _configGame.Height; y++)
+                    Debug.Log("Column");
+                    for (int newY = 0; newY < _configGame.Height; newY++)
                     {
-                        this.SendCommand(new RemoveObstacleCommand(cell.GridPosition.x, cell.GridPosition.y));
-                        _grid[cell.GridPosition.x, y].Type = CONSTANTS.CellType.None;
+                        var gridPos = cell.GridPosition;
+                        SetObstacleAndFish(gridPos.x, newY);
                     }
                 }
 
                 if (cell.SpecialType == CONSTANTS.CellSpecialType.Row)
                 {
-                    for (int x = 0; x < _configGame.Width; x++)
+                    Debug.Log("Row");
+                    for (int newX = 0; newX < _configGame.Width; newX++)
                     {
-                        this.SendCommand(new RemoveObstacleCommand(cell.GridPosition.x, cell.GridPosition.y));
-                        _grid[x, cell.GridPosition.y].Type = CONSTANTS.CellType.None;
+                        var gridPos = cell.GridPosition;
+                        SetObstacleAndFish(newX, gridPos.y);
                     }
                 }
             }
+        }
+
+        private void SetObstacleAndFish(int x, int y)
+        {
+            this.SendCommand(new RemoveObstacleCommand(x, y));
+            _grid[x, y].Type = CONSTANTS.CellType.None;
         }
 
         private static bool MergeCellByCount(int index, int random, List<Cell> cellList, Cell cell,
