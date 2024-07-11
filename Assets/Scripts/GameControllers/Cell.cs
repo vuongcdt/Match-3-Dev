@@ -8,10 +8,10 @@ namespace GameControllers
     {
         private PositionCell _positionCell;
         private InvertedCell _invertedCell;
-        private CreateCell _createCell;
+        // private CreateCell _createCell;
         private TypeCell _typeCell;
 
-        public CreateCell CreateCell => _createCell;
+        // public CreateCell CreateCell => _createCell;
 
         public InvertedCell InvertedCell => _invertedCell;
 
@@ -40,14 +40,14 @@ namespace GameControllers
             _positionCell = this.GetComponent<PositionCell>();
             _invertedCell = this.GetComponent<InvertedCell>();
             _typeCell = this.GetComponent<TypeCell>();
-            _createCell = this.GetComponent<CreateCell>();
+            // _createCell = this.GetComponent<CreateCell>();
         }
 
-        public Cell Create(Utils.GridPos pos, Transform transformParent, float cellSize, CONSTANTS.CellType cellType)
-        {
-            var worldPos = GetWorldPos(pos);
-            return _createCell.Create(worldPos, transformParent, cellSize, cellType);
-        }
+        // public Cell Create(Utils.GridPos pos, Transform transformParent, float cellSize, CONSTANTS.CellType cellType)
+        // {
+        //     var worldPos = GetWorldPos(pos);
+        //     return _createCell.Create(worldPos, transformParent, cellSize, cellType);
+        // }
 
         public void ClearFish()
         {
@@ -57,12 +57,6 @@ namespace GameControllers
         public void ClearCell()
         {
             _typeCell.ClearCell();
-        }
-
-        private Vector3 GetWorldPos(Utils.GridPos pos)
-        {
-            var configGame = ConfigGame.Instance;
-            return Utils.GetWorldPosition(pos.x, pos.y, configGame.Width, configGame.Height, configGame.CellSize);
         }
 
         public IArchitecture GetArchitecture()

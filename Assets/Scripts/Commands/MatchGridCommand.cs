@@ -131,6 +131,7 @@ namespace Commands
 
         private void ClearFish(int x, int y)
         {
+            _grid[x, y].SpecialType = CONSTANTS.CellSpecialType.Normal;
             _grid[x, y].ClearFish();
         }
 

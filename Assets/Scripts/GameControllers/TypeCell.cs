@@ -72,7 +72,7 @@ namespace GameControllers
 
         public void ClearCell()
         {
-            this.SpecialType = CONSTANTS.CellSpecialType.Normal;
+            // this.SpecialType = CONSTANTS.CellSpecialType.Normal;
             this.Type = CONSTANTS.CellType.None;
         }
 
