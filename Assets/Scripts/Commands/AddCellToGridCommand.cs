@@ -45,16 +45,7 @@ namespace Commands
                 }
             }
 
-            // yield return new WaitForSeconds(configGame.FillTime);
             return isAdd;
-            // if (isAdd)
-            // {
-            //     this.SendEvent<ProcessingGridEvent>();
-            // }
-            // else
-            // {
-            //     this.SendCommand(new MatchGridCommand());
-            // }
         }
 
         private static void ReturnPool(Cell cellBelow, ConfigGame configGame)
