@@ -22,9 +22,8 @@ namespace Commands
                 for (int x = 0; x < configGame.Width; x++)
                 {
                     CheckFill(x, y);
+                    configGame.IsRevertFill = !configGame.IsRevertFill;
                 }
-
-                configGame.IsRevertFill = !configGame.IsRevertFill;
             }
         }
 
@@ -58,7 +57,8 @@ namespace Commands
                 // {
                 //     continue;
                 // }
-                if (index != 0 && !(isNextToObstacle || isUpNotFish))
+
+                if (!(index == 0 || isNextToObstacle || isUpNotFish))
                 {
                     continue;
                 }

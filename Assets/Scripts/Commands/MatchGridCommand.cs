@@ -2,6 +2,7 @@
 using GameControllers;
 using QFramework;
 using Queries;
+using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Commands
@@ -10,6 +11,16 @@ namespace Commands
     {
         private Cell[,] _grid;
         private ConfigGame _configGame;
+        private bool _isInverted;
+
+        public MatchGridCommand()
+        {
+        }
+
+        public MatchGridCommand(bool isInverted)
+        {
+            _isInverted = isInverted;
+        }
 
         protected override bool OnExecute()
         {
@@ -52,12 +63,34 @@ namespace Commands
                 }
             }
 
+            Cell cellCanRainbow = null;
+            if (matchCellList.Count == 2 && _isInverted)
+            {
+                foreach (var cellOut in matchCellList[0].CellList)
+                {
+                    foreach (var cellIn in matchCellList[1].CellList)
+                    {
+                        if (cellIn.GridPosition.x == cellOut.GridPosition.x &&
+                            cellIn.GridPosition.y == cellOut.GridPosition.y)
+                        {
+                            cellCanRainbow = cellIn;
+                        }
+                    }
+                }
+            }
+
+            if (_isInverted)
+            {
+                return MergeCells(matchCellList, cellCanRainbow);
+            }
+
             return MergeCells(matchCellList);
         }
 
-        private bool MergeCells(List<Utils.MatchCell> matchCellList)
+        private bool MergeCells(List<Utils.MatchCell> matchCellList, Cell cellCanRainbow = null)
         {
             matchCellList.Sort((listA, listB) => listB.CellList.Count - listA.CellList.Count);
+
             foreach (var matchCell in matchCellList)
             {
                 var cellList = matchCell.CellList;
@@ -71,6 +104,22 @@ namespace Commands
                 {
                     var cell = cellList[index];
                     this.SendCommand(new ClearObstacleAroundCommand(cell.GridPosition.x, cell.GridPosition.y));
+
+                    if (cellCanRainbow != null && _isInverted)
+                    {
+                        var isSameGrid = cellCanRainbow.GridPosition.x == cell.GridPosition.x &&
+                                         cellCanRainbow.GridPosition.y == cell.GridPosition.y;
+                        if (isSameGrid)
+                        {
+                            cell.SetTypeRainbow();
+                        }
+                        else
+                        {
+                            cell.ClearCell();
+                        }
+
+                        continue;
+                    }
 
                     if (MergeCellByCount(index, random, cellList, cell, matchCell)) continue;
 
@@ -145,7 +194,7 @@ namespace Commands
 
             if (index == random && cellList.Count == 4)
             {
-                SetTriggerAndSpecialType(matchCell, index);
+                SetTriggerAndSpecialType(matchCell, 2);
                 return true;
             }
 

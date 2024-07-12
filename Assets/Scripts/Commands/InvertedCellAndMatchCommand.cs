@@ -39,7 +39,7 @@ namespace Commands
 
             yield return new WaitForSeconds(_configGame.FillTime);
 
-            var isMatch = this.SendCommand(new MatchGridCommand());
+            var isMatch = this.SendCommand(new MatchGridCommand(true));
 
             if (!isMatch || !isInverted)
             {

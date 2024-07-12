@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace GameControllers
 {
-    public class InvertedCell : MonoBehaviour, IController
+    public class CellController : MonoBehaviour, IController
     {
         private Cell _positionCell;
         private IEnumerator _moveIE;

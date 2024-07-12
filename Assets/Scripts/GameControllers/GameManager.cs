@@ -43,7 +43,7 @@ namespace GameControllers
 
             if (_configGame.ObstaclesTotal == 0)
             {
-                Debug.Log("GAME WIN");
+                // Debug.Log("GAME WIN");
                 // StartCoroutine(ResetGame());
                 // yield break;
             }
