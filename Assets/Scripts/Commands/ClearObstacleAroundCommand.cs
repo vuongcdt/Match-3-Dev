@@ -4,14 +4,14 @@ using Queries;
 
 namespace Commands
 {
-    public class ClearObstacleCommand : AbstractCommand
+    public class ClearObstacleAroundCommand : AbstractCommand
     {
         private Cell[,] _grid;
         private ConfigGame _configGame;
         private int _x;
         private int _y;
 
-        public ClearObstacleCommand(int x, int y)
+        public ClearObstacleAroundCommand(int x, int y)
         {
             _x = x;
             _y = y;

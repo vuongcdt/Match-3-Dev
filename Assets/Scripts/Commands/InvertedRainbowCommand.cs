@@ -48,7 +48,7 @@ namespace Commands
                 if (cell.Type == typeFish)
                 {
                     cell.ClearCell();
-                    this.SendCommand(new ClearObstacleCommand(cell.GridPosition.x, cell.GridPosition.y));
+                    this.SendCommand(new ClearObstacleAroundCommand(cell.GridPosition.x, cell.GridPosition.y));
                 }
             }
 

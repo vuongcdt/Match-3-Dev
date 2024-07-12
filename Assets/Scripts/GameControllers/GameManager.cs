@@ -41,11 +41,11 @@ namespace GameControllers
         {
             _configGame.IsProcessing = true;
 
-            if (_configGame.ObstaclesTotal == 0)
-            {
-                StartCoroutine(ResetGame());
-                yield break;
-            }
+            // if (_configGame.ObstaclesTotal == 0)
+            // {
+            //     StartCoroutine(ResetGame());
+            //     yield break;
+            // }
 
             this.SendCommand<FillCommand>();
             var isAdd = this.SendCommand(new AddCellToGridCommand());

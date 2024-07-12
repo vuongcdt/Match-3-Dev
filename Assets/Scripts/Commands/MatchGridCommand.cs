@@ -70,7 +70,7 @@ namespace Commands
                 for (var index = 0; index < cellList.Count; index++)
                 {
                     var cell = cellList[index];
-                    this.SendCommand(new ClearObstacleCommand(cell.GridPosition.x, cell.GridPosition.y));
+                    this.SendCommand(new ClearObstacleAroundCommand(cell.GridPosition.x, cell.GridPosition.y));
 
                     if (MergeCellByCount(index, random, cellList, cell, matchCell)) continue;
 
@@ -86,30 +86,52 @@ namespace Commands
             var gridPos = cell.GridPosition;
             if (cell.SpecialType == CONSTANTS.CellSpecialType.Column)
             {
+                cell.SpecialType = CONSTANTS.CellSpecialType.Normal;
                 for (int newY = 0; newY < _configGame.Height; newY++)
                 {
-                    this.SendCommand(new ClearObstacleCommand(gridPos.x, newY));
-                    
+                    var newCell = _grid[gridPos.x, newY];
+                    CheckRainbow(newCell);
+                    MergeCellRowColumn(newCell);
+                    this.SendCommand(new ClearObstacleAroundCommand(gridPos.x, newY));
+
                     ClearFish(gridPos.x, newY);
                 }
             }
 
             if (cell.SpecialType == CONSTANTS.CellSpecialType.Row)
             {
+                cell.SpecialType = CONSTANTS.CellSpecialType.Normal;
                 for (int newX = 0; newX < _configGame.Width; newX++)
                 {
-                    this.SendCommand(new ClearObstacleCommand(newX, gridPos.y));
-                    
+                    var newCell = _grid[newX, gridPos.y];
+                    CheckRainbow(newCell);
+                    MergeCellRowColumn(newCell);
+                    this.SendCommand(new ClearObstacleAroundCommand(newX, gridPos.y));
+
                     ClearFish(newX, gridPos.y);
+                }
+            }
+        }
+
+        private void CheckRainbow(Cell newCell)
+        {
+            if (newCell.Type == CONSTANTS.CellType.Rainbow)
+            {
+                var randomType = Random.Range(3, _configGame.MaxListImage);
+                foreach (var cell in _grid)
+                {
+                    if (cell.Type == (CONSTANTS.CellType)randomType)
+                    {
+                        cell.ClearCell();
+                        this.SendCommand(new ClearObstacleAroundCommand(cell.GridPosition.x, cell.GridPosition.y));
+                    }
                 }
             }
         }
 
         private void ClearFish(int x, int y)
         {
-            _grid[x,y].ClearCell();
-            // _grid[x, y].Type = CONSTANTS.CellType.None;
-            // _grid[x, y].SpecialType = CONSTANTS.CellSpecialType.Normal;
+            _grid[x, y].ClearCell();
         }
 
         private static bool MergeCellByCount(int index, int random, List<Cell> cellList, Cell cell,
