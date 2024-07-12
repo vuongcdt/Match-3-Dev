@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Commands;
 using QFramework;
 using UnityEngine;
@@ -7,16 +8,18 @@ namespace GameControllers
 {
     public class Cell : MonoBehaviour, IController
     {
-        [SerializeField] private BoxCollider2D box2D;
+        [SerializeField] private Utils.GridPos _gridPos;
+        [SerializeField] private Vector3 _worldPos;
 
         private CONSTANTS.CellType _type;
         private CONSTANTS.CellSpecialType _specialType;
         private IEnumerator _moveIE;
-        [SerializeField] private Utils.GridPos _gridPos;
-        [SerializeField] private Vector3 _worldPos;
+        private Animator _animator;
 
         private Vector3 _clampMagnitude;
         private bool _isDragged;
+        private static readonly int RowAnimator = Animator.StringToHash("Row");
+        private static readonly int ColumnAnimator = Animator.StringToHash("Column");
         private static readonly int ClearAnimator = Animator.StringToHash("Clear");
 
         public Utils.GridPos GridPosition
@@ -30,22 +33,12 @@ namespace GameControllers
             }
         }
 
-        public Vector3 WorldPosition
-        {
-            get => _worldPos;
-            set
-            {
-                SetWorldPosition(value);
-                _worldPos = value;
-                Move(_gridPos, ConfigGame.Instance.FillTime);
-            }
-        }
-
+        public Vector3 WorldPosition => _worldPos;
 
         public CONSTANTS.CellSpecialType SpecialType
         {
             get => _specialType;
-            set => _specialType = value;
+            set => StartCoroutine(SetTriggerIE(value));
         }
 
         public CONSTANTS.CellType Type
@@ -58,56 +51,28 @@ namespace GameControllers
             }
         }
 
-        private void SetWorldPosition(Vector3 value)
-        {
-            var gridPos = GetGridPos(value);
+        public Animator Animator => _animator;
 
-            if (IsPositionInGrid(gridPos))
-            {
-                _gridPos = gridPos;
-            }
+        private void Awake()
+        {
+            _animator = this.GetComponentInChildren<Animator>();
         }
 
-        // public Cell Create(Utils.GridPos pos, Transform transformParent, float cellSize, CONSTANTS.CellType cellType)
-        // {
-        //     var worldPos = GetWorldPos(pos);
-        //     return Create(worldPos, transformParent, cellSize, cellType);
-        // }
-        //
-        // private Cell Create(Vector2 pos, Transform transformParent, float cellSize, CONSTANTS.CellType cellType)
-        // {
-        //     var configGame = ConfigGame.Instance;
-        //     var isCellNormal =
-        //         cellType is not (CONSTANTS.CellType.Background or CONSTANTS.CellType.Obstacle
-        //             or CONSTANTS.CellType.None);
-        //
-        //     this.transform.localScale = Vector2.one * cellSize;
-        //
-        //     Cell cell = null;
-        //     if (configGame.Pool.Count > 0)
-        //     {
-        //         cell = configGame.Pool.Pop();
-        //         cell.GetComponent<BoxCollider2D>().enabled = true;
-        //     }
-        //     else
-        //     {
-        //         box2D.enabled = isCellNormal;
-        //         cell = Instantiate(this, pos, Quaternion.identity, transformParent);
-        //     }
-        //
-        //     cell._worldPos = pos;
-        //     cell._gridPos = GetGridPos(pos);
-        //     cell.transform.position = pos;
-        //     cell.Type = cellType;
-        //     cell.StopMoveIE();
-        //     if (cellType == CONSTANTS.CellType.Rainbow)
-        //     {
-        //         cell._specialType = CONSTANTS.CellSpecialType.Rainbow;
-        //     }
-        //
-        //     return cell;
-        // }
+        private IEnumerator SetTriggerIE(CONSTANTS.CellSpecialType specialType)
+        {
+            var isRow = specialType == CONSTANTS.CellSpecialType.Row;
+            var isColumn = specialType == CONSTANTS.CellSpecialType.Column;
 
+            if (isRow || isColumn)
+            {
+                this.Animator.SetTrigger(ClearAnimator);
+                yield return new WaitForSeconds(ConfigGame.Instance.MatchTime);
+
+                this.Animator.SetTrigger(isRow ? RowAnimator : ColumnAnimator);
+            }
+            _specialType = specialType;
+
+        }
         private void SetAvatar(CONSTANTS.CellType newType)
         {
             var avatar = this.GetComponentInChildren<SpriteRenderer>();
@@ -122,16 +87,20 @@ namespace GameControllers
             avatar.sprite = image;
         }
 
+        public void ClearObstacle()
+        {
+            StartCoroutine(SetTypeIE());
+        }
+
         public void ClearCell()
         {
-            var animator = this.GetComponentInChildren<Animator>();
-            animator.SetTrigger(ClearAnimator);
-            // animator.speed = ConfigGame.Instance.FillTime;
             StartCoroutine(SetTypeIE());
         }
 
         private IEnumerator SetTypeIE()
         {
+            _animator.SetTrigger(ClearAnimator);
+            _type = CONSTANTS.CellType.None;
             yield return new WaitForSeconds(ConfigGame.Instance.MatchTime);
             this.Type = CONSTANTS.CellType.None;
         }
@@ -152,41 +121,24 @@ namespace GameControllers
         private void Move(Utils.GridPos pos, float time)
         {
             var worldPos = GetWorldPos(pos);
-            // if (_moveIE != null)
-            // {
-            //     StopCoroutine(_moveIE);
-            // }
+
             _moveIE = MoveIE(worldPos, time);
             StartCoroutine(_moveIE);
             this.gameObject.name = $"{this._type.ToString()} {this._gridPos.x}_{this._gridPos.y}";
         }
-        
+
         private IEnumerator MoveIE(Vector2 pos, float time)
         {
-            // time *= ConfigGame.Instance.TimeScale;
             for (float t = 0; t <= time * ConfigGame.Instance.TimeScale; t += Time.deltaTime)
             {
                 this.transform.position =
                     Vector3.Lerp(this.transform.position, pos, t / (time));
                 yield return null;
             }
-        
+
             _worldPos = pos;
             _gridPos = GetGridPos(pos);
             // this.transform.position = pos;
-        }
-        
-        private bool IsPositionInGrid(Utils.GridPos targetGridPos)
-        {
-            var configGame = ConfigGame.Instance;
-
-            return targetGridPos.x >= 0 && targetGridPos.x < configGame.Width &&
-                   targetGridPos.y >= 0 && targetGridPos.y < configGame.Height;
-        }
-
-        public IArchitecture GetArchitecture()
-        {
-            return GameApp.Interface;
         }
 
         private Utils.GridPos GetGridPos(Vector3 pos)
@@ -195,15 +147,15 @@ namespace GameControllers
             return Utils.GetGridPos(pos.x, pos.y, configGame.Width, configGame.Height, configGame.CellSize);
         }
 
-        private Vector3 GetWorldPoint()
-        {
-            return Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        }
-
         private Vector3 GetWorldPos(Utils.GridPos pos)
         {
             var configGame = ConfigGame.Instance;
             return Utils.GetWorldPosition(pos.x, pos.y, configGame.Width, configGame.Height, configGame.CellSize);
+        }
+
+        public IArchitecture GetArchitecture()
+        {
+            return GameApp.Interface;
         }
     }
 }

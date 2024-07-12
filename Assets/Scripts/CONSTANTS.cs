@@ -11,7 +11,7 @@
         Normal,
         Row,
         Column,
-        Rainbow,
+        // Rainbow,
     }
 
     public enum CellType

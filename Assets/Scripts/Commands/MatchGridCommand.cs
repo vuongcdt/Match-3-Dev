@@ -12,10 +12,6 @@ namespace Commands
     {
         private Cell[,] _grid;
         private ConfigGame _configGame;
-        private static readonly int RowAnimator = Animator.StringToHash("Row");
-        private static readonly int ColumnAnimator = Animator.StringToHash("Column");
-        private static readonly int ClearAnimator = Animator.StringToHash("Clear");
-
 
         protected override bool OnExecute()
         {
@@ -81,7 +77,6 @@ namespace Commands
                     if (MergeCellByCount(index, random, cellList, cell, matchCell)) continue;
 
                     cell.ClearCell();
-                    // cell.DeActive();
                 }
             }
 
@@ -95,20 +90,9 @@ namespace Commands
             {
                 for (int newY = 0; newY < _configGame.Height; newY++)
                 {
-                    // if (gridPos.y == newY)
-                    // {
-                    //     continue;
-                    // }
-                    
                     this.SendCommand(new ClearObstacleCommand(gridPos.x, newY));
+                    
                     ClearFish(gridPos.x, newY);
-
-                    var cellSpecialType = _grid[gridPos.x, newY].SpecialType;
-                    if (cellSpecialType == CONSTANTS.CellSpecialType.Column ||
-                        cellSpecialType == CONSTANTS.CellSpecialType.Row)
-                    {
-                        MergeCellRowColumn(_grid[gridPos.x, newY]);
-                    }
                 }
             }
 
@@ -116,28 +100,18 @@ namespace Commands
             {
                 for (int newX = 0; newX < _configGame.Width; newX++)
                 {
-                    // if (gridPos.x == newX)
-                    // {
-                    //     continue;
-                    // }
-                    
                     this.SendCommand(new ClearObstacleCommand(newX, gridPos.y));
+                    
                     ClearFish(newX, gridPos.y);
-
-                    var cellSpecialType = _grid[newX, gridPos.y].SpecialType;
-                    if (cellSpecialType == CONSTANTS.CellSpecialType.Column ||
-                        cellSpecialType == CONSTANTS.CellSpecialType.Row)
-                    {
-                        MergeCellRowColumn(_grid[newX, gridPos.y]);
-                    }
                 }
             }
         }
 
         private void ClearFish(int x, int y)
         {
-            _grid[x, y].Type = CONSTANTS.CellType.None;
-            _grid[x, y].SpecialType = CONSTANTS.CellSpecialType.Normal;
+            _grid[x,y].ClearCell();
+            // _grid[x, y].Type = CONSTANTS.CellType.None;
+            // _grid[x, y].SpecialType = CONSTANTS.CellSpecialType.Normal;
         }
 
         private static bool MergeCellByCount(int index, int random, List<Cell> cellList, Cell cell,
@@ -145,7 +119,7 @@ namespace Commands
         {
             if (index == random && cellList.Count >= 5)
             {
-                cell.SpecialType = CONSTANTS.CellSpecialType.Rainbow;
+                // cell.SpecialType = CONSTANTS.CellSpecialType.Rainbow;
                 cell.Type = CONSTANTS.CellType.Rainbow;
                 return true;
             }
@@ -217,8 +191,7 @@ namespace Commands
             var cells = matchCell.CellList;
             var isTriggerRow = matchCell.Type == CONSTANTS.GridType.Row;
 
-            cells[index].GetComponentInChildren<Animator>().SetTrigger(isTriggerRow ? RowAnimator : ColumnAnimator);
-            // cells[index].GetComponentInChildren<Animator>().SetTrigger(ClearAnimator);
+            // cells[index].Animator.SetTrigger(isTriggerRow ? RowAnimator : ColumnAnimator);
             cells[index].SpecialType = isTriggerRow ? CONSTANTS.CellSpecialType.Row : CONSTANTS.CellSpecialType.Column;
         }
     }

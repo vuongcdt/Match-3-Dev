@@ -54,7 +54,7 @@ namespace Commands
         {
             if (obstacle.Type == CONSTANTS.CellType.Obstacle)
             {
-                obstacle.Type = CONSTANTS.CellType.None;
+                obstacle.ClearObstacle();
                 _configGame.ObstaclesTotal--;
                 _configGame.ObstaclesTotalText.text = _configGame.ObstaclesTotal.ToString();
             }
