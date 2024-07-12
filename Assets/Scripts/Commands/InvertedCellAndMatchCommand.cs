@@ -49,11 +49,9 @@ namespace Commands
             if (isMatch)
             {
                 this.SendCommand<SetStepsTotalCommand>();
+                yield return new WaitForSeconds(_configGame.MatchTime);
+                this.SendCommand<ProcessingGridEventCommand>();
             }
-
-            yield return new WaitForSeconds(_configGame.MatchTime);
-
-            this.SendCommand<ProcessingGridEventCommand>();
             
             _configGame.IsProcessing = false;
             _configGame.IsDragged = false;

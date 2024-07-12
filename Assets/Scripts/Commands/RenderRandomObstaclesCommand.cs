@@ -91,9 +91,11 @@ namespace Commands
                     continue;
                 }
 
-                _grid[gridPos.x, gridPos.y].Type = CellType.Obstacle;
-                _grid[gridPos.x, gridPos.y].name = CellType.Obstacle.ToString();
-                _grid[gridPos.x, gridPos.y].GridPosition = gridPos;
+                var obstacle = _grid[gridPos.x, gridPos.y];
+                obstacle.Type = CellType.Obstacle;
+                obstacle.name = CellType.Obstacle.ToString();
+                obstacle.GridPosition = gridPos;
+                obstacle.GetComponent<BoxCollider2D>().enabled = false;
             }
         }
 

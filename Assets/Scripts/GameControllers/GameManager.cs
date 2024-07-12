@@ -47,6 +47,7 @@ namespace GameControllers
                 // StartCoroutine(ResetGame());
                 // yield break;
             }
+
             if (_configGame.ObstaclesTotal > 0 && _configGame.StepsTotal == 0)
             {
                 Debug.Log("GAME OVER");
@@ -59,21 +60,19 @@ namespace GameControllers
             {
                 yield return new WaitForSeconds(_configGame.FillTime);
                 StartCoroutine(ProcessingGrid());
+                yield break;
             }
-            else
-            {
-                var isMatch = this.SendCommand(new MatchGridCommand());
-                yield return new WaitForSeconds(_configGame.MatchTime);
 
-                if (isMatch)
-                {
-                    StartCoroutine(ProcessingGrid());
-                }
-                else
-                {
-                    _configGame.IsProcessing = false;
-                }
+            var isMatch = this.SendCommand(new MatchGridCommand());
+
+            if (isMatch)
+            {
+                yield return new WaitForSeconds(_configGame.MatchTime);
+                StartCoroutine(ProcessingGrid());
+                yield break;
             }
+
+            _configGame.IsProcessing = false;
         }
 
         private IEnumerator ResetGame()
