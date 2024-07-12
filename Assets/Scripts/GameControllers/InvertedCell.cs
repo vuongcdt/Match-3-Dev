@@ -79,59 +79,13 @@ namespace GameControllers
 
             if (isTargetRainbow || isSourceRainbow)
             {
-                StartCoroutine(InvertedRainbow(sourceCell, targetCell, targetGridPos, isTargetRainbow));
+                StartCoroutine(this.SendCommand(
+                    new InvertedRainbowCommand(sourceCell, targetCell, targetGridPos, isTargetRainbow)));
             }
             else
             {
-                StartCoroutine(InvertedAndMatch(sourceCell, targetCell));
+                StartCoroutine(this.SendCommand(new InvertedCellAndMatchCommand(sourceCell, targetCell)));
             }
-
-            _configGame.IsDragged = false;
-        }
-
-        private IEnumerator InvertedRainbow(Cell sourceCell, Cell targetCell,
-            Utils.GridPos targetGridPos, bool isTargetRainbow)
-        {
-            sourceCell.GridPosition = targetGridPos;
-
-            var typeFish = isTargetRainbow
-                ? sourceCell.Type
-                : targetCell.Type;
-
-            var rainbowCell = isTargetRainbow ? targetCell : sourceCell;
-
-            rainbowCell.Type = CONSTANTS.CellType.None;
-
-            foreach (var cell in _grid)
-            {
-                if (cell.Type == typeFish)
-                {
-                    cell.ClearCell();
-                    this.SendCommand(new ClearObstacleCommand(cell.GridPosition.x, cell.GridPosition.y));
-                }
-            }
-
-            yield return new WaitForSeconds(_configGame.MatchTime);
-
-            this.SendCommand<ProcessingGridEventCommand>();
-        }
-
-        private IEnumerator InvertedAndMatch(Cell sourceCell, Cell targetCell)
-        {
-            var isInverted = this.SendCommand(new InvertedCellCommand(sourceCell, targetCell));
-
-            yield return new WaitForSeconds(ConfigGame.Instance.FillTime);
-
-            var isMatch = this.SendCommand(new MatchGridCommand());
-
-            if (!isMatch || !isInverted)
-            {
-                this.SendCommand(new InvertedCellCommand(targetCell, sourceCell));
-            }
-
-            yield return new WaitForSeconds(ConfigGame.Instance.MatchTime);
-
-            this.SendCommand<ProcessingGridEventCommand>();
 
             _configGame.IsDragged = false;
         }
