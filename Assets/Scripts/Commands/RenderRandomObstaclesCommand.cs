@@ -109,9 +109,9 @@ namespace Commands
 
             var isNotNextTo = Random.value > 0.5f;
 
-            // var randomObstaclesTotal = Random.Range(15, 22);
+            var randomObstaclesTotal = Random.Range(15, 22);
             // var randomObstaclesTotal = _configGame.ObstaclesTotal;
-            var randomObstaclesTotal = 10;
+            // var randomObstaclesTotal = 10;
 
             while (obstacleGridPosList.Count < randomObstaclesTotal)
             {

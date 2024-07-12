@@ -8,6 +8,7 @@ namespace Commands
     {
         private ConfigGame _configGame;
         private Cell[,] _grid;
+        
 
         protected override void OnExecute()
         {

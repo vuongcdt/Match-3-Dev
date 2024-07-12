@@ -16,6 +16,7 @@ namespace Commands
         public MatchGridCommand()
         {
         }
+
         public MatchGridCommand(bool isInverted)
         {
             _isInverted = isInverted;
@@ -193,7 +194,7 @@ namespace Commands
 
             if (index == random && cellList.Count == 4)
             {
-                SetTriggerAndSpecialType(matchCell, 2);
+                SetTriggerAndSpecialType(matchCell, index);
                 return true;
             }
 
@@ -256,10 +257,9 @@ namespace Commands
         private static void SetTriggerAndSpecialType(Utils.MatchCell matchCell, int index)
         {
             var cells = matchCell.CellList;
-            var isTriggerRow = matchCell.Type == CONSTANTS.GridType.Row;
+            var isRow = matchCell.Type == CONSTANTS.GridType.Row;
 
-            // cells[index].Animator.SetTrigger(isTriggerRow ? RowAnimator : ColumnAnimator);
-            cells[index].SpecialType = isTriggerRow ? CONSTANTS.CellSpecialType.Row : CONSTANTS.CellSpecialType.Column;
+            cells[index].SpecialType = isRow ? CONSTANTS.CellSpecialType.Column : CONSTANTS.CellSpecialType.Row;
         }
     }
 }

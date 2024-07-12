@@ -33,7 +33,8 @@ namespace GameControllers
         {
             this.SendCommand<RenderCellGridCommand>();
             this.SendCommand<RenderRandomObstaclesCommand>();
-
+            _configGame.StepsTotal = _configGame.ObstaclesTotal;
+            this.SendCommand<SetStepsTotalCommand>();
             StartCoroutine(ProcessingGrid());
         }
 
@@ -43,14 +44,16 @@ namespace GameControllers
 
             if (_configGame.ObstaclesTotal == 0)
             {
-                // Debug.Log("GAME WIN");
-                // StartCoroutine(ResetGame());
-                // yield break;
+                Debug.Log("GAME WIN");
+                StartCoroutine(ResetGame());
+                yield break;
             }
 
             if (_configGame.ObstaclesTotal > 0 && _configGame.StepsTotal == 0)
             {
                 Debug.Log("GAME OVER");
+                StartCoroutine(ResetGame());
+                yield break;
             }
 
             this.SendCommand<FillCommand>();
