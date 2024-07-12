@@ -16,7 +16,6 @@ namespace Commands
         public MatchGridCommand()
         {
         }
-
         public MatchGridCommand(bool isInverted)
         {
             _isInverted = isInverted;
