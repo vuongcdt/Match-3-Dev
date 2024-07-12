@@ -22,10 +22,10 @@ namespace Commands
             _grid = this.SendQuery(new GetGridQuery());
             _configGame = ConfigGame.Instance;
 
-            RemoveObstacle(_x, _y);
+            ClearObstacles(_x, _y);
         }
 
-        private void RemoveObstacle(int x, int y)
+        private void ClearObstacles(int x, int y)
         {
             for (int newX = x - 1; newX <= x + 1; newX++)
             {
@@ -35,7 +35,7 @@ namespace Commands
                 }
 
                 var obstacle = _grid[newX, y];
-                SetObstacleToNone(obstacle);
+                RemoveObstacle(obstacle);
             }
 
             for (int newY = y - 1; newY <= y + 1; newY++)
@@ -46,11 +46,11 @@ namespace Commands
                 }
 
                 var obstacle = _grid[x, newY];
-                SetObstacleToNone(obstacle);
+                RemoveObstacle(obstacle);
             }
         }
 
-        private void SetObstacleToNone(Cell obstacle)
+        private void RemoveObstacle(Cell obstacle)
         {
             if (obstacle.Type == CONSTANTS.CellType.Obstacle)
             {

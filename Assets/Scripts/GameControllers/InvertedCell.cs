@@ -19,14 +19,6 @@ namespace GameControllers
             _configGame = ConfigGame.Instance;
         }
 
-        public void StopMoveIE()
-        {
-            if (_moveIE != null)
-            {
-                StopCoroutine(_moveIE);
-            }
-        }
-
         private void OnMouseDown()
         {
             if (_configGame.IsDragged)
@@ -71,13 +63,31 @@ namespace GameControllers
 
             if (IsPositionInGrid(targetGridPos))
             {
-                StartCoroutine(
-                    this.SendCommand(new InvertedAndMatchCommandIE(_positionCell.GridPosition, targetGridPos)));
+                StartCoroutine(InvertedAndMatch(_positionCell.GridPosition, targetGridPos));
             }
 
             _configGame.IsDragged = false;
         }
+        
+        private IEnumerator InvertedAndMatch(Utils.GridPos sourceGridPos, Utils.GridPos targetGridPos)
+        {
+            var isSpecial = this.SendCommand(new InvertedCellCommand(sourceGridPos, targetGridPos));
 
+            yield return new WaitForSeconds(ConfigGame.Instance.FillTime);
+
+            var isMatch = this.SendCommand(new MatchGridCommand());
+
+            if (!isMatch && !isSpecial)
+            {
+                this.SendCommand(new InvertedCellCommand(targetGridPos, sourceGridPos));
+            }
+
+            yield return new WaitForSeconds(ConfigGame.Instance.MatchTime);
+            this.SendCommand<ProcessingGridEventCommand>();
+
+            _configGame.IsDragged = false;
+        }
+        
         private Utils.GridPos GetTargetGridPos()
         {
             var directionAxis = _clampMagnitude * _configGame.Sensitivity;

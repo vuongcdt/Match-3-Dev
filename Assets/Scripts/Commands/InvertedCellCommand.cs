@@ -45,13 +45,10 @@ namespace Commands
 
         private bool InvertedRainbow(Utils.GridPos targetGridPos, Cell targetCell, Cell sourceCell)
         {
-            // var isTargetRainbow = targetCell.SpecialType == CONSTANTS.CellSpecialType.Rainbow;
-            // var isSourceRanbow = sourceCell.SpecialType == CONSTANTS.CellSpecialType.Rainbow;
-            
             var isTargetRainbow = targetCell.Type == CONSTANTS.CellType.Rainbow;
-            var isSourceRanbow = sourceCell.Type == CONSTANTS.CellType.Rainbow;
+            var isSourceRainbow = sourceCell.Type == CONSTANTS.CellType.Rainbow;
             
-            if (!(isTargetRainbow || isSourceRanbow))
+            if (!(isTargetRainbow || isSourceRainbow))
             {
                 return false;
             }
@@ -62,6 +59,7 @@ namespace Commands
                 : targetCell.Type;
 
             var rainbowCell = isTargetRainbow ? targetCell : sourceCell;
+            
             rainbowCell.Type = CONSTANTS.CellType.None;
             rainbowCell.SpecialType = CONSTANTS.CellSpecialType.Normal;
 

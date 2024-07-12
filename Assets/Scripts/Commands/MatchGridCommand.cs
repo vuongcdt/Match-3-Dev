@@ -119,8 +119,6 @@ namespace Commands
         {
             if (index == random && cellList.Count >= 5)
             {
-                // cell.SpecialType = CONSTANTS.CellSpecialType.Rainbow;
-                // cell.Type = CONSTANTS.CellType.Rainbow;
                 cell.SetTypeRainbow();
                 return true;
             }
