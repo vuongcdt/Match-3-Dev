@@ -21,6 +21,7 @@ namespace GameControllers
         private static readonly int RowAnimator = Animator.StringToHash("Row");
         private static readonly int ColumnAnimator = Animator.StringToHash("Column");
         private static readonly int ClearAnimator = Animator.StringToHash("Clear");
+        private static readonly int DefaultAnimator = Animator.StringToHash("Default");
 
         public Utils.GridPos GridPosition
         {
@@ -51,7 +52,7 @@ namespace GameControllers
             }
         }
 
-        public Animator Animator => _animator;
+        private Animator Animator => _animator;
 
         private void Awake()
         {
@@ -76,33 +77,38 @@ namespace GameControllers
         private void SetAvatar(CONSTANTS.CellType newType)
         {
             var avatar = this.GetComponentInChildren<SpriteRenderer>();
-            var image = ConfigGame.Instance.Sprites[(int)newType];
-
-            if (image == null) //TODO
+            if (newType == CONSTANTS.CellType.None) 
             {
                 avatar.sprite = null;
                 return;
             }
-
+            
+            var image = ConfigGame.Instance.Sprites[(int)newType];
             avatar.sprite = image;
         }
 
         public void ClearObstacle()
         {
-            StartCoroutine(SetTypeIE());
+            StartCoroutine(SetTypeIE(CONSTANTS.CellType.None));
         }
 
         public void ClearCell()
         {
-            StartCoroutine(SetTypeIE());
+            StartCoroutine(SetTypeIE(CONSTANTS.CellType.None));
         }
 
-        private IEnumerator SetTypeIE()
+        public void SetTypeRainbow()
+        {
+            StartCoroutine(SetTypeIE(CONSTANTS.CellType.Rainbow));
+        }
+        
+        private IEnumerator SetTypeIE(CONSTANTS.CellType type)
         {
             _animator.SetTrigger(ClearAnimator);
-            _type = CONSTANTS.CellType.None;
+            _type = type;
             yield return new WaitForSeconds(ConfigGame.Instance.MatchTime);
-            this.Type = CONSTANTS.CellType.None;
+            this.Type = type;
+            _animator.SetTrigger(DefaultAnimator);
         }
 
         public void DeActive()
