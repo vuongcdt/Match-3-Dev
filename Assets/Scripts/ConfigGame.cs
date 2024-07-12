@@ -12,6 +12,7 @@ public class ConfigGame : Singleton<ConfigGame>
     [SerializeField] private Transform gridBlock;
     [SerializeField] private Button buttonReset;
     [SerializeField] private TMP_Text obstaclesTotalText;
+    [SerializeField] private TMP_Text stepsTotalText;
 
     [SerializeField] private int width;
     [SerializeField] private int height;
@@ -28,9 +29,22 @@ public class ConfigGame : Singleton<ConfigGame>
     [SerializeField] private float timeScale = 2;
     [SerializeField] private float fillTime;
     [SerializeField] private float matchTime;
+    [SerializeField] private int stepsTotal = 10;
 
     private bool _isDragged;
     private Stack<Cell> _pool = new();
+
+    public TMP_Text StepsTotalText
+    {
+        get => stepsTotalText;
+        set => stepsTotalText = value;
+    }
+
+    public int StepsTotal
+    {
+        get => stepsTotal;
+        set => stepsTotal = value;
+    }
 
     public float MatchTime
     {

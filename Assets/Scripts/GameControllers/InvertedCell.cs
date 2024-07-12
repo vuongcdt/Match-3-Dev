@@ -43,7 +43,7 @@ namespace GameControllers
             _clampMagnitude = this.SendCommand(new GetClampMagnitudeVectorCommand(offset));
             var newPoint = _clampMagnitude * _configGame.CellSize * 0.9f + _positionCell.WorldPosition;
 
-            this.transform.position = newPoint;
+            this.transform.position = newPoint + Vector3.back;
         }
 
         private Vector3 GetOffset()
@@ -65,6 +65,7 @@ namespace GameControllers
             var targetGridPos = GetTargetGridPos();
             if (!IsPositionInGrid(targetGridPos))
             {
+                _configGame.IsProcessing = false;
                 return;
             }
 

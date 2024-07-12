@@ -28,7 +28,7 @@ namespace Commands
 
         private IEnumerator InvertedAndMatch(Cell sourceCell, Cell targetCell)
         {
-            if (IsNotInverted(sourceCell, targetCell))
+            if (Utils.IsNotInverted(sourceCell, targetCell))
             {
                 _configGame.IsDragged = false;
                 _configGame.IsProcessing = false;
@@ -46,10 +46,16 @@ namespace Commands
                 InvertedCell(targetCell, sourceCell);
             }
 
+            if (isMatch)
+            {
+                this.SendCommand<SetStepsTotalCommand>();
+            }
+
             yield return new WaitForSeconds(_configGame.MatchTime);
 
             this.SendCommand<ProcessingGridEventCommand>();
-
+            
+            _configGame.IsProcessing = false;
             _configGame.IsDragged = false;
         }
 
@@ -65,15 +71,6 @@ namespace Commands
             sourceCell.GridPosition = targetGridPos;
             targetCell.GridPosition = tempPos;
             return true;
-        }
-
-        private bool IsNotInverted(Cell sourceCell, Cell targetCell)
-        {
-            var isObstacle = sourceCell.Type == CONSTANTS.CellType.Obstacle ||
-                             targetCell.Type == CONSTANTS.CellType.Obstacle;
-            var isEmpty = sourceCell.Type == CONSTANTS.CellType.None || targetCell.Type == CONSTANTS.CellType.None;
-
-            return isObstacle || isEmpty;
         }
     }
 }

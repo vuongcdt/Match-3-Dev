@@ -34,6 +34,14 @@ namespace Commands
             Utils.GridPos targetGridPos, bool isTargetRainbow)
         {
             sourceCell.GridPosition = targetGridPos;
+            if (Utils.IsNotInverted(sourceCell, targetCell))
+            {
+                _configGame.IsDragged = false;
+                _configGame.IsProcessing = false;
+                yield break;
+            }
+
+            this.SendCommand<SetStepsTotalCommand>();
 
             var typeFish = isTargetRainbow
                 ? sourceCell.Type

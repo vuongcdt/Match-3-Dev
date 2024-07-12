@@ -41,11 +41,16 @@ namespace GameControllers
         {
             _configGame.IsProcessing = true;
 
-            // if (_configGame.ObstaclesTotal == 0)
-            // {
-            //     StartCoroutine(ResetGame());
-            //     yield break;
-            // }
+            if (_configGame.ObstaclesTotal == 0)
+            {
+                Debug.Log("GAME WIN");
+                // StartCoroutine(ResetGame());
+                // yield break;
+            }
+            if (_configGame.ObstaclesTotal > 0 && _configGame.StepsTotal == 0)
+            {
+                Debug.Log("GAME OVER");
+            }
 
             this.SendCommand<FillCommand>();
             var isAdd = this.SendCommand(new AddCellToGridCommand());
@@ -73,7 +78,6 @@ namespace GameControllers
 
         private IEnumerator ResetGame()
         {
-            Debug.Log("GAME WIN");
             yield return new WaitForSeconds(_configGame.MatchTime * 5);
             InitGame();
         }
