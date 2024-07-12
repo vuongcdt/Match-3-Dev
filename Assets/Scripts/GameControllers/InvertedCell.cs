@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using Commands;
+using Events;
 using QFramework;
+using Queries;
 using UnityEngine;
 
 namespace GameControllers
@@ -12,6 +14,7 @@ namespace GameControllers
         private Vector3 _clampMagnitude;
         private bool _isDragged;
         private ConfigGame _configGame;
+        private Cell[,] _grid;
 
         private void Awake()
         {
@@ -60,34 +63,79 @@ namespace GameControllers
             }
 
             var targetGridPos = GetTargetGridPos();
-
-            if (IsPositionInGrid(targetGridPos))
+            if (!IsPositionInGrid(targetGridPos))
             {
-                StartCoroutine(InvertedAndMatch(_positionCell.GridPosition, targetGridPos));
+                return;
+            }
+
+            var sourceGridPos = _positionCell.GridPosition;
+            _grid = this.SendQuery(new GetGridQuery());
+
+            var targetCell = _grid[sourceGridPos.x, sourceGridPos.y];
+            var sourceCell = _grid[targetGridPos.x, targetGridPos.y];
+
+            var isTargetRainbow = targetCell.Type == CONSTANTS.CellType.Rainbow;
+            var isSourceRainbow = sourceCell.Type == CONSTANTS.CellType.Rainbow;
+
+            if (isTargetRainbow || isSourceRainbow)
+            {
+                StartCoroutine(InvertedRainbow(sourceCell, targetCell, targetGridPos, isTargetRainbow));
+            }
+            else
+            {
+                StartCoroutine(InvertedAndMatch(sourceCell, targetCell));
             }
 
             _configGame.IsDragged = false;
         }
-        
-        private IEnumerator InvertedAndMatch(Utils.GridPos sourceGridPos, Utils.GridPos targetGridPos)
+
+        private IEnumerator InvertedRainbow(Cell sourceCell, Cell targetCell,
+            Utils.GridPos targetGridPos, bool isTargetRainbow)
         {
-            var isSpecial = this.SendCommand(new InvertedCellCommand(sourceGridPos, targetGridPos));
+            sourceCell.GridPosition = targetGridPos;
+
+            var typeFish = isTargetRainbow
+                ? sourceCell.Type
+                : targetCell.Type;
+
+            var rainbowCell = isTargetRainbow ? targetCell : sourceCell;
+
+            rainbowCell.Type = CONSTANTS.CellType.None;
+
+            foreach (var cell in _grid)
+            {
+                if (cell.Type == typeFish)
+                {
+                    cell.ClearCell();
+                    this.SendCommand(new ClearObstacleCommand(cell.GridPosition.x, cell.GridPosition.y));
+                }
+            }
+
+            yield return new WaitForSeconds(_configGame.MatchTime);
+
+            this.SendCommand<ProcessingGridEventCommand>();
+        }
+
+        private IEnumerator InvertedAndMatch(Cell sourceCell, Cell targetCell)
+        {
+            var isInverted = this.SendCommand(new InvertedCellCommand(sourceCell, targetCell));
 
             yield return new WaitForSeconds(ConfigGame.Instance.FillTime);
 
             var isMatch = this.SendCommand(new MatchGridCommand());
 
-            if (!isMatch && !isSpecial)
+            if (!isMatch || !isInverted)
             {
-                this.SendCommand(new InvertedCellCommand(targetGridPos, sourceGridPos));
+                this.SendCommand(new InvertedCellCommand(targetCell, sourceCell));
             }
 
             yield return new WaitForSeconds(ConfigGame.Instance.MatchTime);
+
             this.SendCommand<ProcessingGridEventCommand>();
 
             _configGame.IsDragged = false;
         }
-        
+
         private Utils.GridPos GetTargetGridPos()
         {
             var directionAxis = _clampMagnitude * _configGame.Sensitivity;

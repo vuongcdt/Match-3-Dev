@@ -1,5 +1,4 @@
-﻿using Events;
-using GameControllers;
+﻿using GameControllers;
 using QFramework;
 using Queries;
 
@@ -7,73 +6,39 @@ namespace Commands
 {
     public class InvertedCellCommand : AbstractCommand<bool>
     {
-        private Utils.GridPos _sourcePos;
-        private Utils.GridPos _targetPos;
+        private Cell _sourceCell;
+        private Cell _targetCell;
         private Cell[,] _grid;
+        private bool _isInverted;
 
-        public InvertedCellCommand(Utils.GridPos sourcePos, Utils.GridPos targetPos)
+        public InvertedCellCommand(Cell sourceCell, Cell targetCell)
         {
-            _sourcePos = sourcePos;
-            _targetPos = targetPos;
+            _sourceCell = sourceCell;
+            _targetCell = targetCell;
         }
 
         protected override bool OnExecute()
         {
             _grid = this.SendQuery(new GetGridQuery());
-            return InvertedCell(_sourcePos, _targetPos);
+            return InvertedCell(_sourceCell, _targetCell);
         }
 
-        private bool InvertedCell(Utils.GridPos sourceGridPos, Utils.GridPos targetGridPos)
+        private bool InvertedCell(Cell sourceCell, Cell targetCell)
         {
-            var sourceCell = _grid[sourceGridPos.x, sourceGridPos.y];
-            var targetCell = _grid[targetGridPos.x, targetGridPos.y];
-
             if (!IsInverted(sourceCell, targetCell))
             {
                 return false;
             }
 
-            if (InvertedRainbow(targetGridPos, targetCell, sourceCell)) return true;
-
-            sourceCell.GridPosition = targetGridPos;
-            targetCell.GridPosition = sourceGridPos;
+            var sourceGridPos = sourceCell.GridPosition;
+            var targetGridPos = targetCell.GridPosition;
 
             _grid[sourceGridPos.x, sourceGridPos.y] = targetCell;
             _grid[targetGridPos.x, targetGridPos.y] = sourceCell;
-            return false;
-        }
 
-        private bool InvertedRainbow(Utils.GridPos targetGridPos, Cell targetCell, Cell sourceCell)
-        {
-            var isTargetRainbow = targetCell.Type == CONSTANTS.CellType.Rainbow;
-            var isSourceRainbow = sourceCell.Type == CONSTANTS.CellType.Rainbow;
-            
-            if (!(isTargetRainbow || isSourceRainbow))
-            {
-                return false;
-            }
-
+            var tempPos = new Utils.GridPos(sourceGridPos.x, sourceGridPos.y);
             sourceCell.GridPosition = targetGridPos;
-            var typeFish = isTargetRainbow
-                ? sourceCell.Type
-                : targetCell.Type;
-
-            var rainbowCell = isTargetRainbow ? targetCell : sourceCell;
-            
-            rainbowCell.Type = CONSTANTS.CellType.None;
-            rainbowCell.SpecialType = CONSTANTS.CellSpecialType.Normal;
-
-            foreach (var cell in _grid)
-            {
-                if (cell.Type == typeFish)
-                {
-                    cell.Type = CONSTANTS.CellType.None;
-                    this.SendCommand(new ClearObstacleCommand(cell.GridPosition.x, cell.GridPosition.y));
-                }
-            }
-
-            this.SendEvent<ProcessingGridEvent>();
-
+            targetCell.GridPosition = tempPos;
             return true;
         }
 
