@@ -2,7 +2,6 @@
 using GameControllers;
 using QFramework;
 using Queries;
-using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Commands
@@ -11,8 +10,6 @@ namespace Commands
     {
         private Cell[,] _grid;
         private ConfigGame _configGame;
-        private static readonly int RowAnimator = Animator.StringToHash("Row");
-        private static readonly int ColumnAnimator = Animator.StringToHash("Column");
 
         protected override bool OnExecute()
         {
@@ -61,71 +58,72 @@ namespace Commands
         private bool MergeCells(List<Utils.MatchCell> matchCellList)
         {
             matchCellList.Sort((listA, listB) => listB.CellList.Count - listA.CellList.Count);
-            
             foreach (var matchCell in matchCellList)
             {
                 var cellList = matchCell.CellList;
                 var random = Random.Range(0, cellList.Count);
                 foreach (var cell in cellList)
                 {
-                    MergeCellSpecial(cell);
+                    MergeCellRowColumn(cell);
                 }
 
                 for (var index = 0; index < cellList.Count; index++)
                 {
                     var cell = cellList[index];
-                    this.SendCommand(new ClearObstacleCommand(cell.GridPosition.x, cell.GridPosition.y));
+                    this.SendCommand(new ClearObstacleAroundCommand(cell.GridPosition.x, cell.GridPosition.y));
 
-                    var isMerge = MergeCellByCount(index, random, cellList, cell, matchCell);
-                    if (isMerge)
-                    {
-                        continue;
-                    }
+                    if (MergeCellByCount(index, random, cellList, cell, matchCell)) continue;
 
-                    cell.ClearFish();
+                    cell.ClearCell();
                 }
             }
 
             return matchCellList.Count > 0;
         }
 
-        private void MergeCellSpecial(Cell cell)
+        private void MergeCellRowColumn(Cell cell)
         {
             var gridPos = cell.GridPosition;
             if (cell.SpecialType == CONSTANTS.CellSpecialType.Column)
             {
+                cell.SpecialType = CONSTANTS.CellSpecialType.Normal;
                 for (int newY = 0; newY < _configGame.Height; newY++)
                 {
-                    
-                    this.SendCommand(new ClearObstacleCommand(gridPos.x, newY));
-                    
+                    var newCell = _grid[gridPos.x, newY];
+                    CheckRainbow(newCell);
+                    MergeCellRowColumn(newCell);
+                    this.SendCommand(new ClearObstacleAroundCommand(gridPos.x, newY));
+
                     ClearFish(gridPos.x, newY);
-                    
-                    var cellColumnSpecialType = _grid[gridPos.x, newY].SpecialType;
-                    
-                    if (cellColumnSpecialType == CONSTANTS.CellSpecialType.Column ||
-                        cellColumnSpecialType == CONSTANTS.CellSpecialType.Row)
-                    {
-                        MergeCellSpecial(_grid[gridPos.x, newY]);
-                    }
                 }
             }
 
             if (cell.SpecialType == CONSTANTS.CellSpecialType.Row)
             {
+                cell.SpecialType = CONSTANTS.CellSpecialType.Normal;
                 for (int newX = 0; newX < _configGame.Width; newX++)
                 {
-           
-                    this.SendCommand(new ClearObstacleCommand(newX, gridPos.y));
-                    
+                    var newCell = _grid[newX, gridPos.y];
+                    CheckRainbow(newCell);
+                    MergeCellRowColumn(newCell);
+                    this.SendCommand(new ClearObstacleAroundCommand(newX, gridPos.y));
+
                     ClearFish(newX, gridPos.y);
-                    
-                    var cellRowSpecialType = _grid[newX, gridPos.y].SpecialType;
-                    
-                    if (cellRowSpecialType == CONSTANTS.CellSpecialType.Column ||
-                        cellRowSpecialType == CONSTANTS.CellSpecialType.Row)
+                }
+            }
+        }
+
+        private void CheckRainbow(Cell newCell)
+        {
+            if (newCell.Type == CONSTANTS.CellType.Rainbow)
+            {
+                var randomType = Random.Range(3, _configGame.MaxListImage);
+                foreach (var cell in _grid)
+                {
+                    if (cell.Type == (CONSTANTS.CellType)randomType)
                     {
-                        MergeCellSpecial(_grid[newX, gridPos.y]);
+                        cell.ClearCell();
+                        this.SendCommand(new ClearObstacleAroundCommand(cell.GridPosition.x, cell.GridPosition.y));
                     }
                 }
             }
@@ -133,8 +131,7 @@ namespace Commands
 
         private void ClearFish(int x, int y)
         {
-            // _grid[x, y].SpecialType = CONSTANTS.CellSpecialType.Normal;
-            _grid[x, y].ClearFish();
+            _grid[x, y].ClearCell();
         }
 
         private static bool MergeCellByCount(int index, int random, List<Cell> cellList, Cell cell,
@@ -142,7 +139,7 @@ namespace Commands
         {
             if (index == random && cellList.Count >= 5)
             {
-                cell.Type = CONSTANTS.CellType.Rainbow;
+                cell.SetTypeRainbow();
                 return true;
             }
 
@@ -213,7 +210,7 @@ namespace Commands
             var cells = matchCell.CellList;
             var isTriggerRow = matchCell.Type == CONSTANTS.GridType.Row;
 
-            cells[index].Animator.SetTrigger(isTriggerRow ? RowAnimator : ColumnAnimator);
+            // cells[index].Animator.SetTrigger(isTriggerRow ? RowAnimator : ColumnAnimator);
             cells[index].SpecialType = isTriggerRow ? CONSTANTS.CellSpecialType.Row : CONSTANTS.CellSpecialType.Column;
         }
     }

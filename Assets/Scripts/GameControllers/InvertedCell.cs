@@ -1,35 +1,29 @@
 ﻿using System.Collections;
 using Commands;
 using QFramework;
+using Queries;
 using UnityEngine;
 
 namespace GameControllers
 {
     public class InvertedCell : MonoBehaviour, IController
     {
-        private PositionCell _positionCell;
+        private Cell _positionCell;
         private IEnumerator _moveIE;
         private Vector3 _clampMagnitude;
         private bool _isDragged;
         private ConfigGame _configGame;
+        private Cell[,] _grid;
 
         private void Awake()
         {
-            _positionCell = GetComponent<PositionCell>();
+            _positionCell = GetComponent<Cell>();
             _configGame = ConfigGame.Instance;
-        }
-
-        public void StopMoveIE()
-        {
-            if (_moveIE != null)
-            {
-                StopCoroutine(_moveIE);
-            }
         }
 
         private void OnMouseDown()
         {
-            if (_configGame.IsDragged)
+            if (_configGame.IsDragged || _configGame.IsProcessing)
             {
                 return;
             }
@@ -39,7 +33,7 @@ namespace GameControllers
 
         private void OnMouseDrag()
         {
-            if (!_configGame.IsDragged)
+            if (!_configGame.IsDragged || _configGame.IsProcessing)
             {
                 return;
             }
@@ -49,7 +43,7 @@ namespace GameControllers
             _clampMagnitude = this.SendCommand(new GetClampMagnitudeVectorCommand(offset));
             var newPoint = _clampMagnitude * _configGame.CellSize * 0.9f + _positionCell.WorldPosition;
 
-            this.transform.position = newPoint;
+            this.transform.position = newPoint + Vector3.back;
         }
 
         private Vector3 GetOffset()
@@ -60,22 +54,39 @@ namespace GameControllers
 
         private void OnMouseUp()
         {
-            this.transform.position = _positionCell.WorldPosition;
-
-            if (!_configGame.IsDragged)
+            if (!_configGame.IsDragged || _configGame.IsProcessing)
             {
                 return;
             }
 
-            var targetGridPos = GetTargetGridPos();
+            _configGame.IsProcessing = true;
+            this.transform.position = _positionCell.WorldPosition;
 
-            if (IsPositionInGrid(targetGridPos))
+            var targetGridPos = GetTargetGridPos();
+            if (!IsPositionInGrid(targetGridPos))
             {
-                StartCoroutine(
-                    this.SendCommand(new InvertedAndMatchCommandIE(_positionCell.GridPosition, targetGridPos)));
+                _configGame.IsProcessing = false;
+                return;
             }
 
-            _configGame.IsDragged = false;
+            var sourceGridPos = _positionCell.GridPosition;
+            _grid = this.SendQuery(new GetGridQuery());
+
+            var targetCell = _grid[sourceGridPos.x, sourceGridPos.y];
+            var sourceCell = _grid[targetGridPos.x, targetGridPos.y];
+
+            var isTargetRainbow = targetCell.Type == CONSTANTS.CellType.Rainbow;
+            var isSourceRainbow = sourceCell.Type == CONSTANTS.CellType.Rainbow;
+
+            if (isTargetRainbow || isSourceRainbow)
+            {
+                StartCoroutine(this.SendCommand(
+                    new InvertedRainbowCommand(sourceCell, targetCell, targetGridPos, isTargetRainbow)));
+            }
+            else
+            {
+                StartCoroutine(this.SendCommand(new InvertedCellAndMatchCommand(sourceCell, targetCell)));
+            }
         }
 
         private Utils.GridPos GetTargetGridPos()

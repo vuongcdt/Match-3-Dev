@@ -52,12 +52,12 @@ public static class Utils
         return new GridPos(gridWidth, gridHeight);
     }
 
-    // public static IEnumerator ClearConsoleIE()
-    // {
-    //     yield return new WaitForSeconds(3);
-    //     var assembly = Assembly.GetAssembly(typeof(SceneView));
-    //     var type = assembly.GetType("UnityEditor.LogEntries");
-    //     var method = type.GetMethod("Clear");
-    //     method.Invoke(new object(), null);
-    // }
+    public static bool IsNotInverted(Cell sourceCell, Cell targetCell)
+    {
+        var isObstacle = sourceCell.Type == CONSTANTS.CellType.Obstacle ||
+                         targetCell.Type == CONSTANTS.CellType.Obstacle;
+        var isEmpty = sourceCell.Type == CONSTANTS.CellType.None || targetCell.Type == CONSTANTS.CellType.None;
+
+        return isObstacle || isEmpty;
+    }
 }

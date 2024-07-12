@@ -1,6 +1,8 @@
-﻿using GameControllers;
+﻿using System.Collections.Generic;
+using GameControllers;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class ConfigGame : Singleton<ConfigGame>
@@ -10,6 +12,7 @@ public class ConfigGame : Singleton<ConfigGame>
     [SerializeField] private Transform gridBlock;
     [SerializeField] private Button buttonReset;
     [SerializeField] private TMP_Text obstaclesTotalText;
+    [SerializeField] private TMP_Text stepsTotalText;
 
     [SerializeField] private int width;
     [SerializeField] private int height;
@@ -26,21 +29,57 @@ public class ConfigGame : Singleton<ConfigGame>
     [SerializeField] private float timeScale = 2;
     [SerializeField] private float fillTime;
     [SerializeField] private float matchTime;
-    [SerializeField] private bool isDragged;
+    [SerializeField] private int stepsTotal = 10;
 
+    private bool _isDragged;
+    private Stack<Cell> _pool = new();
 
-    public float MatchTime => matchTime;
+    public TMP_Text StepsTotalText
+    {
+        get => stepsTotalText;
+        set => stepsTotalText = value;
+    }
 
-    public TMP_Text ObstaclesTotalText => obstaclesTotalText;
+    public int StepsTotal
+    {
+        get => stepsTotal;
+        set => stepsTotal = value;
+    }
 
-    public float TimeScale => timeScale;
+    public float MatchTime
+    {
+        get => matchTime;
+        set => matchTime = value;
+    }
 
-    public Sprite[] Sprites => sprites;
+    public TMP_Text ObstaclesTotalText
+    {
+        get => obstaclesTotalText;
+        set => obstaclesTotalText = value;
+    }
+
+    public float TimeScale
+    {
+        get => timeScale;
+        set => timeScale = value;
+    }
+
+    public Stack<Cell> Pool
+    {
+        get => _pool;
+        set => _pool = value;
+    }
+
+    public Sprite[] Sprites
+    {
+        get => sprites;
+        set => sprites = value;
+    }
 
     public bool IsDragged
     {
-        get => isDragged;
-        set => isDragged = value;
+        get => _isDragged;
+        set => _isDragged = value;
     }
 
     private Cell[,] _grid;

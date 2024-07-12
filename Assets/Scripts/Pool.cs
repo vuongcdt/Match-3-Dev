@@ -31,7 +31,7 @@ public class Pool : Singleton<Pool>
         cell.GetComponent<BoxCollider2D>().enabled = isCellNormal;
         cell.GridPosition = GetGridPos(worldPos);
         cell.Type = cellType;
-        cell.InvertedCell.StopMoveIE();
+        cell.StopMoveIE();
 
         // if (cellType == CONSTANTS.CellType.Rainbow)
         // {
@@ -40,7 +40,7 @@ public class Pool : Singleton<Pool>
 
         return cell;
     }
-
+   
     private Vector3 GetWorldPos(Utils.GridPos pos)
     {
         var configGame = ConfigGame.Instance;

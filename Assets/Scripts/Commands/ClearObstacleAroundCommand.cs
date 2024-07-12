@@ -4,14 +4,14 @@ using Queries;
 
 namespace Commands
 {
-    public class ClearObstacleCommand : AbstractCommand
+    public class ClearObstacleAroundCommand : AbstractCommand
     {
         private Cell[,] _grid;
         private ConfigGame _configGame;
         private int _x;
         private int _y;
 
-        public ClearObstacleCommand(int x, int y)
+        public ClearObstacleAroundCommand(int x, int y)
         {
             _x = x;
             _y = y;
@@ -54,11 +54,17 @@ namespace Commands
         {
             if (obstacle.Type == CONSTANTS.CellType.Obstacle)
             {
-                var configGame = ConfigGame.Instance;
-                configGame.ObstaclesTotal--;
-                configGame.ObstaclesTotalText.text = configGame.ObstaclesTotal.ToString();
-                
                 obstacle.ClearObstacle();
+                int count = 0;
+                foreach (var cell in _grid)
+                {
+                    if (cell.Type == CONSTANTS.CellType.Obstacle)
+                    {
+                        count++;
+                    }
+                }
+                _configGame.ObstaclesTotal = count;
+                _configGame.ObstaclesTotalText.text = count.ToString();
             }
         }
     }

@@ -3,6 +3,8 @@ using GameControllers;
 using QFramework;
 using Queries;
 using UnityEngine;
+using CellType = CONSTANTS.CellType;
+using CellSpecialType = CONSTANTS.CellSpecialType;
 
 namespace Commands
 {
@@ -16,8 +18,65 @@ namespace Commands
             _grid = this.SendQuery(new GetGridQuery());
             _configGame = ConfigGame.Instance;
             RenderRandomObstacles();
+            RenderTestCell();
         }
 
+        private void RenderTestCell()
+        {
+            List<CellTest> cellList = new()
+            {
+                new CellTest(0,0,CellType.Blue),
+                new CellTest(0,1,CellType.Blue),
+                new CellTest(0,2,CellType.Red),
+                new CellTest(0,3,CellType.Blue),  
+                
+                new CellTest(1,0,CellType.Yellow,CellSpecialType.Row),
+                // new CellTest(1,0,CellType.Yellow),
+                new CellTest(1,1,CellType.Yellow),
+                new CellTest(1,2,CellType.Blue),
+                new CellTest(1,3,CellType.Yellow),
+                
+                new CellTest(2,0,CellType.Yellow),
+                new CellTest(3,0,CellType.Red),
+                new CellTest(4,0,CellType.Yellow),
+                new CellTest(5,0,CellType.Obstacle),
+                // new CellTest(5,0,CellType.Yellow),
+                new CellTest(6,0,CellType.Rainbow),
+                
+                new CellTest(2,1,CellType.Obstacle),
+                new CellTest(3,1,CellType.Yellow),
+                
+                new CellTest(3,2,CellType.Obstacle),
+            };
+            
+            foreach (var cellTest in cellList)
+            {
+                var cell = _grid[cellTest.GridPos.x, cellTest.GridPos.y];
+                
+                cell.Type = cellTest.CellType;
+                cell.SpecialType = cellTest.SpecialType;
+                
+                cell.name = cellTest.CellType.ToString();
+                cell.GridPosition = cellTest.GridPos;
+                
+                cell.GetComponent<BoxCollider2D>().enabled = true;
+            }
+        }
+
+        private class CellTest
+        {
+            public Utils.GridPos GridPos;
+            public CellType CellType;
+            public CellSpecialType SpecialType;
+
+            public CellTest(int x,int y, CellType cellType,
+                CellSpecialType specialType = 0)
+            {
+                GridPos = new Utils.GridPos(x,y);
+                CellType = cellType;
+                SpecialType = specialType;
+            }
+        }
         private void RenderRandomObstacles()
         {
             var obstacleGridPosList = RandomObstacleGridPosList();
@@ -32,8 +91,8 @@ namespace Commands
                     continue;
                 }
 
-                _grid[gridPos.x, gridPos.y].Type = CONSTANTS.CellType.Obstacle;
-                _grid[gridPos.x, gridPos.y].name = CONSTANTS.CellType.Obstacle.ToString();
+                _grid[gridPos.x, gridPos.y].Type = CellType.Obstacle;
+                _grid[gridPos.x, gridPos.y].name = CellType.Obstacle.ToString();
                 _grid[gridPos.x, gridPos.y].GridPosition = gridPos;
             }
         }
@@ -97,4 +156,5 @@ namespace Commands
             return isNextTo;
         }
     }
+
 }
