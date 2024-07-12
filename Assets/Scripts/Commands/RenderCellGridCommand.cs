@@ -29,7 +29,7 @@ namespace Commands
                     {
                         _configGame.Cell.Type = CONSTANTS.CellType.None;
 
-                        var newCell = _configGame.Cell.Create(
+                        var newCell = Pool.Instance.Create(
                             new Utils.GridPos(x, y),
                             _configGame.GridBlock,
                             _configGame.AvatarSize,

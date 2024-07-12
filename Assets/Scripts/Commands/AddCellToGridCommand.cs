@@ -31,8 +31,8 @@ namespace Commands
                     isAdd = true;
                     var random = Random.Range(3, configGame.MaxListImage);
                     configGame.IsProcessing = true;
-                    
-                    var newCell = configGame.Cell.Create(
+  
+                    var newCell = Pool.Instance.Create(
                         new Utils.GridPos(x, configGame.Height),
                         configGame.GridBlock,
                         configGame.AvatarSize,
@@ -41,27 +41,19 @@ namespace Commands
                     _grid[x, configGame.Height - 1] = newCell;
                     newCell.GridPosition = new Utils.GridPos(x, configGame.Height - 1);
                     
-                    ReturnPool(cellBelow, configGame);
+                    ReturnPool(cellBelow);
                 }
             }
 
-            // yield return new WaitForSeconds(configGame.FillTime);
             return isAdd;
-            // if (isAdd)
-            // {
-            //     this.SendEvent<ProcessingGridEvent>();
-            // }
-            // else
-            // {
-            //     this.SendCommand(new MatchGridCommand());
-            // }
         }
 
-        private static void ReturnPool(Cell cellBelow, ConfigGame configGame)
+        private static void ReturnPool(Cell cellBelow)
         {
             cellBelow.GetComponentInChildren<Animator>().SetTrigger(DefaultAnimator);
             cellBelow.SpecialType = CONSTANTS.CellSpecialType.Normal;
-            configGame.Pool.Push(cellBelow);
+            // configGame.Pool.Push(cellBelow);
+            Pool.Instance.Return(cellBelow);
         }
     }
 }
