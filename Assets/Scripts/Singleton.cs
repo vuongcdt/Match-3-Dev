@@ -1,22 +1,19 @@
 ﻿using UnityEngine;
 
-namespace BaseScripts
+public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
-    public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
-    {
-        private static T _instance;
-        public static T Instance => _instance;
+    private static T _instance;
+    public static T Instance => _instance;
 
-        private void Awake()
+    private void Awake()
+    {
+        if (_instance == null)
         {
-            if (_instance == null)
-            {
-                _instance = GetComponent<T>();
-            }
-            else if (_instance.gameObject.GetInstanceID() != this.gameObject.GetInstanceID())
-            {
-                Destroy(gameObject);
-            }
+            _instance = GetComponent<T>();
+        }
+        else if (_instance.gameObject.GetInstanceID() != this.gameObject.GetInstanceID())
+        {
+            Destroy(gameObject);
         }
     }
 }

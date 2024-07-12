@@ -1,4 +1,4 @@
-﻿using BaseScripts;
+﻿using GameControllers;
 using Interfaces;
 using QFramework;
 
@@ -7,7 +7,7 @@ namespace Models
     public class GameModel : AbstractModel, IGameModel
     {
         public BindableProperty<Cell[,]> GridArray { get; set; } = new();
-        public BindableProperty<Utils.SettingsGrid> SettingsGrid { get; } = new();
+ 
         public BindableProperty<int> Count { get; } = new();
 
         protected override void OnInit()

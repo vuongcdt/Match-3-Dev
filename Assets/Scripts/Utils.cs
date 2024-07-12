@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameControllers;
 using UnityEngine;
 
 public static class Utils
@@ -9,7 +10,6 @@ public static class Utils
     {
         public int x;
         public int y;
-        public CONSTANTS.CellType type;
 
         public GridPos(int x, int y) : this()
         {
@@ -17,22 +17,10 @@ public static class Utils
             this.y = y;
         }
 
-        public GridPos(Vector2 pos) : this()
-        {
-            this.x = (int)pos.x;
-            this.y = (int)pos.y;
-        }
 
-        public GridPos(int x, int y, CONSTANTS.CellType type)
+        public new string ToString()
         {
-            this.x = x;
-            this.y = y;
-            this.type = type;
-        }
-
-        public Vector2 ToVector2()
-        {
-            return new Vector2(x, y);
+            return $"x: {x} y: {y}";
         }
     }
 
@@ -47,35 +35,29 @@ public static class Utils
             Type = type;
         }
     }
-    public struct SettingsGrid
-    {
-        public int Width;
-        public int Height;
-        public float CellSize;
 
-        // private Cell cell;
-        // private Transform backgroundBlock;
-        // private Transform gridBlock;
-        // private Vector2[] obstacles;
-        // private float avatarSize;
-        // private float backgroundSize;
-        // private float fillTime;
-        // private List<Utils.GridPos> cellTypes;
-        // private bool isProcessing;
-        //
-        // private Cell[,] _grid;
-        // private bool _isRevertFill;
-
-        public SettingsGrid(int width, int height, float cellSize) : this()
-        {
-            this.Width = width;
-            this.Height = height;
-            this.CellSize = cellSize;
-        }
-    }
-
-    public static Vector2 GetPositionCell(int x, int y, int width, int height, float cellSize)
+    public static Vector2 GetWorldPosition(int x, int y, int width, int height, float cellSize)
     {
         return new Vector2(x - (width - 1) * 0.5f, y - (height - 1) * 0.5f) * cellSize;
+    }
+
+    public static GridPos GetGridPos(float x, float y, int width, int height, float cellSize)
+    {
+        var gridX = (-x / cellSize + (width - 1) * 0.5f);
+        var gridY = (-y / cellSize + (height - 1) * 0.5f);
+
+        var gridWidth = width - 1 - (int)gridX;
+        var gridHeight = height - 1 - (int)gridY;
+
+        return new GridPos(gridWidth, gridHeight);
+    }
+
+    public static bool IsNotInverted(Cell sourceCell, Cell targetCell)
+    {
+        var isObstacle = sourceCell.Type == CONSTANTS.CellType.Obstacle ||
+                         targetCell.Type == CONSTANTS.CellType.Obstacle;
+        var isEmpty = sourceCell.Type == CONSTANTS.CellType.None || targetCell.Type == CONSTANTS.CellType.None;
+
+        return isObstacle || isEmpty;
     }
 }

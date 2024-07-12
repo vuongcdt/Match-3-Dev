@@ -6,6 +6,14 @@
         Column
     }
 
+    public enum CellSpecialType
+    {
+        Normal,
+        Row,
+        Column,
+        // Rainbow,
+    }
+
     public enum CellType
     {
         Background,
@@ -17,6 +25,6 @@
         Blue,
         Green,
         Pink,
-        Rainbow
+        Rainbow,
     }
 }
