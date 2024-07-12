@@ -30,7 +30,6 @@ namespace Commands
                 {
                     isAdd = true;
                     var random = Random.Range(3, configGame.MaxListImage);
-                    configGame.IsProcessing = true;
   
                     var newCell = Pool.Instance.Create(
                         new Utils.GridPos(x, configGame.Height),

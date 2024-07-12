@@ -21,6 +21,7 @@ namespace Commands
 
         protected override IEnumerator OnExecute()
         {
+            _configGame = ConfigGame.Instance;
             _grid = this.SendQuery(new GetGridQuery());
             return InvertedAndMatch(_sourceCell, _targetCell);
         }
@@ -29,12 +30,13 @@ namespace Commands
         {
             if (IsNotInverted(sourceCell, targetCell))
             {
+                _configGame.IsDragged = false;
+                _configGame.IsProcessing = false;
                 yield break;
             }
 
             var isInverted = InvertedCell(sourceCell, targetCell);
 
-            _configGame = ConfigGame.Instance;
             yield return new WaitForSeconds(_configGame.FillTime);
 
             var isMatch = this.SendCommand(new MatchGridCommand());

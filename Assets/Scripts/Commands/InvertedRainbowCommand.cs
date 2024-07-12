@@ -12,6 +12,7 @@ namespace Commands
         private Cell _sourceCell, _targetCell;
         private Utils.GridPos _targetGridPos;
         private bool _isTargetRainbow;
+        private ConfigGame _configGame;
 
         public InvertedRainbowCommand(Cell sourceCell, Cell targetCell, Utils.GridPos targetGridPos,
             bool isTargetRainbow)
@@ -24,6 +25,7 @@ namespace Commands
 
         protected override IEnumerator OnExecute()
         {
+            _configGame = ConfigGame.Instance;
             _grid = this.SendQuery(new GetGridQuery());
             return InvertedRainbow(_sourceCell, _targetCell, _targetGridPos, _isTargetRainbow);
         }
@@ -51,6 +53,8 @@ namespace Commands
             }
 
             yield return new WaitForSeconds(ConfigGame.Instance.MatchTime);
+
+            _configGame.IsDragged = false;
 
             this.SendCommand<ProcessingGridEventCommand>();
         }

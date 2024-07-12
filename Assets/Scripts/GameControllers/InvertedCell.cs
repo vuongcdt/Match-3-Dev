@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using Commands;
-using Events;
 using QFramework;
 using Queries;
 using UnityEngine;
@@ -24,7 +23,7 @@ namespace GameControllers
 
         private void OnMouseDown()
         {
-            if (_configGame.IsDragged)
+            if (_configGame.IsDragged || _configGame.IsProcessing)
             {
                 return;
             }
@@ -34,7 +33,7 @@ namespace GameControllers
 
         private void OnMouseDrag()
         {
-            if (!_configGame.IsDragged)
+            if (!_configGame.IsDragged || _configGame.IsProcessing)
             {
                 return;
             }
@@ -55,12 +54,13 @@ namespace GameControllers
 
         private void OnMouseUp()
         {
-            this.transform.position = _positionCell.WorldPosition;
-
-            if (!_configGame.IsDragged)
+            if (!_configGame.IsDragged || _configGame.IsProcessing)
             {
                 return;
             }
+
+            _configGame.IsProcessing = true;
+            this.transform.position = _positionCell.WorldPosition;
 
             var targetGridPos = GetTargetGridPos();
             if (!IsPositionInGrid(targetGridPos))
@@ -86,8 +86,6 @@ namespace GameControllers
             {
                 StartCoroutine(this.SendCommand(new InvertedCellAndMatchCommand(sourceCell, targetCell)));
             }
-
-            _configGame.IsDragged = false;
         }
 
         private Utils.GridPos GetTargetGridPos()

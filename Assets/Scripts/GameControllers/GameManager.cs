@@ -39,15 +39,17 @@ namespace GameControllers
 
         private IEnumerator ProcessingGrid()
         {
+            _configGame.IsProcessing = true;
+
             if (_configGame.ObstaclesTotal == 0)
             {
                 StartCoroutine(ResetGame());
-                yield return new WaitForSeconds(_configGame.FillTime);
+                yield break;
             }
 
             this.SendCommand<FillCommand>();
             var isAdd = this.SendCommand(new AddCellToGridCommand());
-            
+
             if (isAdd)
             {
                 yield return new WaitForSeconds(_configGame.FillTime);
@@ -57,10 +59,14 @@ namespace GameControllers
             {
                 var isMatch = this.SendCommand(new MatchGridCommand());
                 yield return new WaitForSeconds(_configGame.MatchTime);
-                
+
                 if (isMatch)
                 {
                     StartCoroutine(ProcessingGrid());
+                }
+                else
+                {
+                    _configGame.IsProcessing = false;
                 }
             }
         }
@@ -68,7 +74,7 @@ namespace GameControllers
         private IEnumerator ResetGame()
         {
             Debug.Log("GAME WIN");
-            yield return new WaitForSeconds(2);
+            yield return new WaitForSeconds(_configGame.MatchTime * 5);
             InitGame();
         }
 
