@@ -32,6 +32,7 @@ public class ConfigGame : Singleton<ConfigGame>
     [SerializeField] private int stepsTotal = 10;
 
     private bool _isDragged;
+    private bool _isGamePlaying;
     private Stack<Cell> _pool = new();
 
     public TMP_Text StepsTotalText

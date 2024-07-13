@@ -35,7 +35,7 @@ namespace GameControllers
             this.SendCommand<RenderRandomObstaclesCommand>();
             _configGame.StepsTotal = _configGame.ObstaclesTotal;
             this.SendCommand<SetStepsTotalCommand>();
-            StartCoroutine(ProcessingGrid());
+            // StartCoroutine(ProcessingGrid());
         }
 
         private IEnumerator ProcessingGrid()
