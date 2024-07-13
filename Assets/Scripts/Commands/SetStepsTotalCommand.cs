@@ -2,9 +2,10 @@
 
 namespace Commands
 {
-    public class SetStepsTotalCommand:AbstractCommand
+    public class SetStepsTotalCommand : AbstractCommand
     {
         private ConfigGame _configGame;
+
         protected override void OnExecute()
         {
             _configGame = ConfigGame.Instance;

@@ -2,7 +2,6 @@
 using GameControllers;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class ConfigGame : Singleton<ConfigGame>
@@ -19,6 +18,7 @@ public class ConfigGame : Singleton<ConfigGame>
     [SerializeField] private float cellSize;
     [SerializeField] private float avatarSize;
     [SerializeField] private float backgroundSize;
+    
     [SerializeField] private bool isProcessing;
     [SerializeField] private int obstaclesTotal;
     [SerializeField] private int maxListImage;
