@@ -11,11 +11,15 @@ namespace GameControllers
         private Cell[,] _grid;
         private ConfigGame _configGame;
 
+        private int _level;
+
         private void Start()
         {
             Application.targetFrameRate = 60;
 
             this.RegisterEvent<ProcessingGridEvent>(e => StartCoroutine(ProcessingGrid()))
+                .UnRegisterWhenGameObjectDestroyed(gameObject);
+            this.RegisterEvent<InitGridEvent>(e => InitLevel(e.Level))
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
 
             _configGame = ConfigGame.Instance;
@@ -26,15 +30,26 @@ namespace GameControllers
             this.SendCommand(new InitGridModelCommand(_grid));
             this.SendCommand<RenderBackgroundGridCommand>();
 
-            InitGame();
+            // InitGame();
         }
 
-        private void InitGame()
+        private void InitLevel(int level)
+        {
+            _configGame.Level = level;
+            StartCoroutine(InitGame());
+        }
+
+        private IEnumerator InitGame()
         {
             this.SendCommand<RenderCellGridCommand>();
             this.SendCommand<RenderRandomObstaclesCommand>();
+            
             _configGame.StepsTotal = _configGame.ObstaclesTotal;
+            
+            this.SendCommand<SetObstaclesTotalCommand>();
             this.SendCommand<SetStepsTotalCommand>();
+            
+            yield return new WaitForSeconds(1);
             // StartCoroutine(ProcessingGrid());
         }
 
@@ -44,14 +59,12 @@ namespace GameControllers
 
             if (_configGame.ObstaclesTotal == 0)
             {
-                Debug.Log("GAME WIN");
                 StartCoroutine(ResetGame());
                 yield break;
             }
 
             if (_configGame.ObstaclesTotal > 0 && _configGame.StepsTotal == 0)
             {
-                Debug.Log("GAME OVER");
                 StartCoroutine(ResetGame());
                 yield break;
             }
@@ -80,13 +93,13 @@ namespace GameControllers
 
         private IEnumerator ResetGame()
         {
-            yield return new WaitForSeconds(_configGame.MatchTime * 5);
-            InitGame();
+            yield return new WaitForSeconds(_configGame.MatchTime * 2);
+            StartCoroutine(InitGame());
         }
 
         public void OnRestartClick()
         {
-            InitGame();
+            StartCoroutine(InitGame());
         }
 
         public IArchitecture GetArchitecture()

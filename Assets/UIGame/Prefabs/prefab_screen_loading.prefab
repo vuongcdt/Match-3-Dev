@@ -220,7 +220,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 100
   m_WholeNumbers: 0
-  m_Value: 75
+  m_Value: 100
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -677,6 +677,8 @@ MonoBehaviour:
     _pushExitAnimations: []
     _popEnterAnimations: []
     _popExitAnimations: []
+  slider: {fileID: 5385654783114470537}
+  textLoading: {fileID: 8828499688277360513}
 --- !u!1 &5812757505067846224
 GameObject:
   m_ObjectHideFlags: 0
@@ -713,8 +715,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -5, y: 0}
-  m_SizeDelta: {x: -20, y: -11.66}
+  m_AnchoredPosition: {x: -0.32751465, y: 0}
+  m_SizeDelta: {x: -10.655, y: -11.66}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &991049288343825777
 CanvasRenderer:

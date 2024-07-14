@@ -24,6 +24,18 @@ public static class Utils
         }
     }
 
+    public struct UserData
+    {
+        public int Level;
+        public int Star;
+
+        public UserData(int level, int star)
+        {
+            Level = level;
+            Star = star;
+        }
+    }
+    
     public struct MatchCell
     {
         public readonly List<Cell> CellList;

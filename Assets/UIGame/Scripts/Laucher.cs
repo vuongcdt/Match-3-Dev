@@ -13,6 +13,7 @@ namespace UIGame.Scripts
 
         private ScreenContainer _screenContainer;
         private ModalContainer _modalContainer;
+        private readonly float _timeDelay = 3;
 
         protected override void OnAwake()
         {
@@ -35,20 +36,20 @@ namespace UIGame.Scripts
             _screenContainer.Preload(ResourceKey.LoadingScreenPrefab());
             _screenContainer.Preload(ResourceKey.HomeScreenPrefab());
             _screenContainer.Preload(ResourceKey.PlayScreenPrefab());
-            
+
             _modalContainer.Preload(ResourceKey.PauseModalPrefab());
             // _modalContainer.Preload(ResourceKey.GameOverModalPrefab());
-
         }
 
         private async UniTaskVoid ShowLoadingPage()
         {
             var options = new ViewOptions(ResourceKey.LoadingScreenPrefab(), false, loadAsync: false);
             await _screenContainer.PushAsync(options);
-            Invoke(nameof(ShowHomePage), 1);
+            await UniTask.WaitForSeconds(_timeDelay);
+            await ShowHomePage();
         }
 
-        private async UniTaskVoid ShowHomePage()
+        private async UniTask ShowHomePage()
         {
             var options = new ViewOptions(ResourceKey.HomeScreenPrefab(), false, loadAsync: false);
             await _screenContainer.PushAsync(options);

@@ -1165,6 +1165,9 @@ MonoBehaviour:
     _pushExitAnimations: []
     _popEnterAnimations: []
     _popExitAnimations: []
+  obstaclesTotalText: {fileID: 2448017494547936042}
+  stepsTotalText: {fileID: 4955631609990986660}
+  scoreText: {fileID: 7870792207142160199}
   pauseBtn: {fileID: 7844403755626241050}
 --- !u!1001 &322622859728396174
 PrefabInstance:
@@ -1182,6 +1185,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: b625cd3838cc0477ca073199439588b5, type: 3}
+    - target: {fileID: 7584206940980384907, guid: 6571f553267974fab9f426d87077c0b0, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7584206940980384916, guid: 6571f553267974fab9f426d87077c0b0, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1268,7 +1275,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7584206940980384917, guid: 6571f553267974fab9f426d87077c0b0, type: 3}
       propertyPath: m_Name
-      value: Button_Round01_BtnText_Yellow
+      value: Score
       objectReference: {fileID: 0}
     - target: {fileID: 7584206941062633673, guid: 6571f553267974fab9f426d87077c0b0, type: 3}
       propertyPath: m_text
@@ -1306,7 +1313,12 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 33.3125
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 7584206941062633675, guid: 6571f553267974fab9f426d87077c0b0, type: 3}
+      propertyPath: m_Name
+      value: Score_Text
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 7584206940980384907, guid: 6571f553267974fab9f426d87077c0b0, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 7584206940980384916, guid: 6571f553267974fab9f426d87077c0b0, type: 3}
@@ -1320,6 +1332,17 @@ PrefabInstance:
       addedObject: {fileID: 836833564904238605}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6571f553267974fab9f426d87077c0b0, type: 3}
+--- !u!114 &7870792207142160199 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7584206941062633673, guid: 6571f553267974fab9f426d87077c0b0, type: 3}
+  m_PrefabInstance: {fileID: 322622859728396174}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &7870792207462566682 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7584206940980384916, guid: 6571f553267974fab9f426d87077c0b0, type: 3}
@@ -1335,7 +1358,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 8056374027458760450, guid: 6d752d68651dc4f2889f1bed94a636e5, type: 3}
       propertyPath: m_Name
-      value: Button_Tapered_BtnText_Yellow
+      value: Step_Move
       objectReference: {fileID: 0}
     - target: {fileID: 8056374027458760451, guid: 6d752d68651dc4f2889f1bed94a636e5, type: 3}
       propertyPath: m_Pivot.x
@@ -1421,6 +1444,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8056374027739308963, guid: 6d752d68651dc4f2889f1bed94a636e5, type: 3}
+      propertyPath: m_Name
+      value: StepMoveText
+      objectReference: {fileID: 0}
     - target: {fileID: 8056374027739308989, guid: 6d752d68651dc4f2889f1bed94a636e5, type: 3}
       propertyPath: m_text
       value: 66
@@ -1446,6 +1473,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8056374027458760451, guid: 6d752d68651dc4f2889f1bed94a636e5, type: 3}
   m_PrefabInstance: {fileID: 3100743526458071065}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4955631609990986660 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8056374027739308989, guid: 6d752d68651dc4f2889f1bed94a636e5, type: 3}
+  m_PrefabInstance: {fileID: 3100743526458071065}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &8900037960715936140
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1454,6 +1492,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4201922576047522370}
     m_Modifications:
+    - target: {fileID: 6519615417387815588, guid: 1978043fa72484a869883ee2a02ce2bf, type: 3}
+      propertyPath: m_Name
+      value: Obstacle_Total_Text
+      objectReference: {fileID: 0}
     - target: {fileID: 6519615417387815590, guid: 1978043fa72484a869883ee2a02ce2bf, type: 3}
       propertyPath: m_text
       value: 8
@@ -1480,7 +1522,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6519615419442395744, guid: 1978043fa72484a869883ee2a02ce2bf, type: 3}
       propertyPath: m_Name
-      value: Button_Tapered_BtnText_White
+      value: Obstacle_Total
       objectReference: {fileID: 0}
     - target: {fileID: 6519615419442395745, guid: 1978043fa72484a869883ee2a02ce2bf, type: 3}
       propertyPath: m_Pivot.x
@@ -1579,3 +1621,14 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 6519615419442395745, guid: 1978043fa72484a869883ee2a02ce2bf, type: 3}
   m_PrefabInstance: {fileID: 8900037960715936140}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2448017494547936042 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6519615417387815590, guid: 1978043fa72484a869883ee2a02ce2bf, type: 3}
+  m_PrefabInstance: {fileID: 8900037960715936140}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

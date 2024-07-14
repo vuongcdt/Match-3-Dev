@@ -18,50 +18,49 @@ namespace Commands
             _grid = this.SendQuery(new GetGridQuery());
             _configGame = ConfigGame.Instance;
             RenderRandomObstacles();
-            RenderTestCell();
+            // RenderTestCell();
         }
 
         private void RenderTestCell()
         {
             List<CellTest> cellList = new()
             {
-                new CellTest(0,0,CellType.Blue),
-                new CellTest(0,1,CellType.Blue),
-                new CellTest(0,2,CellType.Red),
-                new CellTest(0,3,CellType.Blue),  
-                
+                new CellTest(0, 0, CellType.Blue),
+                new CellTest(0, 1, CellType.Blue),
+                new CellTest(0, 2, CellType.Red),
+                new CellTest(0, 3, CellType.Blue),
+
                 // new CellTest(1,0,CellType.Yellow,CellSpecialType.Row),
-                new CellTest(1,0,CellType.Yellow),
-                new CellTest(1,1,CellType.Yellow),
-                new CellTest(1,2,CellType.Blue),
-                new CellTest(1,3,CellType.Yellow),
-                
-                new CellTest(2,0,CellType.Yellow),
-                new CellTest(3,0,CellType.Red),
-                new CellTest(4,0,CellType.Yellow),
-                new CellTest(5,0,CellType.Obstacle),
+                new CellTest(1, 0, CellType.Yellow),
+                new CellTest(1, 1, CellType.Yellow),
+                new CellTest(1, 2, CellType.Blue),
+                new CellTest(1, 3, CellType.Yellow),
+
+                new CellTest(2, 0, CellType.Yellow),
+                new CellTest(3, 0, CellType.Red),
+                new CellTest(4, 0, CellType.Yellow),
+                new CellTest(5, 0, CellType.Obstacle),
                 // new CellTest(5,0,CellType.Yellow),
-                new CellTest(6,0,CellType.Rainbow),
-                
-                new CellTest(2,1,CellType.Obstacle),
-                new CellTest(3,1,CellType.Yellow),
-                
-                new CellTest(3,2,CellType.Yellow),
-                new CellTest(3,3,CellType.Obstacle),
-                new CellTest(4,1,CellType.Blue),
+                new CellTest(6, 0, CellType.Rainbow),
+
+                new CellTest(2, 1, CellType.Obstacle),
+                new CellTest(3, 1, CellType.Yellow),
+
+                new CellTest(3, 2, CellType.Yellow),
+                new CellTest(3, 3, CellType.Obstacle),
+                new CellTest(4, 1, CellType.Blue),
             };
-            cellList = new();
-            
+
             foreach (var cellTest in cellList)
             {
                 var cell = _grid[cellTest.GridPos.x, cellTest.GridPos.y];
-                
+
                 cell.Type = cellTest.CellType;
                 cell.SpecialType = cellTest.SpecialType;
-                
+
                 cell.name = cellTest.CellType.ToString();
                 cell.GridPosition = cellTest.GridPos;
-                
+
                 cell.GetComponent<BoxCollider2D>().enabled = true;
             }
         }
@@ -72,20 +71,20 @@ namespace Commands
             public CellType CellType;
             public CellSpecialType SpecialType;
 
-            public CellTest(int x,int y, CellType cellType,
+            public CellTest(int x, int y, CellType cellType,
                 CellSpecialType specialType = 0)
             {
-                GridPos = new Utils.GridPos(x,y);
+                GridPos = new Utils.GridPos(x, y);
                 CellType = cellType;
                 SpecialType = specialType;
             }
         }
+
         private void RenderRandomObstacles()
         {
             var obstacleGridPosList = RandomObstacleGridPosList();
-
             _configGame.ObstaclesTotal = obstacleGridPosList.Count;
-            _configGame.ObstaclesTotalText.text = obstacleGridPosList.Count.ToString();
+
             foreach (var gridPos in obstacleGridPosList)
             {
                 if (gridPos.x < 0 || gridPos.x > _configGame.Width - 1 || gridPos.y < 0 ||
@@ -107,11 +106,8 @@ namespace Commands
             int count = 0;
             List<Utils.GridPos> obstacleGridPosList = new();
 
-            var isNotNextTo = Random.value > 0.5f;
-
-            var randomObstaclesTotal = Random.Range(15, 22);
-            // var randomObstaclesTotal = _configGame.ObstaclesTotal;
-            // var randomObstaclesTotal = 10;
+            var isNotNextTo = _configGame.Level % 2 == 0;
+            var randomObstaclesTotal = _configGame.Level / 2 + 5;
 
             while (obstacleGridPosList.Count < randomObstaclesTotal)
             {
@@ -121,13 +117,13 @@ namespace Commands
 
                 var cellPos = new Utils.GridPos(randomX, randomY);
                 var isNoInList = obstacleGridPosList.IndexOf(cellPos) == -1;
-                
+
                 var isNextTo = IsNextTo(obstacleGridPosList, cellPos);
                 if (isNoInList && !isNextTo && isNotNextTo)
                 {
                     obstacleGridPosList.Add(cellPos);
-                }   
-                
+                }
+
                 if (isNoInList && !isNotNextTo)
                 {
                     obstacleGridPosList.Add(cellPos);
@@ -135,12 +131,10 @@ namespace Commands
 
                 if (count > 100)
                 {
-                    Debug.Log("loop");
                     break;
                 }
             }
 
-            // Debug.Log($"count {count}");
             return obstacleGridPosList;
         }
 
@@ -161,5 +155,4 @@ namespace Commands
             return isNextTo;
         }
     }
-
 }

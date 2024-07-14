@@ -12,9 +12,9 @@ namespace UIGame.Scripts
 {
     public class GamePlayScreen : Screen
     {
-        // [SerializeField] internal TMP_Text scoreText;
-        // [SerializeField] internal TMP_Text highScoreText;
-        // [SerializeField] internal TMP_Text nextSquareText;
+        [SerializeField] internal TMP_Text obstaclesTotalText;
+        [SerializeField] internal TMP_Text stepsTotalText;
+        [SerializeField] internal TMP_Text scoreText;
         // [SerializeField] internal Image background;
         //
         [SerializeField] private Button pauseBtn;
@@ -25,6 +25,11 @@ namespace UIGame.Scripts
         
             pauseBtn.onClick.RemoveAllListeners();
             pauseBtn.onClick.AddListener(OnPauseBtnClick);
+
+            var configGame = ConfigGame.Instance;
+            configGame.ObstaclesTotalText = obstaclesTotalText;
+            configGame.StepsTotalText = stepsTotalText;
+            configGame.ScoreText = scoreText;
         
             return UniTask.CompletedTask;
         }

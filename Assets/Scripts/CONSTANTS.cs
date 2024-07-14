@@ -11,7 +11,13 @@
         Normal,
         Row,
         Column,
-        // Rainbow,
+    }
+    
+    public enum TypeCard
+    {
+        Checked,
+        Checking,
+        CanCheck,
     }
 
     public enum CellType
