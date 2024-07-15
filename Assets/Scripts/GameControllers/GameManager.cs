@@ -44,7 +44,8 @@ namespace GameControllers
             this.SendCommand<RenderCellGridCommand>();
             this.SendCommand<RenderRandomObstaclesCommand>();
 
-            _gameModel.StepsTotal.Value = _gameModel.ObstaclesTotal.Value;
+            _gameModel.ScoreTotal.Value = 0;
+            _gameModel.StepsTotal.Value = Utils.GetStepsMove(_gameModel.ObstaclesTotal.Value);
 
             this.SendCommand<SetObstaclesTotalCommand>();
             this.SendCommand<SetStepsTotalCommand>();
@@ -56,6 +57,10 @@ namespace GameControllers
         private IEnumerator ProcessingGrid()
         {
             _configGame.IsProcessing = true;
+            if (_gameModel.ObstaclesTotal.Value == 0 || _gameModel.StepsTotal.Value == 0)
+            {
+                yield break;
+            }
 
             this.SendCommand<FillCommand>();
             var isAdd = this.SendCommand(new AddCellToGridCommand());

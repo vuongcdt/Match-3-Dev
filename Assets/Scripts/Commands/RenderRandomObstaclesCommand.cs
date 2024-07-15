@@ -13,11 +13,13 @@ namespace Commands
     {
         private Cell[,] _grid;
         private ConfigGame _configGame;
+        private IGameModel _gameModel;
 
         protected override void OnExecute()
         {
             _grid = this.SendQuery(new GetGridQuery());
             _configGame = ConfigGame.Instance;
+            _gameModel = this.GetModel<IGameModel>();
             RenderRandomObstacles();
             // RenderTestCell();
         }
@@ -111,7 +113,7 @@ namespace Commands
             List<Utils.GridPos> obstacleGridPosList = new();
 
             var isNotNextTo = _configGame.Level % 2 == 0;
-            var randomObstaclesTotal = _configGame.Level / 2 + 5;
+            var randomObstaclesTotal = Utils.GetObstaclesTotal(_gameModel.Level.Value);
 
             while (obstacleGridPosList.Count < randomObstaclesTotal)
             {

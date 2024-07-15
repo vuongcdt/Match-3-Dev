@@ -63,6 +63,14 @@ namespace Commands
                 }
             }
 
+            var countCell = 0;
+            foreach (var matchCell in matchCellList)
+            {
+                countCell+= matchCell.CellList.Count;
+            }
+
+            this.SendCommand(new AddScoreCommand(countCell));
+
             Cell cellCanRainbow = null;
             if (matchCellList.Count == 2 && _isInverted)
             {
@@ -139,8 +147,10 @@ namespace Commands
                 for (int newY = 0; newY < _configGame.Height; newY++)
                 {
                     var newCell = _grid[gridPos.x, newY];
+
                     CheckRainbow(newCell);
                     MergeCellRowColumn(newCell);
+
                     this.SendCommand(new ClearObstacleAroundCommand(gridPos.x, newY));
 
                     ClearFish(gridPos.x, newY);
@@ -153,8 +163,10 @@ namespace Commands
                 for (int newX = 0; newX < _configGame.Width; newX++)
                 {
                     var newCell = _grid[newX, gridPos.y];
+
                     CheckRainbow(newCell);
                     MergeCellRowColumn(newCell);
+
                     this.SendCommand(new ClearObstacleAroundCommand(newX, gridPos.y));
 
                     ClearFish(newX, gridPos.y);
@@ -167,10 +179,12 @@ namespace Commands
             if (newCell.Type == CONSTANTS.CellType.Rainbow)
             {
                 var randomType = Random.Range(3, _configGame.MaxListImage);
+                var countCell = 0;
                 foreach (var cell in _grid)
                 {
                     if (cell.Type == (CONSTANTS.CellType)randomType)
                     {
+                        countCell++;
                         cell.ClearCell();
                         this.SendCommand(new ClearObstacleAroundCommand(cell.GridPosition.x, cell.GridPosition.y));
                     }
@@ -183,16 +197,18 @@ namespace Commands
             _grid[x, y].ClearCell();
         }
 
-        private static bool MergeCellByCount(int index, int random, List<Cell> cellList, Cell cell,
+        private bool MergeCellByCount(int index, int random, List<Cell> cellList, Cell cell,
             Utils.MatchCell matchCell)
         {
-            if (index == random && cellList.Count >= 5)
+            var cellListCount = cellList.Count;
+
+            if (index == random && cellListCount >= 5)
             {
                 cell.SetTypeRainbow();
                 return true;
             }
 
-            if (index == random && cellList.Count == 4)
+            if (index == random && cellListCount == 4)
             {
                 SetTriggerAndSpecialType(matchCell, index);
                 return true;

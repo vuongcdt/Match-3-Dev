@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using Commands;
 using Cysharp.Threading.Tasks;
+using Interfaces;
 using QFramework;
 using UnityEngine;
-using UnityEngine.UI;
 using ZBase.UnityScreenNavigator.Core.Screens;
-using Random = UnityEngine.Random;
 using Screen = ZBase.UnityScreenNavigator.Core.Screens.Screen;
 
 namespace UIGame.Scripts
@@ -15,16 +13,33 @@ namespace UIGame.Scripts
     {
         [SerializeField] private CardItem[] cardItems;
 
+        private IGameModel _gameModel;
+
         public override UniTask Initialize(Memory<object> args)
         {
-            Utils.UserData[] userData = new Utils.UserData[12];
-            for (var index = 0; index < userData.Length; index++)
-            {
-                var random = Random.Range(1, 4);
-                userData[index] = new Utils.UserData(index + 1, random);
-            }
+            base.OnEnable();
+            _gameModel = this.GetModel<IGameModel>();
 
-            for (var index = 0; index <= userData.Length; index++)
+            _gameModel.Level.RegisterWithInitValue(level => GetUserData());
+
+            // GetUserData();
+
+            return UniTask.CompletedTask;
+        }
+
+        private void GetUserData()
+        {
+            var userData = _gameModel.UserData.Value;
+            Debug.Log($"user data2 {userData.Count}");
+
+            // Utils.LevelData[] userData = new Utils.LevelData[12];
+            // for (var index = 0; index < userData.Count; index++)
+            // {
+            //     var random = Random.Range(1, 4);
+            //     userData[index] = new Utils.LevelData(index + 1, random);
+            // }
+
+            for (var index = 0; index <= userData.Count; index++)
             {
                 if (index >= cardItems.Length)
                 {
@@ -33,9 +48,9 @@ namespace UIGame.Scripts
 
                 var cardItem = cardItems[index];
 
-                if (index == userData.Length)
+                if (index == userData.Count)
                 {
-                    cardItem.SetCardItem(CONSTANTS.TypeCard.Checking, userData.Length + 1, 0);
+                    cardItem.SetCardItem(CONSTANTS.TypeCard.Checking, userData.Count + 1, 0);
                     break;
                 }
 
@@ -44,12 +59,10 @@ namespace UIGame.Scripts
                 cardItem.SetCardItem(CONSTANTS.TypeCard.Checked, dataLevel.Level, dataLevel.Star);
             }
 
-            for (var index = userData.Length; index < cardItems.Length; index++)
+            for (var index = userData.Count; index < cardItems.Length; index++)
             {
                 cardItems[index].SetLevelCardItem(index + 1);
             }
-
-            return UniTask.CompletedTask;
         }
 
 
