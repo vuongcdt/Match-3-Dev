@@ -11,7 +11,7 @@ namespace UIGame.Scripts
     {
         [SerializeField] private Slider slider;
         [SerializeField] private TMP_Text textLoading;
-        private readonly float _timeDelay = 2.5f;
+        private readonly float _timeDelay = 0.7f;
 
         public override UniTask Initialize(Memory<object> args)
         {

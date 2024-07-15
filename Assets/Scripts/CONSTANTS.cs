@@ -33,4 +33,8 @@
         Pink,
         Rainbow,
     }
+    public class Volume
+    {
+        public const float VOLUME_DEFAULT = 0.5f;
+    }
 }

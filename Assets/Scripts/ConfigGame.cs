@@ -18,7 +18,6 @@ public class ConfigGame : Singleton<ConfigGame>
     [SerializeField] private float backgroundSize;
 
     [SerializeField] private bool isProcessing;
-    [SerializeField] private int obstaclesTotal;
     [SerializeField] private int maxListImage;
     [SerializeField] private float sensitivity;
     [SerializeField] private float minSensitivity;
@@ -27,12 +26,7 @@ public class ConfigGame : Singleton<ConfigGame>
     [SerializeField] private float timeScale = 2;
     [SerializeField] private float fillTime;
     [SerializeField] private float matchTime;
-    [SerializeField] private int stepsTotal = 10;
 
-    private TMP_Text _obstaclesTotalText;
-    private TMP_Text _stepsTotalText;
-    private TMP_Text _scoreText;
-    
     private int _level;
     private bool _isDragged;
     private bool _isGamePlaying;
@@ -44,34 +38,10 @@ public class ConfigGame : Singleton<ConfigGame>
         set => _level = value;
     }
 
-    public TMP_Text ScoreText
-    {
-        get => _scoreText;
-        set => _scoreText = value;
-    }
-
-    public TMP_Text StepsTotalText
-    {
-        get => _stepsTotalText;
-        set => _stepsTotalText = value;
-    }
-
-    public int StepsTotal
-    {
-        get => stepsTotal;
-        set => stepsTotal = value;
-    }
-
     public float MatchTime
     {
         get => matchTime;
         set => matchTime = value;
-    }
-
-    public TMP_Text ObstaclesTotalText
-    {
-        get => _obstaclesTotalText;
-        set => _obstaclesTotalText = value;
     }
 
     public float TimeScale
@@ -123,12 +93,6 @@ public class ConfigGame : Singleton<ConfigGame>
     public float BackgroundSize => backgroundSize;
 
     public float FillTime => fillTime;
-
-    public int ObstaclesTotal
-    {
-        get => obstaclesTotal;
-        set => obstaclesTotal = value;
-    }
 
     public int MaxListImage => maxListImage;
 

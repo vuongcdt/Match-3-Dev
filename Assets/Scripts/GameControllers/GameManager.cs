@@ -1,6 +1,7 @@
 using System.Collections;
 using Commands;
 using Events;
+using Interfaces;
 using QFramework;
 using UnityEngine;
 
@@ -10,27 +11,26 @@ namespace GameControllers
     {
         private Cell[,] _grid;
         private ConfigGame _configGame;
-
+        private IGameModel _gameModel;
         private int _level;
 
         private void Start()
         {
             Application.targetFrameRate = 60;
+            _gameModel = this.GetModel<IGameModel>();
 
             this.RegisterEvent<ProcessingGridEvent>(e => StartCoroutine(ProcessingGrid()))
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
             this.RegisterEvent<InitGridEvent>(e => InitLevel(e.Level))
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
+            this.RegisterEvent<ResetGameEvent>(e => StartCoroutine(ResetGame()))
+                .UnRegisterWhenGameObjectDestroyed(gameObject);
 
             _configGame = ConfigGame.Instance;
-            _configGame.ButtonReset.onClick.RemoveAllListeners();
-            _configGame.ButtonReset.onClick.AddListener(OnRestartClick);
 
             _grid = new Cell[_configGame.Width, _configGame.Height];
             this.SendCommand(new InitGridModelCommand(_grid));
             this.SendCommand<RenderBackgroundGridCommand>();
-
-            // InitGame();
         }
 
         private void InitLevel(int level)
@@ -43,31 +43,19 @@ namespace GameControllers
         {
             this.SendCommand<RenderCellGridCommand>();
             this.SendCommand<RenderRandomObstaclesCommand>();
-            
-            _configGame.StepsTotal = _configGame.ObstaclesTotal;
-            
+
+            _gameModel.StepsTotal.Value = _gameModel.ObstaclesTotal.Value;
+
             this.SendCommand<SetObstaclesTotalCommand>();
             this.SendCommand<SetStepsTotalCommand>();
-            
+
             yield return new WaitForSeconds(1);
-            // StartCoroutine(ProcessingGrid());
+            StartCoroutine(ProcessingGrid());
         }
 
         private IEnumerator ProcessingGrid()
         {
             _configGame.IsProcessing = true;
-
-            if (_configGame.ObstaclesTotal == 0)
-            {
-                StartCoroutine(ResetGame());
-                yield break;
-            }
-
-            if (_configGame.ObstaclesTotal > 0 && _configGame.StepsTotal == 0)
-            {
-                StartCoroutine(ResetGame());
-                yield break;
-            }
 
             this.SendCommand<FillCommand>();
             var isAdd = this.SendCommand(new AddCellToGridCommand());
@@ -93,12 +81,7 @@ namespace GameControllers
 
         private IEnumerator ResetGame()
         {
-            yield return new WaitForSeconds(_configGame.MatchTime * 2);
-            StartCoroutine(InitGame());
-        }
-
-        public void OnRestartClick()
-        {
+            yield return new WaitForSeconds(_configGame.MatchTime);
             StartCoroutine(InitGame());
         }
 

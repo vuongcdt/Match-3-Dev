@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5726295087823791056}
   - component: {fileID: 6318981652248198689}
   - component: {fileID: 8071716695596554435}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Icon_Check
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -86,7 +86,7 @@ GameObject:
   - component: {fileID: 5184798220664105256}
   - component: {fileID: 4222607886304088688}
   - component: {fileID: 2576451973941172915}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: FocusBorder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -162,7 +162,7 @@ GameObject:
   - component: {fileID: 1837129277960250030}
   - component: {fileID: 2326535256344929772}
   - component: {fileID: 899263940840183512}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ItemIcon (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -253,7 +253,7 @@ GameObject:
   - component: {fileID: 4167983799560070755}
   - component: {fileID: 6046027377898424345}
   - component: {fileID: 2444170727742520402}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ItemIcon (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -344,7 +344,7 @@ GameObject:
   - component: {fileID: 3091802498935025409}
   - component: {fileID: 1416165551394897418}
   - component: {fileID: 7856720257929034280}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: LockLevel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -469,7 +469,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3483649051751542636}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Focus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -509,7 +509,7 @@ GameObject:
   - component: {fileID: 4281811315768909848}
   - component: {fileID: 6248863431623682138}
   - component: {fileID: 7846483001993203122}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ItemIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -599,7 +599,7 @@ GameObject:
   - component: {fileID: 8368459038507456716}
   - component: {fileID: 3021556669413761263}
   - component: {fileID: 1754657930476739657}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Image_Rotate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -674,7 +674,7 @@ GameObject:
   - component: {fileID: 5268256692088159809}
   - component: {fileID: 5414304991202192074}
   - component: {fileID: 8303317698209493317}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Corner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -750,7 +750,7 @@ GameObject:
   - component: {fileID: 4411680110746062837}
   - component: {fileID: 4850619115805729531}
   - component: {fileID: 8651121898359424821}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text_Day
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -884,7 +884,7 @@ GameObject:
   - component: {fileID: 1182840894073048803}
   - component: {fileID: 4813687828115157613}
   - component: {fileID: 5257367435591372185}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Image_Star (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -959,7 +959,7 @@ GameObject:
   - component: {fileID: 9087179913102057062}
   - component: {fileID: 2427888335871838182}
   - component: {fileID: 4518571605195513872}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Border
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1034,7 +1034,7 @@ GameObject:
   - component: {fileID: 7518068339701841306}
   - component: {fileID: 9177029565453561109}
   - component: {fileID: 2178536132519474496}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: FocusGlow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1107,7 +1107,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7343724706193165274}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Group_ImageEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1147,7 +1147,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5554062324495185907}
   - component: {fileID: 8192980567985602242}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ItemBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1211,7 +1211,7 @@ GameObject:
   - component: {fileID: 4583633889573117235}
   - component: {fileID: 6495359753307793308}
   - component: {fileID: 3016957721832632636}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Image_Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1288,7 +1288,7 @@ GameObject:
   - component: {fileID: 8074894465454664929}
   - component: {fileID: 5496143624270301856}
   - component: {fileID: 1970237644159786974}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: LevelCardItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1394,9 +1394,6 @@ MonoBehaviour:
   - {fileID: 2326535256344929772}
   bgCard: {fileID: 6237192702771006094}
   cornerBg: {fileID: 8303317698209493317}
-  typeCard: 1
-  levelNum: 99
-  starsNum: 1
 --- !u!114 &1970237644159786974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1464,7 +1461,7 @@ GameObject:
   - component: {fileID: 5298085931657673065}
   - component: {fileID: 5104251858320076735}
   - component: {fileID: 2519186131982018071}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Image_Star
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1539,7 +1536,7 @@ GameObject:
   - component: {fileID: 8650235548122051496}
   - component: {fileID: 1674267684493239711}
   - component: {fileID: 5987924571476117877}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1675,7 +1672,7 @@ GameObject:
   - component: {fileID: 6237192702771006094}
   - component: {fileID: 917710192562731803}
   - component: {fileID: 2854103631685087239}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Bg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1780,7 +1777,7 @@ GameObject:
   - component: {fileID: 5058725166525556161}
   - component: {fileID: 8055449828121420382}
   - component: {fileID: 6056087344122388118}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Glow
   m_TagString: Untagged
   m_Icon: {fileID: 0}

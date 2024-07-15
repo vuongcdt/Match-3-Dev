@@ -1,4 +1,4 @@
-﻿using GameControllers;
+﻿using Interfaces;
 using QFramework;
 using Queries;
 
@@ -6,17 +6,13 @@ namespace Commands
 {
     public class SetObstaclesTotalCommand : AbstractCommand
     {
-        private ConfigGame _configGame;
-        private Cell[,] _grid;
-        
-
         protected override void OnExecute()
         {
-            _configGame = ConfigGame.Instance;
-            _grid = this.SendQuery(new GetGridQuery());
+            var gameModel = this.GetModel<IGameModel>();
+           var grid = gameModel.GridArray.Value;
 
             int count = 0;
-            foreach (var cell in _grid)
+            foreach (var cell in grid)
             {
                 if (cell.Type == CONSTANTS.CellType.Obstacle)
                 {
@@ -24,8 +20,7 @@ namespace Commands
                 }
             }
 
-            _configGame.ObstaclesTotal = count;
-            _configGame.ObstaclesTotalText.text = count.ToString();
+            gameModel.ObstaclesTotal.Value = count;
         }
     }
 }

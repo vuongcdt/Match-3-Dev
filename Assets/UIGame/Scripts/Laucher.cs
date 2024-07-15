@@ -13,7 +13,7 @@ namespace UIGame.Scripts
 
         private ScreenContainer _screenContainer;
         private ModalContainer _modalContainer;
-        private readonly float _timeDelay = 3;
+        private readonly float _timeDelay = 1;
 
         protected override void OnAwake()
         {
@@ -38,7 +38,7 @@ namespace UIGame.Scripts
             _screenContainer.Preload(ResourceKey.PlayScreenPrefab());
 
             _modalContainer.Preload(ResourceKey.PauseModalPrefab());
-            // _modalContainer.Preload(ResourceKey.GameOverModalPrefab());
+            _modalContainer.Preload(ResourceKey.GameOverModalPrefab());
         }
 
         private async UniTaskVoid ShowLoadingPage()

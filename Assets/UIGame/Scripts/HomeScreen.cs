@@ -20,7 +20,7 @@ namespace UIGame.Scripts
             Utils.UserData[] userData = new Utils.UserData[12];
             for (var index = 0; index < userData.Length; index++)
             {
-                var random = Random.Range(0, 4);
+                var random = Random.Range(1, 4);
                 userData[index] = new Utils.UserData(index + 1, random);
             }
 

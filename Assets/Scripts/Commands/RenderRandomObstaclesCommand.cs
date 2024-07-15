@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using GameControllers;
+using Interfaces;
 using QFramework;
 using Queries;
 using UnityEngine;
@@ -82,8 +83,11 @@ namespace Commands
 
         private void RenderRandomObstacles()
         {
+            var gameModel = this.GetModel<IGameModel>();
+            
             var obstacleGridPosList = RandomObstacleGridPosList();
-            _configGame.ObstaclesTotal = obstacleGridPosList.Count;
+            
+            gameModel.ObstaclesTotal.Value = obstacleGridPosList.Count;
 
             foreach (var gridPos in obstacleGridPosList)
             {
