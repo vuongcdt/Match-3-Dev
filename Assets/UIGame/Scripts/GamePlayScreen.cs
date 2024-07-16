@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Interfaces;
 using QFramework;
@@ -26,6 +28,7 @@ namespace UIGame.Scripts
         public override UniTask Initialize(Memory<object> args)
         {
             base.OnEnable();
+            Time.timeScale = 1;
 
             pauseBtn.onClick.RemoveAllListeners();
             pauseBtn.onClick.AddListener(OnPauseBtnClick);
@@ -60,9 +63,9 @@ namespace UIGame.Scripts
 
             bool isHasUserData = false;
             var newData = new Utils.LevelData(_gameModel.LevelSelect.Value, _gameModel.StarsTotal.Value);
-            for (var index = 0; index < _gameModel.LevelsData.Value.Count; index++)
+            for (var index = 0; index < _gameModel.LevelsData.Count; index++)
             {
-                var levelData = _gameModel.LevelsData.Value[index];
+                var levelData = _gameModel.LevelsData[index];
 
                 if (levelData.Level != newData.Level)
                 {
@@ -70,19 +73,26 @@ namespace UIGame.Scripts
                 }
 
                 isHasUserData = true;
-                
+
                 if (newData.Star > levelData.Star)
                 {
-                    _gameModel.LevelsData.Value[index] = newData;
+                    List<Utils.LevelData> newList = new List<Utils.LevelData>();
+                    newList.AddRange(_gameModel.LevelsData);
+                    newList[index] = newData;
+
+                    _gameModel.LevelsData = newList;
                 }
             }
 
             if (!isHasUserData)
             {
-                _gameModel.LevelsData.Value.Add(newData);
+                List<Utils.LevelData> newList = new List<Utils.LevelData>();
+                newList.AddRange(_gameModel.LevelsData);
+                newList.Add(newData);
+
+                _gameModel.LevelsData = newList;
             }
 
-            Debug.Log($"UserData {_gameModel.LevelsData.Value.Count}");
 
             ShowGameOverPopup().Forget();
         }
@@ -127,6 +137,7 @@ namespace UIGame.Scripts
             {
                 return;
             }
+
             ShowGameOverPopup().Forget();
         }
 

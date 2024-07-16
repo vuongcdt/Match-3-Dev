@@ -17,22 +17,22 @@ namespace Utilities
 
         public void SaveFloat(string key, float value)
         {
-            throw new System.NotImplementedException();
+            PlayerPrefs.SetFloat(key, value);
         }
 
         public float LoadFloat(string key, float defaultValue = 0)
         {
-            throw new System.NotImplementedException();
+            return PlayerPrefs.GetFloat(key);
         }
 
         public void SaveString(string key, string value)
         {
-            PlayerPrefs.GetString(key, value);
+            PlayerPrefs.SetString(key, value);
         }
 
         public string LoadString(string key)
         {
-           return PlayerPrefs.GetString(key);
+            return PlayerPrefs.GetString(key);
         }
     }
 }

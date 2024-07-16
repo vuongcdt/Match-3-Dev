@@ -21,27 +21,27 @@ namespace UIGame.Scripts
             base.OnEnable();
             Debug.Log("Initialize HomeScreen");
             _gameModel = this.GetModel<IGameModel>();
-            
+
             this.RegisterEvent<LevelSelectEvent>(e => OnClickPlayLevel(e.Level))
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
             this.RegisterEvent<UserDataEvent>(e => GetUserData())
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
-            
+
             GetUserData();
             return UniTask.CompletedTask;
         }
 
         private void GetUserData()
         {
-            var userData = _gameModel.LevelsData.Value;
+            var userData = _gameModel.LevelsData;
 
-            if (userData.Count == 0)
-            {
-                userData.Add(new Utils.LevelData(1, 1));
-            }
+            // if (userData.Count == 0)
+            // {
+            //     userData.Add(new Utils.LevelData(1, 1));
+            // }
 
             var data = userData.Select(e => $"Level:{e.Level}- Star:{e.Star}").ToList();
-            Debug.Log(string.Join(", ", data));
+            Debug.Log($"user data {string.Join(", ", data)}");
 
             // Utils.LevelData[] userData = new Utils.LevelData[12];
             // for (var index = 0; index < userData.Count; index++)

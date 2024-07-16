@@ -24,6 +24,7 @@ public static class Utils
         }
     }
 
+    [Serializable]
     public struct LevelData
     {
         public int Level;
@@ -90,6 +91,6 @@ public static class Utils
 
     public static int GetStepsMove(int obstaclesTotal)
     {
-        return obstaclesTotal * 2;
+        return obstaclesTotal * 20;
     }
 }
