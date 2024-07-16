@@ -113,7 +113,7 @@ namespace Commands
             List<Utils.GridPos> obstacleGridPosList = new();
 
             var isNotNextTo = _configGame.Level % 2 == 0;
-            var randomObstaclesTotal = Utils.GetObstaclesTotal(_gameModel.Level.Value);
+            var randomObstaclesTotal = Utils.GetObstaclesTotal(_gameModel.LevelSelect.Value);
 
             while (obstacleGridPosList.Count < randomObstaclesTotal)
             {

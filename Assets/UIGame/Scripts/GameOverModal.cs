@@ -1,6 +1,7 @@
 ﻿using System;
 using Commands;
 using Cysharp.Threading.Tasks;
+using Events;
 using Interfaces;
 using QFramework;
 using TMPro;
@@ -11,7 +12,7 @@ using ZBase.UnityScreenNavigator.Core.Screens;
 
 namespace UIGame.Scripts
 {
-    public class GameOverModal : Modal, IController
+    public class GameOverModal : Modal, IController, ICanSendEvent
     {
         [SerializeField] private Button replayButton;
         [SerializeField] private Button homeButton;
@@ -32,22 +33,25 @@ namespace UIGame.Scripts
 
             replayButton.onClick.RemoveAllListeners();
             replayButton.onClick.AddListener(OnReplayBtnClick);
+
             homeButton.onClick.RemoveAllListeners();
             homeButton.onClick.AddListener(OnHomeBtnClick);
+
             closeButton.onClick.RemoveAllListeners();
             closeButton.onClick.AddListener(OnCloseBtnClick);
 
-            if (_gameModel.ObstaclesTotal.Value == 0)
+            if (_gameModel.ObstaclesTotal.Value != 0)
             {
-                replayText.text = "Next Level";
-                gameOver.SetActive(false);
-                stars.SetActive(true);
-
-                SetStarIcons();
-
-                replayButton.onClick.RemoveAllListeners();
-                replayButton.onClick.AddListener(OnNextLevelBtnClick);
+                return UniTask.CompletedTask;
             }
+            replayText.text = "Next Level";
+            gameOver.SetActive(false);
+            stars.SetActive(true);
+
+            SetStarIcons();
+
+            replayButton.onClick.RemoveAllListeners();
+            replayButton.onClick.AddListener(OnNextLevelBtnClick);
 
             return UniTask.CompletedTask;
         }
@@ -63,12 +67,11 @@ namespace UIGame.Scripts
         private void OnNextLevelBtnClick()
         {
             Time.timeScale = 1;
+            _gameModel.LevelSelect.Value++;
+            
             ModalContainer.Find(ContainerKey.Modals).Pop(true);
-
-            this.SendCommand(new InitGridEventCommand(_gameModel.Level.Value));
+            this.SendEvent(new InitGridEvent(_gameModel.LevelSelect.Value));
         }
-
-
 
         private void OnReplayBtnClick()
         {
@@ -79,8 +82,9 @@ namespace UIGame.Scripts
 
         private void OnHomeBtnClick()
         {
-            ModalContainer.Find(ContainerKey.Modals).Pop(true);
-            ScreenContainer.Find(ContainerKey.Screens).Pop(true);
+            this.SendEvent<UserDataEvent>();
+            ScreenContainer.Find(ContainerKey.Screens).Pop(false);
+            ModalContainer.Find(ContainerKey.Modals).Pop(false);
         }
 
         private void OnCloseBtnClick()

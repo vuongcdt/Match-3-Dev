@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Events;
 using GameControllers;
 using QFramework;
 using Queries;
@@ -6,7 +7,7 @@ using UnityEngine;
 
 namespace Commands
 {
-    public class InvertedRainbowCommand : AbstractCommand<IEnumerator>
+    public class InvertedRainbowCommand : AbstractCommand<IEnumerator>,ICanSendEvent
     {
         private Cell[,] _grid;
         private Cell _sourceCell, _targetCell;
@@ -64,7 +65,7 @@ namespace Commands
 
             _configGame.IsDragged = false;
 
-            this.SendCommand<ProcessingGridEventCommand>();
+            this.SendEvent<ProcessingGridEvent>();
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Interfaces;
 using QFramework;
-using Queries;
 
 namespace Commands
 {

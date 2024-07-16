@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Events;
 using GameControllers;
 using QFramework;
 using Queries;
@@ -6,7 +7,7 @@ using UnityEngine;
 
 namespace Commands
 {
-    public class InvertedCellAndMatchCommand : AbstractCommand<IEnumerator>
+    public class InvertedCellAndMatchCommand : AbstractCommand<IEnumerator>,ICanSendEvent
     {
         private Cell _sourceCell;
         private Cell _targetCell;
@@ -50,7 +51,7 @@ namespace Commands
             {
                 this.SendCommand<SetStepsTotalCommand>();
                 yield return new WaitForSeconds(_configGame.MatchTime);
-                this.SendCommand<ProcessingGridEventCommand>();
+                this.SendEvent<ProcessingGridEvent>();
             }
             
             _configGame.IsProcessing = false;

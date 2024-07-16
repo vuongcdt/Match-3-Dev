@@ -10,9 +10,9 @@ namespace Interfaces
         public BindableProperty<int> StepsTotal { get; set; } 
         public BindableProperty<int> ObstaclesTotal { get; set; } 
         public BindableProperty<int> ScoreTotal { get; set; }
-        public BindableProperty<int> Level { get; set; }
+        public BindableProperty<int> LevelSelect { get; set; }
         public BindableProperty<int> StarsTotal { get; set; }
-        public BindableProperty<List<Utils.LevelData>> UserData { get; set; }
+        public BindableProperty<List<Utils.LevelData>> LevelsData { get; set; }
         public BindableProperty<float> MusicSetting { get; set; }
         public BindableProperty<float> SfxSetting { get; set; }
         

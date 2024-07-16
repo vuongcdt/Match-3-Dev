@@ -20,19 +20,19 @@ namespace Utilities
             throw new System.NotImplementedException();
         }
 
-        public int LoadFloat(string key, float defaultValue = 0)
+        public float LoadFloat(string key, float defaultValue = 0)
         {
             throw new System.NotImplementedException();
         }
 
         public void SaveString(string key, string value)
         {
-            throw new System.NotImplementedException();
+            PlayerPrefs.GetString(key, value);
         }
 
-        public int LoadString(string key, string defaultValue = "")
+        public string LoadString(string key)
         {
-            throw new System.NotImplementedException();
+           return PlayerPrefs.GetString(key);
         }
     }
 }

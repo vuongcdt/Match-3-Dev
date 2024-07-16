@@ -1,10 +1,15 @@
-﻿using TMPro;
+﻿using System;
+using Cysharp.Threading.Tasks;
+using Events;
+using Interfaces;
+using QFramework;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace UIGame.Scripts
 {
-    public class CardItem : MonoBehaviour
+    public class CardItem : MonoBehaviour, IController,ICanSendEvent
     {
         [SerializeField] private Sprite starActive, starDeActive, lockLevelImg;
         [SerializeField] private Color bgColorChecked, bgColorChecking, bgColorCanCheck;
@@ -15,6 +20,8 @@ namespace UIGame.Scripts
         [SerializeField] private Image[] starIconImages;
         [SerializeField] private Image bgCard, cornerBg;
 
+        private IGameModel _gameModel;
+     
         public void SetLevelCardItem(int levelNum)
         {
             levelText.text = levelNum.ToString();
@@ -64,8 +71,14 @@ namespace UIGame.Scripts
 
         private void Onclick()
         {
-            var homeScreen = this.GetComponentInParent<HomeScreen>();
-            homeScreen.OnClickPlayLevel(int.Parse(levelText.text));
+            var level = int.Parse(levelText.text);
+            
+            this.SendEvent(new LevelSelectEvent(level));
+        }
+
+        public IArchitecture GetArchitecture()
+        {
+            return GameApp.Interface;
         }
     }
 }

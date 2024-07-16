@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using Commands;
 using Cysharp.Threading.Tasks;
 using Interfaces;
 using QFramework;
@@ -40,7 +38,7 @@ namespace UIGame.Scripts
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
             _gameModel.ScoreTotal.RegisterWithInitValue(SetScoreText)
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
-            _gameModel.Level.RegisterWithInitValue(SetLevelText)
+            _gameModel.LevelSelect.RegisterWithInitValue(SetLevelText)
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
 
             return UniTask.CompletedTask;
@@ -48,13 +46,45 @@ namespace UIGame.Scripts
 
         private void SetObstacleText(int value)
         {
-            if (value == 0)
-            {
-                this.SendCommand<SetLevelAndUserDataCommand>();
-                ShowGameOverPopup().Forget();
-            }
+            CheckGameWin(value);
 
             obstaclesTotalText.text = value.ToString();
+        }
+
+        private void CheckGameWin(int value)
+        {
+            if (value != 0)
+            {
+                return;
+            }
+
+            bool isHasUserData = false;
+            var newData = new Utils.LevelData(_gameModel.LevelSelect.Value, _gameModel.StarsTotal.Value);
+            for (var index = 0; index < _gameModel.LevelsData.Value.Count; index++)
+            {
+                var levelData = _gameModel.LevelsData.Value[index];
+
+                if (levelData.Level != newData.Level)
+                {
+                    continue;
+                }
+
+                isHasUserData = true;
+                
+                if (newData.Star > levelData.Star)
+                {
+                    _gameModel.LevelsData.Value[index] = newData;
+                }
+            }
+
+            if (!isHasUserData)
+            {
+                _gameModel.LevelsData.Value.Add(newData);
+            }
+
+            Debug.Log($"UserData {_gameModel.LevelsData.Value.Count}");
+
+            ShowGameOverPopup().Forget();
         }
 
         private void SetScoreText(int value)
@@ -68,7 +98,7 @@ namespace UIGame.Scripts
             var starTotal = 0;
             for (var index = 0; index < starIcons.Length; index++)
             {
-                var obstacles = Utils.GetObstaclesTotal(_gameModel.Level.Value);
+                var obstacles = Utils.GetObstaclesTotal(_gameModel.LevelSelect.Value);
                 var stepsMove = Utils.GetStepsMove(obstacles);
                 if (score >= stepsMove * (3 + index))
                 {
@@ -86,19 +116,24 @@ namespace UIGame.Scripts
 
         private void SetStepMoveText(int value)
         {
-            if (value == 0)
-            {
-                ShowGameOverPopup().Forget();
-            }
+            CheckGameOver(value);
 
             stepsTotalText.text = value.ToString();
+        }
+
+        private void CheckGameOver(int value)
+        {
+            if (value != 0)
+            {
+                return;
+            }
+            ShowGameOverPopup().Forget();
         }
 
         private void SetLevelText(int value)
         {
             levelText.text = $"Level {value}";
         }
-
 
         private void OnPauseBtnClick()
         {
@@ -112,7 +147,7 @@ namespace UIGame.Scripts
             await UniTask.WaitForSeconds(1);
             Time.timeScale = 0;
             var options = new ModalOptions(ResourceKey.GameOverModalPrefab());
-            ModalContainer.Find(ContainerKey.Modals).PushAsync(options);
+            await ModalContainer.Find(ContainerKey.Modals).PushAsync(options);
         }
 
         public IArchitecture GetArchitecture()

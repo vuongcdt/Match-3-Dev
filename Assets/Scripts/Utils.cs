@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using GameControllers;
 using UnityEngine;
-using UnityEngine.UI;
 
 public static class Utils
 {
@@ -48,6 +47,16 @@ public static class Utils
             Type = type;
         }
     }
+    
+    public struct JsonHelper<T>
+    {
+        public List<T> ListData;
+
+        public JsonHelper(List<T> listData)
+        {
+            ListData = listData;
+        }
+    }
 
     public static Vector2 GetWorldPosition(int x, int y, int width, int height, float cellSize)
     {
@@ -76,34 +85,11 @@ public static class Utils
 
     public static int GetObstaclesTotal(int level)
     {
-        return level / 2 + 5;
+        return level / 2 + 2;
     }
-
 
     public static int GetStepsMove(int obstaclesTotal)
     {
         return obstaclesTotal * 2;
-    }
-
-    public static int SetStarIcons(int score, Image[] starIcons, int level, Sprite starIconActive,
-        Sprite starIconDeActive)
-    {
-        var starTotal = 0;
-        for (var index = 0; index < starIcons.Length; index++)
-        {
-            var obstacles = GetObstaclesTotal(level);
-            var stepsMove = GetStepsMove(obstacles);
-            if (score >= stepsMove * (3 + index))
-            {
-                starTotal = index;
-                starIcons[index].sprite = starIconActive;
-            }
-            else
-            {
-                starIcons[index].sprite = starIconDeActive;
-            }
-        }
-
-        return starTotal;
     }
 }

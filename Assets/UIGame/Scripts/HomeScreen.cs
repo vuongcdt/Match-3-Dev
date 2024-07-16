@@ -1,6 +1,7 @@
 ﻿using System;
-using Commands;
+using System.Linq;
 using Cysharp.Threading.Tasks;
+using Events;
 using Interfaces;
 using QFramework;
 using UnityEngine;
@@ -9,7 +10,7 @@ using Screen = ZBase.UnityScreenNavigator.Core.Screens.Screen;
 
 namespace UIGame.Scripts
 {
-    public class HomeScreen : Screen, IController
+    public class HomeScreen : Screen, IController, ICanSendEvent
     {
         [SerializeField] private CardItem[] cardItems;
 
@@ -18,19 +19,29 @@ namespace UIGame.Scripts
         public override UniTask Initialize(Memory<object> args)
         {
             base.OnEnable();
+            Debug.Log("Initialize HomeScreen");
             _gameModel = this.GetModel<IGameModel>();
-
-            _gameModel.Level.RegisterWithInitValue(level => GetUserData());
-
-            // GetUserData();
-
+            
+            this.RegisterEvent<LevelSelectEvent>(e => OnClickPlayLevel(e.Level))
+                .UnRegisterWhenGameObjectDestroyed(gameObject);
+            this.RegisterEvent<UserDataEvent>(e => GetUserData())
+                .UnRegisterWhenGameObjectDestroyed(gameObject);
+            
+            GetUserData();
             return UniTask.CompletedTask;
         }
 
         private void GetUserData()
         {
-            var userData = _gameModel.UserData.Value;
-            Debug.Log($"user data2 {userData.Count}");
+            var userData = _gameModel.LevelsData.Value;
+
+            if (userData.Count == 0)
+            {
+                userData.Add(new Utils.LevelData(1, 1));
+            }
+
+            var data = userData.Select(e => $"Level:{e.Level}- Star:{e.Star}").ToList();
+            Debug.Log(string.Join(", ", data));
 
             // Utils.LevelData[] userData = new Utils.LevelData[12];
             // for (var index = 0; index < userData.Count; index++)
@@ -65,11 +76,12 @@ namespace UIGame.Scripts
             }
         }
 
-
-        public void OnClickPlayLevel(int level)
+        private void OnClickPlayLevel(int level)
         {
+            _gameModel.LevelSelect.Value = level;
+
             ScreenContainer.Of(transform).Push(new ScreenOptions(ResourceKey.PlayScreenPrefab()));
-            this.SendCommand(new InitGridEventCommand(level));
+            this.SendEvent(new InitGridEvent(level));
         }
 
         public IArchitecture GetArchitecture()
