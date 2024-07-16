@@ -48,7 +48,7 @@ public static class Utils
             Type = type;
         }
     }
-    
+
     public struct JsonHelper<T>
     {
         public List<T> ListData;
@@ -89,8 +89,9 @@ public static class Utils
         return level / 2 + 2;
     }
 
-    public static int GetStepsMove(int obstaclesTotal)
+    public static int GetStepsMove(int level)
     {
-        return obstaclesTotal * 20;
+        // return GetObstaclesTotal(level) * 2 + 4;
+        return GetObstaclesTotal(level) ;
     }
 }

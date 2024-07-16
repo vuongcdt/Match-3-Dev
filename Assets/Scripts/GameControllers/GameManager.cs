@@ -44,9 +44,6 @@ namespace GameControllers
             this.SendCommand<RenderCellGridCommand>();
             this.SendCommand<RenderRandomObstaclesCommand>();
 
-            _gameModel.ScoreTotal.Value = 0;
-            _gameModel.StepsTotal.Value = Utils.GetStepsMove(_gameModel.ObstaclesTotal.Value);
-
             this.SendCommand<SetObstaclesTotalCommand>();
             this.SendCommand<SetStepsTotalCommand>();
 

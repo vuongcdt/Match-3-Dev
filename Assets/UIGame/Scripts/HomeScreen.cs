@@ -79,8 +79,9 @@ namespace UIGame.Scripts
         private void OnClickPlayLevel(int level)
         {
             _gameModel.LevelSelect.Value = level;
-
-            ScreenContainer.Of(transform).Push(new ScreenOptions(ResourceKey.PlayScreenPrefab()));
+            Debug.Log("OnClickPlayLevel");
+            // ScreenContainer.Of(transform).Push(new ScreenOptions(ResourceKey.PlayScreenPrefab()));
+            ScreenContainer.Find(ContainerKey.Screens).Push(new ScreenOptions(ResourceKey.PlayScreenPrefab()));
             this.SendEvent(new InitGridEvent(level));
         }
 

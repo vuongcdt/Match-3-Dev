@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Interfaces;
@@ -32,9 +31,12 @@ namespace UIGame.Scripts
 
             pauseBtn.onClick.RemoveAllListeners();
             pauseBtn.onClick.AddListener(OnPauseBtnClick);
-
             _gameModel = this.GetModel<IGameModel>();
 
+            // _gameModel.ScoreTotal.Value = 0;
+            // _gameModel.StepsTotal.Value = Utils.GetStepsMove(_gameModel.LevelSelect.Value);
+            // _gameModel.ObstaclesTotal.Value = Utils.GetObstaclesTotal(_gameModel.LevelSelect.Value);
+            
             _gameModel.ObstaclesTotal.RegisterWithInitValue(SetObstacleText)
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
             _gameModel.StepsTotal.RegisterWithInitValue(SetStepMoveText)
@@ -47,16 +49,16 @@ namespace UIGame.Scripts
             return UniTask.CompletedTask;
         }
 
-        private void SetObstacleText(int value)
+        private void SetObstacleText(int obstacleTotal)
         {
-            CheckGameWin(value);
+            CheckGameWin(obstacleTotal);
 
-            obstaclesTotalText.text = value.ToString();
+            obstaclesTotalText.text = obstacleTotal.ToString();
         }
 
-        private void CheckGameWin(int value)
+        private void CheckGameWin(int obstacleTotal)
         {
-            if (value != 0)
+            if (obstacleTotal != 0)
             {
                 return;
             }
@@ -94,7 +96,7 @@ namespace UIGame.Scripts
             }
 
 
-            ShowGameOverPopup().Forget();
+            ShowGameWinPopup();
         }
 
         private void SetScoreText(int value)
@@ -109,10 +111,9 @@ namespace UIGame.Scripts
             for (var index = 0; index < starIcons.Length; index++)
             {
                 var obstacles = Utils.GetObstaclesTotal(_gameModel.LevelSelect.Value);
-                var stepsMove = Utils.GetStepsMove(obstacles);
-                if (score >= stepsMove * (3 + index))
+                if (score >= obstacles * (3 + index))
                 {
-                    starTotal = index;
+                    starTotal = index + 1;
                     starIcons[index].sprite = starIconActive;
                 }
                 else
@@ -124,16 +125,16 @@ namespace UIGame.Scripts
             _gameModel.StarsTotal.Value = starTotal;
         }
 
-        private void SetStepMoveText(int value)
+        private void SetStepMoveText(int stepMove)
         {
-            CheckGameOver(value);
+            CheckGameOver(stepMove);
 
-            stepsTotalText.text = value.ToString();
+            stepsTotalText.text = stepMove.ToString();
         }
 
-        private void CheckGameOver(int value)
+        private void CheckGameOver(int stepMove)
         {
-            if (value != 0)
+            if (stepMove != 0 || _gameModel.ObstaclesTotal.Value == 0)
             {
                 return;
             }
@@ -153,12 +154,17 @@ namespace UIGame.Scripts
             ModalContainer.Find(ContainerKey.Modals).Push(options);
         }
 
+        private void ShowGameWinPopup()
+        {
+            ShowGameOverPopup().Forget();
+        }
+
         private async UniTask ShowGameOverPopup()
         {
             await UniTask.WaitForSeconds(1);
             Time.timeScale = 0;
             var options = new ModalOptions(ResourceKey.GameOverModalPrefab());
-            await ModalContainer.Find(ContainerKey.Modals).PushAsync(options);
+            ModalContainer.Find(ContainerKey.Modals).PushAsync(options);
         }
 
         public IArchitecture GetArchitecture()

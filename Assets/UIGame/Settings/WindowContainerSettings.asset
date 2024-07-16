@@ -15,13 +15,13 @@ MonoBehaviour:
   containers:
   - name: Modals
     containerType: 0
-    overrideSorting: 0
+    overrideSorting: 1
     sortingLayer:
       id: 0
-    orderInLayer: 0
+    orderInLayer: 1
   - name: Screens
     containerType: 1
-    overrideSorting: 0
+    overrideSorting: 1
     sortingLayer:
       id: 0
     orderInLayer: 0
