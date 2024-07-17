@@ -50,13 +50,6 @@ namespace Commands
                 var isNextToObstacle = _grid[x + index, y].Type == CONSTANTS.CellType.Obstacle;
 
                 var isUpNotFish = IsUpNotFish(x, y);
-                // var isSpecial = y + 1 < configGame.Height &&
-                //                 _grid[x + index, y + 1].Type == CONSTANTS.CellType.Obstacle &&
-                //                 _grid[x, y + 1].Type == CONSTANTS.CellType.Obstacle;     
-                // if (index != 0 && !isNextToObstacle && !isSpecial)
-                // {
-                //     continue;
-                // }
 
                 if (!(index == 0 || isNextToObstacle || isUpNotFish))
                 {
@@ -64,17 +57,10 @@ namespace Commands
                 }
 
                 if (isSourceFish && isTargetEmpty)
-                {
+                { 
                     MoveToBelow(source, target, x, y, index);
                     break;
                 }
-
-                // if (index != 0 && isSourceFish && isSpecial && _grid[x + index, y].Type == CONSTANTS.CellType.None)
-                // {
-                //     target = _grid[x + index, y];
-                //     MoveToNextTo(source, target, x, y, index);
-                //     break;
-                // }
             }
         }
 

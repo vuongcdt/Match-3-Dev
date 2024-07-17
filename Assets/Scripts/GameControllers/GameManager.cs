@@ -1,13 +1,14 @@
 using System.Collections;
 using Commands;
 using Events;
+using Events.Sound;
 using Interfaces;
 using QFramework;
 using UnityEngine;
 
 namespace GameControllers
 {
-    public class GameManager : MonoBehaviour, IController
+    public class GameManager : MonoBehaviour, IController,ICanSendEvent
     {
         private Cell[,] _grid;
         private ConfigGame _configGame;
@@ -64,6 +65,7 @@ namespace GameControllers
 
             if (isAdd)
             {
+                this.SendEvent<PlaySoundFillSfxEvent>();
                 yield return new WaitForSeconds(_configGame.FillTime);
                 StartCoroutine(ProcessingGrid());
                 yield break;
@@ -73,6 +75,8 @@ namespace GameControllers
 
             if (isMatch)
             {
+                this.SendEvent<PlaySoundMatchSfxEvent>();
+
                 yield return new WaitForSeconds(_configGame.MatchTime);
                 StartCoroutine(ProcessingGrid());
                 yield break;

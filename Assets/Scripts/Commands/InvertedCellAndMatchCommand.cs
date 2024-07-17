@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Events;
+using Events.Sound;
 using GameControllers;
 using QFramework;
 using Queries;
@@ -44,11 +45,13 @@ namespace Commands
 
             if (!isMatch || !isInverted)
             {
+                this.SendEvent<PlaySoundNoInvertedSfxEvent>();
                 InvertedCell(targetCell, sourceCell);
             }
 
             if (isMatch)
             {
+                this.SendEvent<PlaySoundInvertedSfxEvent>();
                 this.SendCommand<SetStepsTotalCommand>();
                 yield return new WaitForSeconds(_configGame.MatchTime);
                 this.SendEvent<ProcessingGridEvent>();

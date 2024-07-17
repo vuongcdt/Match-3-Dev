@@ -15,8 +15,8 @@ namespace Models
         public BindableProperty<int> LevelSelect { get; set; } = new(1);
         public BindableProperty<int> StarsTotal { get; set; } = new();
         public BindableProperty<List<Utils.LevelData>> LevelsData { get; set; } = new(new());
-        public BindableProperty<float> MusicSetting { get; set; } = new(0.5f);
-        public BindableProperty<float> SfxSetting { get; set; } = new(0.5f);
+        public BindableProperty<float> MusicSetting { get; set; } = new();
+        public BindableProperty<float> SfxSetting { get; set; } = new();
 
         public BindableProperty<int> Count { get; } = new();
 
@@ -25,11 +25,16 @@ namespace Models
             var storage = this.GetUtility<IGameStorage>();
 
             Count.Register(newCount => storage.SaveInt(nameof(Count), newCount));
-            var loadInt = storage.LoadInt(nameof(Count));
-            Count.SetValueWithoutEvent(loadInt);
+            Count.SetValueWithoutEvent(storage.LoadInt(nameof(Count)));
 
             // LevelsData.Register(SaveLevelsData);
             LevelsData.SetValueWithoutEvent(LoadLevelsData());
+
+            MusicSetting.Register(newValue => storage.SaveFloat(nameof(MusicSetting), newValue));
+            MusicSetting.SetValueWithoutEvent(storage.LoadFloat(nameof(MusicSetting)));
+
+            SfxSetting.Register(newValue => storage.SaveFloat(nameof(SfxSetting), newValue));
+            SfxSetting.SetValueWithoutEvent(storage.LoadFloat(nameof(SfxSetting)));
         }
 
         public void SaveLevelsData()

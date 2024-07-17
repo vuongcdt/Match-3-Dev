@@ -86,11 +86,11 @@ public static class Utils
 
     public static int GetObstaclesTotal(int level)
     {
-        return level / 2 + 2;
+        return level / 2 + 5;
     }
 
     public static int GetStepsMove(int level)
     {
-        return GetObstaclesTotal(level) * 2 + 4;
+        return GetObstaclesTotal(level) * 2;
     }
 }

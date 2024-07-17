@@ -87,12 +87,12 @@ namespace Commands
                 }
             }
 
-            if (_isInverted)
-            {
-                return MergeCells(matchCellList, cellCanRainbow);
-            }
+            // if (_isInverted)
+            // {
+            //     return MergeCells(matchCellList, cellCanRainbow);
+            // }
 
-            return MergeCells(matchCellList);
+            return MergeCells(matchCellList,cellCanRainbow);
         }
 
         private bool MergeCells(List<Utils.MatchCell> matchCellList, Cell cellCanRainbow = null)

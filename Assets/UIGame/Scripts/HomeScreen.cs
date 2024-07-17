@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Events;
+using Events.Sound;
 using Interfaces;
 using QFramework;
 using UnityEngine;
@@ -29,6 +30,7 @@ namespace UIGame.Scripts
 
         public override UniTask Initialize(Memory<object> args)
         {
+            this.SendEvent<PlaySoundMusicEvent>();
             _gameModel = this.GetModel<IGameModel>();
             this.RegisterEvent<LevelSelectEvent>(e => OnClickPlayLevel(e.Level))
                 .UnRegisterWhenGameObjectDestroyed(gameObject);

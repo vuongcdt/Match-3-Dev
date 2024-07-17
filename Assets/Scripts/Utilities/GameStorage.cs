@@ -20,9 +20,9 @@ namespace Utilities
             PlayerPrefs.SetFloat(key, value);
         }
 
-        public float LoadFloat(string key, float defaultValue = 0)
+        public float LoadFloat(string key, float defaultValue = 0.5f)
         {
-            return PlayerPrefs.GetFloat(key);
+            return PlayerPrefs.GetFloat(key,defaultValue);
         }
 
         public void SaveString(string key, string value)

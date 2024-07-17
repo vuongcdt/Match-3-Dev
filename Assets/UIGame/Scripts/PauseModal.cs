@@ -1,6 +1,7 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using Events;
+using Events.Sound;
 using Interfaces;
 using QFramework;
 using UnityEngine;
@@ -77,12 +78,12 @@ namespace UIGame.Scripts
 
         private void OnChangeVolumeMusic(float value)
         {
-            // _gameModel.MusicSetting.Value = value;
+            this.SendEvent(new SetVolumeMusicEvent(value));
         }
 
         private void OnChangeVolumeSFX(float value)
         {
-            // _gameModel.SfxSetting.Value = value;
+            this.SendEvent(new SetVolumeSoundMatchSfxEvent(value));
         }
 
         public IArchitecture GetArchitecture()
