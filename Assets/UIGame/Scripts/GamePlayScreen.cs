@@ -106,7 +106,7 @@ namespace UIGame.Scripts
             for (var index = 0; index < starIcons.Length; index++)
             {
                 var obstacles = Utils.GetObstaclesTotal(_gameModel.LevelSelect.Value);
-                if (score >= obstacles * (3 + index))
+                if (score >= obstacles * (index + 2))
                 {
                     starTotal = index + 1;
                     starIcons[index].sprite = starIconActive;
