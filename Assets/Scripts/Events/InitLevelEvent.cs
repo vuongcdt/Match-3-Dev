@@ -1,10 +1,10 @@
 ﻿namespace Events
 {
-    public struct InitGridEvent
+    public struct InitLevelEvent
     {
         public int Level;
 
-        public InitGridEvent(int level)
+        public InitLevelEvent(int level)
         {
             Level = level;
         }

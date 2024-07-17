@@ -85,12 +85,8 @@ namespace Commands
 
         private void RenderRandomObstacles()
         {
-            var gameModel = this.GetModel<IGameModel>();
-            
             var obstacleGridPosList = RandomObstacleGridPosList();
             
-            // gameModel.ObstaclesTotal.Value = obstacleGridPosList.Count;
-
             foreach (var gridPos in obstacleGridPosList)
             {
                 if (gridPos.x < 0 || gridPos.x > _configGame.Width - 1 || gridPos.y < 0 ||
@@ -112,7 +108,8 @@ namespace Commands
             int count = 0;
             List<Utils.GridPos> obstacleGridPosList = new();
 
-            var isNotNextTo = _configGame.Level % 2 == 0;
+            // var isNotNextTo = _configGame.Level % 2 == 0;
+            var isNotNextTo = _gameModel.LevelSelect.Value % 2 == 0;
             var randomObstaclesTotal = Utils.GetObstaclesTotal(_gameModel.LevelSelect.Value);
 
             while (obstacleGridPosList.Count < randomObstaclesTotal)

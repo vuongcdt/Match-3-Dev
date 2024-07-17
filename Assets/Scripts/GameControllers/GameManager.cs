@@ -18,19 +18,19 @@ namespace GameControllers
         {
             Application.targetFrameRate = 60;
             _gameModel = this.GetModel<IGameModel>();
-
-            this.RegisterEvent<ProcessingGridEvent>(e => StartCoroutine(ProcessingGrid()))
-                .UnRegisterWhenGameObjectDestroyed(gameObject);
-            this.RegisterEvent<InitGridEvent>(e => InitLevel(e.Level))
-                .UnRegisterWhenGameObjectDestroyed(gameObject);
-            this.RegisterEvent<ResetGameEvent>(e => StartCoroutine(ResetGame()))
-                .UnRegisterWhenGameObjectDestroyed(gameObject);
-
             _configGame = ConfigGame.Instance;
 
             _grid = new Cell[_configGame.Width, _configGame.Height];
             this.SendCommand(new InitGridModelCommand(_grid));
             this.SendCommand<RenderBackgroundGridCommand>();
+            
+            this.RegisterEvent<ProcessingGridEvent>(e => StartCoroutine(ProcessingGrid()))
+                .UnRegisterWhenGameObjectDestroyed(gameObject);
+            this.RegisterEvent<ResetGameEvent>(e => StartCoroutine(ResetGame()))
+                .UnRegisterWhenGameObjectDestroyed(gameObject);
+            this.RegisterEvent<InitLevelEvent>(e => InitLevel(e.Level))
+                .UnRegisterWhenGameObjectDestroyed(gameObject);
+            // _gameModel.LevelSelect.RegisterWithInitValue(InitLevel);
         }
 
         private void InitLevel(int level)

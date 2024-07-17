@@ -60,11 +60,18 @@ namespace UIGame.Scripts
                 return;
             }
 
+            ShowGameWinPopup();
+            UpdateLevelData();
+        }
+
+        private void UpdateLevelData()
+        {
             bool isHasUserData = false;
             var newData = new Utils.LevelData(_gameModel.LevelSelect.Value, _gameModel.StarsTotal.Value);
-            for (var index = 0; index < _gameModel.LevelsData.Count; index++)
+
+            for (var index = 0; index < _gameModel.LevelsData.Value.Count; index++)
             {
-                var levelData = _gameModel.LevelsData[index];
+                var levelData = _gameModel.LevelsData.Value[index];
 
                 if (levelData.Level != newData.Level)
                 {
@@ -75,25 +82,14 @@ namespace UIGame.Scripts
 
                 if (newData.Star > levelData.Star)
                 {
-                    List<Utils.LevelData> newList = new List<Utils.LevelData>();
-                    newList.AddRange(_gameModel.LevelsData);
-                    newList[index] = newData;
-
-                    _gameModel.LevelsData = newList;
+                    _gameModel.LevelsData.Value[index] = newData;
                 }
             }
 
             if (!isHasUserData)
             {
-                List<Utils.LevelData> newList = new List<Utils.LevelData>();
-                newList.AddRange(_gameModel.LevelsData);
-                newList.Add(newData);
-
-                _gameModel.LevelsData = newList;
+                _gameModel.LevelsData.Value.Add(newData);
             }
-
-
-            ShowGameWinPopup();
         }
 
         private void SetScoreText(int value)
@@ -137,7 +133,7 @@ namespace UIGame.Scripts
                 return;
             }
 
-            ShowGameOverPopup().Forget();
+            ShowGameOverPopup();
         }
 
         private void SetLevelText(int value)
@@ -154,12 +150,11 @@ namespace UIGame.Scripts
 
         private void ShowGameWinPopup()
         {
-            ShowGameOverPopup().Forget();
+            ShowGameOverPopup();
         }
 
-        private async UniTask ShowGameOverPopup() 
+        private void ShowGameOverPopup()
         {
-            await UniTask.WaitForSeconds(1);
             Time.timeScale = 0;
             var options = new ModalOptions(ResourceKey.GameOverModalPrefab());
             ModalContainer.Find(ContainerKey.Modals).PushAsync(options);

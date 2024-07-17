@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Events;
 using Interfaces;
@@ -18,21 +19,31 @@ namespace UIGame.Scripts
         public override UniTask Initialize(Memory<object> args)
         {
             base.OnEnable();
-            _gameModel = this.GetModel<IGameModel>();
+           
 
-            this.RegisterEvent<LevelSelectEvent>(e => OnClickPlayLevel(e.Level))
+            this.RegisterEvent<LevelSelectEvent>(e => OnClickPlayLevel(e.Level).Forget())
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
             
-            _gameModel._levelsData.RegisterWithInitValue(value => GetUserData());
+            // _gameModel._levelsData.RegisterWithInitValue(value => GetUserData());
+            // _gameModel.LevelsData.RegisterWithInitValue(value => GetUserData());
 
             Debug.Log("Initialize HomeScreen");
 
             return UniTask.CompletedTask;
         }
 
+        protected override void OnEnable()
+        {
+            Debug.Log("OnEnable");
+            base.OnEnable();
+            _gameModel = this.GetModel<IGameModel>();
+            GetUserData();
+        }
+
         private void GetUserData()
         {
-            var userData = _gameModel.LevelsData;
+            Debug.Log("GetUserData");
+            var userData = _gameModel.LevelsData.Value ?? new List<Utils.LevelData>();
 
             for (var index = 0; index <= userData.Count; index++)
             {
@@ -60,13 +71,13 @@ namespace UIGame.Scripts
             }
         }
 
-        private void OnClickPlayLevel(int level)
+        private async UniTask OnClickPlayLevel(int level)
         {
             _gameModel.LevelSelect.Value = level;
             _gameModel.ResetValueTextUI();
 
-            ScreenContainer.Of(transform).Push(new ScreenOptions(ResourceKey.PlayScreenPrefab()));
-            this.SendEvent(new InitGridEvent(level));
+            await ScreenContainer.Of(transform).PushAsync(new ScreenOptions(ResourceKey.PlayScreenPrefab()));
+            this.SendEvent(new InitLevelEvent(level));
         }
 
         // private void ResetValueUI()
