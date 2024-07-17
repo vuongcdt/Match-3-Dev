@@ -1,13 +1,14 @@
 using System.Collections;
 using Commands;
 using Events;
+using Events.Sound;
 using Interfaces;
 using QFramework;
 using UnityEngine;
 
 namespace GameControllers
 {
-    public class GameManager : MonoBehaviour, IController
+    public class GameManager : MonoBehaviour, IController,ICanSendEvent
     {
         private Cell[,] _grid;
         private ConfigGame _configGame;
@@ -30,7 +31,6 @@ namespace GameControllers
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
             this.RegisterEvent<InitLevelEvent>(e => InitLevel(e.Level))
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
-            // _gameModel.LevelSelect.RegisterWithInitValue(InitLevel);
         }
 
         private void InitLevel(int level)
@@ -54,7 +54,7 @@ namespace GameControllers
         private IEnumerator ProcessingGrid()
         {
             _configGame.IsProcessing = true;
-            if (_gameModel.ObstaclesTotal.Value == 0 || _gameModel.StepsTotal.Value == 0)
+            if (_gameModel.ObstaclesTotal.Value == 0 || _gameModel.StepsTotal.Value == 0 || Time.timeScale == 0)
             {
                 yield break;
             }
@@ -64,6 +64,7 @@ namespace GameControllers
 
             if (isAdd)
             {
+                this.SendEvent<PlaySoundFillSfxEvent>();
                 yield return new WaitForSeconds(_configGame.FillTime);
                 StartCoroutine(ProcessingGrid());
                 yield break;
@@ -73,6 +74,8 @@ namespace GameControllers
 
             if (isMatch)
             {
+                this.SendEvent<PlaySoundMatchSfxEvent>();
+
                 yield return new WaitForSeconds(_configGame.MatchTime);
                 StartCoroutine(ProcessingGrid());
                 yield break;

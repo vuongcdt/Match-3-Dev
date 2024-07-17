@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Events.Sound;
 using Interfaces;
 using QFramework;
 using TMPro;
@@ -11,7 +11,7 @@ using Screen = ZBase.UnityScreenNavigator.Core.Screens.Screen;
 
 namespace UIGame.Scripts
 {
-    public class GamePlayScreen : Screen, IController
+    public class GamePlayScreen : Screen, IController, ICanSendEvent
     {
         [SerializeField] private TMP_Text obstaclesTotalText;
         [SerializeField] private TMP_Text stepsTotalText;
@@ -59,7 +59,8 @@ namespace UIGame.Scripts
                 return;
             }
 
-            ShowGameWinPopup();
+            this.SendEvent<PlaySoundGameWinSfxEvent>();
+            ShowEndGamePopup().Forget();
             UpdateLevelData();
         }
 
@@ -89,7 +90,8 @@ namespace UIGame.Scripts
             {
                 _gameModel.LevelsData.Value.Add(newData);
             }
-            _gameModel.SaveLevelsData();//vuong
+
+            _gameModel.SaveLevelsData(); //vuong
         }
 
         private void SetScoreText(int value)
@@ -104,7 +106,7 @@ namespace UIGame.Scripts
             for (var index = 0; index < starIcons.Length; index++)
             {
                 var obstacles = Utils.GetObstaclesTotal(_gameModel.LevelSelect.Value);
-                if (score >= obstacles * (3 + index))
+                if (score >= obstacles * (index + 2))
                 {
                     starTotal = index + 1;
                     starIcons[index].sprite = starIconActive;
@@ -132,7 +134,8 @@ namespace UIGame.Scripts
                 return;
             }
 
-            ShowGameOverPopup().Forget();
+            this.SendEvent<PlaySoundGameOverSfxEvent>();
+            ShowEndGamePopup().Forget();
         }
 
         private void SetLevelText(int value)
@@ -147,12 +150,7 @@ namespace UIGame.Scripts
             ModalContainer.Find(ContainerKey.Modals).Push(options);
         }
 
-        private void ShowGameWinPopup()
-        {
-            ShowGameOverPopup().Forget();
-        }
-
-        private async UniTask ShowGameOverPopup()
+        private async UniTask ShowEndGamePopup()
         {
             await UniTask.WaitForSeconds(1);
             var options = new ModalOptions(ResourceKey.GameOverModalPrefab());

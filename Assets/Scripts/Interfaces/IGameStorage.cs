@@ -9,7 +9,7 @@ namespace Interfaces
         int LoadInt(string key, int defaultValue = 0);
         
         void SaveFloat(string key, float value);
-        float LoadFloat(string key, float defaultValue = 0);
+        float LoadFloat(string key, float defaultValue = 0.5f);
         
         void SaveString(string key, string value);
         string LoadString(string key);
