@@ -16,8 +16,8 @@
     public enum TypeCard
     {
         Checked,
-        Checking,
-        CanCheck,
+        UnLock,
+        Lock,
     }
 
     public enum CellType

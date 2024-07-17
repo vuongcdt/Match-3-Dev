@@ -89,7 +89,7 @@ namespace UIGame.Scripts
             {
                 _gameModel.LevelsData.Value.Add(newData);
             }
-            // _gameModel.SaveLevelsData();//vuong
+            _gameModel.SaveLevelsData();//vuong
         }
 
         private void SetScoreText(int value)

@@ -1,6 +1,4 @@
-﻿using System;
-using Cysharp.Threading.Tasks;
-using Events;
+﻿using Events;
 using Interfaces;
 using QFramework;
 using TMPro;
@@ -9,19 +7,19 @@ using UnityEngine.UI;
 
 namespace UIGame.Scripts
 {
-    public class CardItem : MonoBehaviour, IController,ICanSendEvent
+    public class CardItem : MonoBehaviour, IController, ICanSendEvent
     {
-        [SerializeField] private Sprite starActive, starDeActive, lockLevelImg;
-        [SerializeField] private Color bgColorChecked, bgColorChecking, bgColorCanCheck;
-        [SerializeField] private Color levelTextColorChecked, levelTextColorChecking, levelTextColorCanCheck;
+        [SerializeField] private Sprite starActive, starDeActive, unLockLeverImg;
+        [SerializeField] private Color bgColorChecked, bgColorUnlock, levelTextColorChecked, levelTextColorUnLock, cornerBgUnlock;
 
-        [SerializeField] private GameObject focus, groupImageEffect, checkIcon, bgGlow, starBlock, lockLevelBlock;
+        [SerializeField] private GameObject focus, groupImageEffect, bgGlow, starBlock;
+        [SerializeField] private RectTransform lockLevelBlock;
         [SerializeField] private TMP_Text levelText;
         [SerializeField] private Image[] starIconImages;
-        [SerializeField] private Image bgCard, cornerBg;
+        [SerializeField] private Image bgCard, cornerBg, lockLeverIcon;
 
         private IGameModel _gameModel;
-     
+
         public void SetLevelCardItem(int levelNum)
         {
             levelText.text = levelNum.ToString();
@@ -32,33 +30,30 @@ namespace UIGame.Scripts
             var button = this.GetComponent<Button>();
             button.onClick.AddListener(Onclick);
 
-            if (typeCard == CONSTANTS.TypeCard.CanCheck)
+            if (typeCard == CONSTANTS.TypeCard.UnLock)
             {
+                bgCard.color = bgColorUnlock;
+                cornerBg.color = cornerBgUnlock;
+                levelText.color = levelTextColorUnLock;
+
+                lockLeverIcon.sprite = unLockLeverImg;
+                lockLevelBlock.sizeDelta = new Vector2(100, 100);
+                
+                bgGlow.SetActive(true);
             }
 
-            if (typeCard == CONSTANTS.TypeCard.Checking)
+            if (typeCard == CONSTANTS.TypeCard.Checked)
             {
                 bgCard.color = bgColorChecked;
                 cornerBg.color = Color.white;
                 levelText.color = levelTextColorChecked;
 
-                checkIcon.SetActive(true);
-                bgGlow.SetActive(false);
+                lockLevelBlock.gameObject.SetActive(false);
+
                 focus.SetActive(true);
-                starBlock.SetActive(true);
-                lockLevelBlock.SetActive(false);
-            }
-
-            if (typeCard == CONSTANTS.TypeCard.Checked)
-            {
-                bgCard.color = bgColorChecking;
-                cornerBg.color = Color.white;
-                levelText.color = levelTextColorChecking;
-
                 bgGlow.SetActive(false);
                 groupImageEffect.SetActive(true);
                 starBlock.SetActive(true);
-                lockLevelBlock.SetActive(false);
             }
 
 
@@ -72,7 +67,7 @@ namespace UIGame.Scripts
         private void Onclick()
         {
             var level = int.Parse(levelText.text);
-            
+
             this.SendEvent(new LevelSelectEvent(level));
         }
 

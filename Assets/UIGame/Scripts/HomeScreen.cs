@@ -53,7 +53,7 @@ namespace UIGame.Scripts
 
                 if (index == userData.Count)
                 {
-                    cardItem.SetCardItem(CONSTANTS.TypeCard.Checking, userData.Count + 1, 0);
+                    cardItem.SetCardItem(CONSTANTS.TypeCard.UnLock, userData.Count + 1, 0);
                     break;
                 }
 
