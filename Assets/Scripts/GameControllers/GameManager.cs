@@ -31,7 +31,6 @@ namespace GameControllers
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
             this.RegisterEvent<InitLevelEvent>(e => InitLevel(e.Level))
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
-            // _gameModel.LevelSelect.RegisterWithInitValue(InitLevel);
         }
 
         private void InitLevel(int level)
@@ -55,7 +54,7 @@ namespace GameControllers
         private IEnumerator ProcessingGrid()
         {
             _configGame.IsProcessing = true;
-            if (_gameModel.ObstaclesTotal.Value == 0 || _gameModel.StepsTotal.Value == 0)
+            if (_gameModel.ObstaclesTotal.Value == 0 || _gameModel.StepsTotal.Value == 0 || Time.timeScale == 0)
             {
                 yield break;
             }

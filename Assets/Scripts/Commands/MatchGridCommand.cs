@@ -87,11 +87,6 @@ namespace Commands
                 }
             }
 
-            // if (_isInverted)
-            // {
-            //     return MergeCells(matchCellList, cellCanRainbow);
-            // }
-
             return MergeCells(matchCellList,cellCanRainbow);
         }
 
@@ -153,7 +148,7 @@ namespace Commands
 
                     this.SendCommand(new ClearObstacleAroundCommand(gridPos.x, newY));
 
-                    ClearFish(gridPos.x, newY);
+                    ClearCellFish(gridPos.x, newY);
                 }
             }
 
@@ -169,7 +164,7 @@ namespace Commands
 
                     this.SendCommand(new ClearObstacleAroundCommand(newX, gridPos.y));
 
-                    ClearFish(newX, gridPos.y);
+                    ClearCellFish(newX, gridPos.y);
                 }
             }
         }
@@ -179,12 +174,10 @@ namespace Commands
             if (newCell.Type == CONSTANTS.CellType.Rainbow)
             {
                 var randomType = Random.Range(3, _configGame.MaxListImage);
-                var countCell = 0;
                 foreach (var cell in _grid)
                 {
                     if (cell.Type == (CONSTANTS.CellType)randomType)
                     {
-                        countCell++;
                         cell.ClearCell();
                         this.SendCommand(new ClearObstacleAroundCommand(cell.GridPosition.x, cell.GridPosition.y));
                     }
@@ -192,7 +185,7 @@ namespace Commands
             }
         }
 
-        private void ClearFish(int x, int y)
+        private void ClearCellFish(int x, int y)
         {
             _grid[x, y].ClearCell();
         }

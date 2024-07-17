@@ -1,6 +1,5 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
-using Events;
 using Events.Sound;
 using Interfaces;
 using QFramework;
@@ -39,7 +38,7 @@ namespace UIGame.Scripts
 
             _gameModel.MusicSetting.RegisterWithInitValue(SetVolumeMusic)
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
-            _gameModel.SfxSetting.RegisterWithInitValue(SetVolumeSFX)
+            _gameModel.SfxSetting.RegisterWithInitValue(SetVolumeSfx)
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
 
             return UniTask.CompletedTask;
@@ -47,23 +46,15 @@ namespace UIGame.Scripts
 
         private void OnHomeBtnClick()
         {
-            SaveSettings();
+            Time.timeScale = 1;
             ModalContainer.Find(ContainerKey.Modals).Pop(true);
             ScreenContainer.Find(ContainerKey.Screens).Pop(true);
-            // this.SendEvent<UserDataEvent>();
         }
 
         private void OnCloseBtnClick()
         {
-            SaveSettings();
-            ModalContainer.Find(ContainerKey.Modals).Pop(true);
-        }
-
-        private void SaveSettings()
-        {
             Time.timeScale = 1;
-            _gameModel.MusicSetting.Value = sliderMusic.value;
-            _gameModel.SfxSetting.Value = sliderSfx.value;
+            ModalContainer.Find(ContainerKey.Modals).Pop(true);
         }
 
         private void SetVolumeMusic(float value)
@@ -71,7 +62,7 @@ namespace UIGame.Scripts
             sliderMusic.value = _gameModel.MusicSetting.Value;
         }
 
-        private void SetVolumeSFX(float value)
+        private void SetVolumeSfx(float value)
         {
             sliderSfx.value = _gameModel.SfxSetting.Value;
         }

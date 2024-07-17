@@ -16,7 +16,7 @@ namespace UIGame.Scripts
     {
         [SerializeField] private Button replayButton;
         [SerializeField] private Button homeButton;
-        [SerializeField] private Button closeButton;
+        [SerializeField] private GameObject rightButton;
 
         [SerializeField] private TMP_Text replayText;
         [SerializeField] private GameObject gameOver;
@@ -36,9 +36,10 @@ namespace UIGame.Scripts
 
             homeButton.onClick.RemoveAllListeners();
             homeButton.onClick.AddListener(OnHomeBtnClick);
-
-            closeButton.onClick.RemoveAllListeners();
-            closeButton.onClick.AddListener(OnCloseBtnClick);
+            if (_gameModel.LevelSelect.Value == 32)
+            {
+                rightButton.SetActive(false);
+            }
 
             if (_gameModel.ObstaclesTotal.Value != 0)
             {
@@ -84,12 +85,6 @@ namespace UIGame.Scripts
         private void OnHomeBtnClick()
         {
             ScreenContainer.Find(ContainerKey.Screens).Pop(true);
-            ModalContainer.Find(ContainerKey.Modals).Pop(true);
-        }
-
-        private void OnCloseBtnClick()
-        {
-            Time.timeScale = 1;
             ModalContainer.Find(ContainerKey.Modals).Pop(true);
         }
 
