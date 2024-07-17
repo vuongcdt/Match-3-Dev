@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Events;
@@ -19,36 +20,23 @@ namespace UIGame.Scripts
         public override UniTask Initialize(Memory<object> args)
         {
             base.OnEnable();
-            Debug.Log("Initialize HomeScreen");
             _gameModel = this.GetModel<IGameModel>();
 
             this.RegisterEvent<LevelSelectEvent>(e => OnClickPlayLevel(e.Level))
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
-            this.RegisterEvent<UserDataEvent>(e => GetUserData())
-                .UnRegisterWhenGameObjectDestroyed(gameObject);
+            // this.RegisterEvent<UserDataEvent>(e => GetUserData())
+            //     .UnRegisterWhenGameObjectDestroyed(gameObject);
+            
+            _gameModel._levelsData.RegisterWithInitValue(value => GetUserData());
 
-            GetUserData();
+            // GetUserData();
             return UniTask.CompletedTask;
         }
 
         private void GetUserData()
         {
+            Debug.Log("GetUserData");
             var userData = _gameModel.LevelsData;
-
-            // if (userData.Count == 0)
-            // {
-            //     userData.Add(new Utils.LevelData(1, 1));
-            // }
-
-            var data = userData.Select(e => $"Level:{e.Level}- Star:{e.Star}").ToList();
-            Debug.Log($"user data {string.Join(", ", data)}");
-
-            // Utils.LevelData[] userData = new Utils.LevelData[12];
-            // for (var index = 0; index < userData.Count; index++)
-            // {
-            //     var random = Random.Range(1, 4);
-            //     userData[index] = new Utils.LevelData(index + 1, random);
-            // }
 
             for (var index = 0; index <= userData.Count; index++)
             {
@@ -79,9 +67,11 @@ namespace UIGame.Scripts
         private void OnClickPlayLevel(int level)
         {
             _gameModel.LevelSelect.Value = level;
-            Debug.Log("OnClickPlayLevel");
-            // ScreenContainer.Of(transform).Push(new ScreenOptions(ResourceKey.PlayScreenPrefab()));
-            ScreenContainer.Find(ContainerKey.Screens).Push(new ScreenOptions(ResourceKey.PlayScreenPrefab()));
+            _gameModel.ScoreTotal.Value = 0;
+            _gameModel.StepsTotal.Value = Utils.GetStepsMove(_gameModel.LevelSelect.Value);
+            _gameModel.ObstaclesTotal.Value = Utils.GetObstaclesTotal(_gameModel.LevelSelect.Value);
+
+            ScreenContainer.Of(transform).Push(new ScreenOptions(ResourceKey.PlayScreenPrefab()));
             this.SendEvent(new InitGridEvent(level));
         }
 

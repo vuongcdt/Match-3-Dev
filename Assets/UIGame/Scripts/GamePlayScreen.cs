@@ -33,10 +33,6 @@ namespace UIGame.Scripts
             pauseBtn.onClick.AddListener(OnPauseBtnClick);
             _gameModel = this.GetModel<IGameModel>();
 
-            // _gameModel.ScoreTotal.Value = 0;
-            // _gameModel.StepsTotal.Value = Utils.GetStepsMove(_gameModel.LevelSelect.Value);
-            // _gameModel.ObstaclesTotal.Value = Utils.GetObstaclesTotal(_gameModel.LevelSelect.Value);
-            
             _gameModel.ObstaclesTotal.RegisterWithInitValue(SetObstacleText)
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
             _gameModel.StepsTotal.RegisterWithInitValue(SetStepMoveText)
@@ -51,6 +47,7 @@ namespace UIGame.Scripts
 
         private void SetObstacleText(int obstacleTotal)
         {
+            // Debug.Log($"SetObstacleText {obstacleTotal}");
             CheckGameWin(obstacleTotal);
 
             obstaclesTotalText.text = obstacleTotal.ToString();
@@ -127,6 +124,7 @@ namespace UIGame.Scripts
 
         private void SetStepMoveText(int stepMove)
         {
+            // Debug.Log($"SetStepMoveText {stepMove}");
             CheckGameOver(stepMove);
 
             stepsTotalText.text = stepMove.ToString();
@@ -159,7 +157,7 @@ namespace UIGame.Scripts
             ShowGameOverPopup().Forget();
         }
 
-        private async UniTask ShowGameOverPopup()
+        private async UniTask ShowGameOverPopup() 
         {
             await UniTask.WaitForSeconds(1);
             Time.timeScale = 0;

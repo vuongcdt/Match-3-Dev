@@ -15,7 +15,7 @@ namespace Models
         public BindableProperty<int> LevelSelect { get; set; } = new(1);
         public BindableProperty<int> StarsTotal { get; set; } = new();
 
-        private BindableProperty<string> _levelsData = new();
+        public BindableProperty<string> _levelsData  { get; set; }= new();
 
         public List<Utils.LevelData> LevelsData
         {

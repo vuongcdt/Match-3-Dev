@@ -82,7 +82,7 @@ namespace UIGame.Scripts
 
         private void OnHomeBtnClick()
         {
-            this.SendEvent<UserDataEvent>();
+            // this.SendEvent<UserDataEvent>();
             ScreenContainer.Find(ContainerKey.Screens).Pop(true);
             ModalContainer.Find(ContainerKey.Modals).Pop(true);
         }

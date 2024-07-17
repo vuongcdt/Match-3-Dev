@@ -46,7 +46,6 @@ namespace UIGame.Scripts
         private void OnHomeBtnClick()
         {
             SaveSettings();
-
             ModalContainer.Find(ContainerKey.Modals).Pop(true);
             ScreenContainer.Find(ContainerKey.Screens).Pop(true);
         }
@@ -54,13 +53,14 @@ namespace UIGame.Scripts
         private void OnCloseBtnClick()
         {
             SaveSettings();
-
             ModalContainer.Find(ContainerKey.Modals).Pop(true);
         }
 
         private void SaveSettings()
         {
             Time.timeScale = 1;
+            _gameModel.MusicSetting.Value = sliderMusic.value;
+            _gameModel.SfxSetting.Value = sliderSfx.value;
         }
 
         private void SetVolumeMusic(float value)
@@ -73,14 +73,14 @@ namespace UIGame.Scripts
             sliderSfx.value = _gameModel.SfxSetting.Value;
         }
 
-        public void OnChangeVolumeMusic(float value)
+        private void OnChangeVolumeMusic(float value)
         {
-            _gameModel.MusicSetting.Value = value;
+            // _gameModel.MusicSetting.Value = value;
         }
 
-        public void OnChangeVolumeSFX(float value)
+        private void OnChangeVolumeSFX(float value)
         {
-            _gameModel.SfxSetting.Value = value;
+            // _gameModel.SfxSetting.Value = value;
         }
 
         public IArchitecture GetArchitecture()

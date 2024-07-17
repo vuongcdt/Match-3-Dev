@@ -91,7 +91,7 @@ public static class Utils
 
     public static int GetStepsMove(int level)
     {
-        // return GetObstaclesTotal(level) * 2 + 4;
-        return GetObstaclesTotal(level) ;
+        return GetObstaclesTotal(level) * 2 + 4;
+        // return GetObstaclesTotal(level) ;
     }
 }

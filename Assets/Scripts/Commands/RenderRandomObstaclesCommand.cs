@@ -89,7 +89,7 @@ namespace Commands
             
             var obstacleGridPosList = RandomObstacleGridPosList();
             
-            gameModel.ObstaclesTotal.Value = obstacleGridPosList.Count;
+            // gameModel.ObstaclesTotal.Value = obstacleGridPosList.Count;
 
             foreach (var gridPos in obstacleGridPosList)
             {
