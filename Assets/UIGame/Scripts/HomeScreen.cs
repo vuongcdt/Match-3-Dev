@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using Events;
 using Interfaces;
@@ -24,18 +22,16 @@ namespace UIGame.Scripts
 
             this.RegisterEvent<LevelSelectEvent>(e => OnClickPlayLevel(e.Level))
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
-            // this.RegisterEvent<UserDataEvent>(e => GetUserData())
-            //     .UnRegisterWhenGameObjectDestroyed(gameObject);
             
             _gameModel._levelsData.RegisterWithInitValue(value => GetUserData());
 
-            // GetUserData();
+            Debug.Log("Initialize HomeScreen");
+
             return UniTask.CompletedTask;
         }
 
         private void GetUserData()
         {
-            Debug.Log("GetUserData");
             var userData = _gameModel.LevelsData;
 
             for (var index = 0; index <= userData.Count; index++)
@@ -67,13 +63,18 @@ namespace UIGame.Scripts
         private void OnClickPlayLevel(int level)
         {
             _gameModel.LevelSelect.Value = level;
-            _gameModel.ScoreTotal.Value = 0;
-            _gameModel.StepsTotal.Value = Utils.GetStepsMove(_gameModel.LevelSelect.Value);
-            _gameModel.ObstaclesTotal.Value = Utils.GetObstaclesTotal(_gameModel.LevelSelect.Value);
+            _gameModel.ResetValueTextUI();
 
             ScreenContainer.Of(transform).Push(new ScreenOptions(ResourceKey.PlayScreenPrefab()));
             this.SendEvent(new InitGridEvent(level));
         }
+
+        // private void ResetValueUI()
+        // {
+        //     _gameModel.ScoreTotal.Value = 0;
+        //     _gameModel.StepsTotal.Value = Utils.GetStepsMove(_gameModel.LevelSelect.Value);
+        //     _gameModel.ObstaclesTotal.Value = Utils.GetObstaclesTotal(_gameModel.LevelSelect.Value);
+        // }
 
         public IArchitecture GetArchitecture()
         {

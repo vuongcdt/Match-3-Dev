@@ -18,5 +18,7 @@ namespace Interfaces
         public BindableProperty<float> SfxSetting { get; set; }
         
         BindableProperty<int> Count { get; }
+
+        public void ResetValueTextUI();
     }
 }

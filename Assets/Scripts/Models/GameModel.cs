@@ -48,7 +48,6 @@ namespace Models
         private void SetLevelsData(List<Utils.LevelData> value)
         {
             _levelsData.Value = JsonUtility.ToJson(new Utils.JsonHelper<Utils.LevelData>(value));
-            Debug.Log($"_levelsData.Value {_levelsData.Value}");
         }
 
         private List<Utils.LevelData> GetLevelsData()
@@ -57,6 +56,12 @@ namespace Models
                 ? new List<Utils.LevelData>()
                 : JsonUtility.FromJson<Utils.JsonHelper<Utils.LevelData>>(_levelsData.Value).ListData;
             return levelsData;
+        }
+        public void ResetValueTextUI()
+        {
+            ScoreTotal.Value = 0;
+            StepsTotal.Value = Utils.GetStepsMove(LevelSelect.Value);
+            ObstaclesTotal.Value = Utils.GetObstaclesTotal(LevelSelect.Value);
         }
     }
 }

@@ -12,7 +12,7 @@ using ZBase.UnityScreenNavigator.Core.Screens;
 
 namespace UIGame.Scripts
 {
-    public class GameOverModal : Modal, IController, ICanSendEvent
+    public class EndGameModal : Modal, IController, ICanSendEvent
     {
         [SerializeField] private Button replayButton;
         [SerializeField] private Button homeButton;
@@ -68,7 +68,7 @@ namespace UIGame.Scripts
         {
             Time.timeScale = 1;
             _gameModel.LevelSelect.Value++;
-            
+            _gameModel.ResetValueTextUI();
             ModalContainer.Find(ContainerKey.Modals).Pop(true);
             this.SendEvent(new InitGridEvent(_gameModel.LevelSelect.Value));
         }
@@ -76,13 +76,13 @@ namespace UIGame.Scripts
         private void OnReplayBtnClick()
         {
             Time.timeScale = 1;
+            _gameModel.ResetValueTextUI();
             ModalContainer.Find(ContainerKey.Modals).Pop(true);
-            this.SendCommand<ResetGameEventCommand>();
+            this.SendEvent<ResetGameEvent>();
         }
 
         private void OnHomeBtnClick()
         {
-            // this.SendEvent<UserDataEvent>();
             ScreenContainer.Find(ContainerKey.Screens).Pop(true);
             ModalContainer.Find(ContainerKey.Modals).Pop(true);
         }

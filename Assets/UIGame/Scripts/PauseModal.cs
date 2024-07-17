@@ -45,6 +45,7 @@ namespace UIGame.Scripts
 
         private void OnHomeBtnClick()
         {
+            Debug.Log("PauseModal");
             SaveSettings();
             ModalContainer.Find(ContainerKey.Modals).Pop(true);
             ScreenContainer.Find(ContainerKey.Screens).Pop(true);
