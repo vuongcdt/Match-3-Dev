@@ -28,27 +28,29 @@ namespace Models
             var loadInt = storage.LoadInt(nameof(Count));
             Count.SetValueWithoutEvent(loadInt);
 
-            // _levelsData.Register(newValue =>
-            // {
-            //     storage.SaveString(nameof(_levelsData), newValue);
-            // });
-            //
-            // var loadLevelsData = storage.LoadString(nameof(_levelsData));
-            // _levelsData.SetValueWithoutEvent(loadLevelsData);
+            // LevelsData.Register(SaveLevelsData);
+            LevelsData.SetValueWithoutEvent(LoadLevelsData());
         }
 
-        // private void SetLevelsData(List<Utils.LevelData> value)
-        // {
-        //     _levelsData.Value = JsonUtility.ToJson(new Utils.JsonHelper<Utils.LevelData>(value));
-        // }
-        //
-        // private List<Utils.LevelData> GetLevelsData()
-        // {
-        //     var levelsData = string.IsNullOrEmpty(_levelsData.Value)
-        //         ? new List<Utils.LevelData>()
-        //         : JsonUtility.FromJson<Utils.JsonHelper<Utils.LevelData>>(_levelsData.Value).ListData;
-        //     return levelsData;
-        // }
+        public void SaveLevelsData()
+        {
+            var storage = this.GetUtility<IGameStorage>();
+            var json = JsonUtility.ToJson(new Utils.JsonHelper<Utils.LevelData>(LevelsData.Value));
+
+            storage.SaveString(nameof(LevelsData), json);
+        }
+
+        private List<Utils.LevelData> LoadLevelsData()
+        {
+            var storage = this.GetUtility<IGameStorage>();
+            var json = storage.LoadString(nameof(LevelsData));
+
+            var levelsData = string.IsNullOrEmpty(json)
+                ? new List<Utils.LevelData>()
+                : JsonUtility.FromJson<Utils.JsonHelper<Utils.LevelData>>(json).ListData;
+
+            return levelsData;
+        }
 
         public void ResetValueTextUI()
         {

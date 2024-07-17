@@ -70,7 +70,7 @@ namespace UIGame.Scripts
             _gameModel.LevelSelect.Value++;
             _gameModel.ResetValueTextUI();
             ModalContainer.Find(ContainerKey.Modals).Pop(true);
-            // this.SendEvent(new InitLevelEvent(_gameModel.LevelSelect.Value));
+            this.SendEvent(new InitLevelEvent(_gameModel.LevelSelect.Value));
         }
 
         private void OnReplayBtnClick()

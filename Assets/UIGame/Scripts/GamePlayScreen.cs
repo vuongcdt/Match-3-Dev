@@ -47,7 +47,6 @@ namespace UIGame.Scripts
 
         private void SetObstacleText(int obstacleTotal)
         {
-            // Debug.Log($"SetObstacleText {obstacleTotal}");
             CheckGameWin(obstacleTotal);
 
             obstaclesTotalText.text = obstacleTotal.ToString();
@@ -90,6 +89,7 @@ namespace UIGame.Scripts
             {
                 _gameModel.LevelsData.Value.Add(newData);
             }
+            // _gameModel.SaveLevelsData();//vuong
         }
 
         private void SetScoreText(int value)
@@ -120,7 +120,6 @@ namespace UIGame.Scripts
 
         private void SetStepMoveText(int stepMove)
         {
-            // Debug.Log($"SetStepMoveText {stepMove}");
             CheckGameOver(stepMove);
 
             stepsTotalText.text = stepMove.ToString();
@@ -133,7 +132,7 @@ namespace UIGame.Scripts
                 return;
             }
 
-            ShowGameOverPopup();
+            ShowGameOverPopup().Forget();
         }
 
         private void SetLevelText(int value)
@@ -150,14 +149,14 @@ namespace UIGame.Scripts
 
         private void ShowGameWinPopup()
         {
-            ShowGameOverPopup();
+            ShowGameOverPopup().Forget();
         }
 
-        private void ShowGameOverPopup()
+        private async UniTask ShowGameOverPopup()
         {
-            Time.timeScale = 0;
+            await UniTask.WaitForSeconds(1);
             var options = new ModalOptions(ResourceKey.GameOverModalPrefab());
-            ModalContainer.Find(ContainerKey.Modals).PushAsync(options);
+            await ModalContainer.Find(ContainerKey.Modals).PushAsync(options);
         }
 
         public IArchitecture GetArchitecture()

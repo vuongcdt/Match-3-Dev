@@ -15,34 +15,31 @@ namespace UIGame.Scripts
         [SerializeField] private CardItem[] cardItems;
 
         private IGameModel _gameModel;
+        private bool _isClick;
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            _isClick = false;
+            if (_gameModel != null)
+            {
+                GetUserData();
+            }
+        }
 
         public override UniTask Initialize(Memory<object> args)
         {
-            base.OnEnable();
-           
-
-            this.RegisterEvent<LevelSelectEvent>(e => OnClickPlayLevel(e.Level).Forget())
+            _gameModel = this.GetModel<IGameModel>();
+            this.RegisterEvent<LevelSelectEvent>(e => OnClickPlayLevel(e.Level))
                 .UnRegisterWhenGameObjectDestroyed(gameObject);
-            
-            // _gameModel._levelsData.RegisterWithInitValue(value => GetUserData());
-            // _gameModel.LevelsData.RegisterWithInitValue(value => GetUserData());
 
-            Debug.Log("Initialize HomeScreen");
+            GetUserData();
 
             return UniTask.CompletedTask;
         }
 
-        protected override void OnEnable()
-        {
-            Debug.Log("OnEnable");
-            base.OnEnable();
-            _gameModel = this.GetModel<IGameModel>();
-            GetUserData();
-        }
-
         private void GetUserData()
         {
-            Debug.Log("GetUserData");
             var userData = _gameModel.LevelsData.Value ?? new List<Utils.LevelData>();
 
             for (var index = 0; index <= userData.Count; index++)
@@ -71,21 +68,20 @@ namespace UIGame.Scripts
             }
         }
 
-        private async UniTask OnClickPlayLevel(int level)
+        private void OnClickPlayLevel(int level)
         {
+            if (_isClick)
+            {
+                return;
+            }
+            _isClick = true;
             _gameModel.LevelSelect.Value = level;
             _gameModel.ResetValueTextUI();
 
-            await ScreenContainer.Of(transform).PushAsync(new ScreenOptions(ResourceKey.PlayScreenPrefab()));
+            ScreenContainer.Find(ContainerKey.Screens).Push(new ScreenOptions(ResourceKey.PlayScreenPrefab()));
+
             this.SendEvent(new InitLevelEvent(level));
         }
-
-        // private void ResetValueUI()
-        // {
-        //     _gameModel.ScoreTotal.Value = 0;
-        //     _gameModel.StepsTotal.Value = Utils.GetStepsMove(_gameModel.LevelSelect.Value);
-        //     _gameModel.ObstaclesTotal.Value = Utils.GetObstaclesTotal(_gameModel.LevelSelect.Value);
-        // }
 
         public IArchitecture GetArchitecture()
         {

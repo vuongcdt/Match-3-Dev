@@ -1,5 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using Events;
 using Interfaces;
 using QFramework;
 using UnityEngine;
@@ -9,7 +10,7 @@ using ZBase.UnityScreenNavigator.Core.Screens;
 
 namespace UIGame.Scripts
 {
-    public class PauseModal : Modal, IController
+    public class PauseModal : Modal, IController,ICanSendEvent
     {
         [SerializeField] private Button continueButton;
         [SerializeField] private Button homeButton;
@@ -45,10 +46,10 @@ namespace UIGame.Scripts
 
         private void OnHomeBtnClick()
         {
-            Debug.Log("PauseModal");
             SaveSettings();
             ModalContainer.Find(ContainerKey.Modals).Pop(true);
             ScreenContainer.Find(ContainerKey.Screens).Pop(true);
+            // this.SendEvent<UserDataEvent>();
         }
 
         private void OnCloseBtnClick()

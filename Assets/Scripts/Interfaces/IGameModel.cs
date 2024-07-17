@@ -20,5 +20,6 @@ namespace Interfaces
         BindableProperty<int> Count { get; }
 
         public void ResetValueTextUI();
+        public void SaveLevelsData();
     }
 }
