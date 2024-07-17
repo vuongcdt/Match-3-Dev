@@ -42,9 +42,9 @@ namespace UIGame.Scripts
 
         private void GetUserData()
         {
-            var userData = _gameModel.LevelsData.Value ?? new List<Utils.LevelData>();
+            var levelsData = _gameModel.LevelsData.Value ?? new List<Utils.LevelData>();
 
-            for (var index = 0; index <= userData.Count; index++)
+            for (var index = 0; index <= levelsData.Count; index++)
             {
                 if (index >= cardItems.Length)
                 {
@@ -53,18 +53,18 @@ namespace UIGame.Scripts
 
                 var cardItem = cardItems[index];
 
-                if (index == userData.Count)
+                if (index == levelsData.Count)
                 {
-                    cardItem.SetCardItem(CONSTANTS.TypeCard.UnLock, userData.Count + 1, 0);
+                    cardItem.SetCardItem(CONSTANTS.TypeCard.UnLock, levelsData.Count + 1, 0);
                     break;
                 }
 
-                var dataLevel = userData[index];
+                var dataLevel = levelsData[index];
 
                 cardItem.SetCardItem(CONSTANTS.TypeCard.Checked, dataLevel.Level, dataLevel.Star);
             }
 
-            for (var index = userData.Count; index < cardItems.Length; index++)
+            for (var index = levelsData.Count; index < cardItems.Length; index++)
             {
                 cardItems[index].SetLevelCardItem(index + 1);
             }
