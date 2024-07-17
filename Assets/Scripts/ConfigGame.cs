@@ -2,7 +2,6 @@
 using GameControllers;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class ConfigGame : Singleton<ConfigGame>
@@ -11,16 +10,14 @@ public class ConfigGame : Singleton<ConfigGame>
     [SerializeField] private Transform backgroundBlock;
     [SerializeField] private Transform gridBlock;
     [SerializeField] private Button buttonReset;
-    [SerializeField] private TMP_Text obstaclesTotalText;
-    [SerializeField] private TMP_Text stepsTotalText;
 
     [SerializeField] private int width;
     [SerializeField] private int height;
     [SerializeField] private float cellSize;
     [SerializeField] private float avatarSize;
     [SerializeField] private float backgroundSize;
+
     [SerializeField] private bool isProcessing;
-    [SerializeField] private int obstaclesTotal;
     [SerializeField] private int maxListImage;
     [SerializeField] private float sensitivity;
     [SerializeField] private float minSensitivity;
@@ -29,33 +26,22 @@ public class ConfigGame : Singleton<ConfigGame>
     [SerializeField] private float timeScale = 2;
     [SerializeField] private float fillTime;
     [SerializeField] private float matchTime;
-    [SerializeField] private int stepsTotal = 10;
 
+    private int _level;
     private bool _isDragged;
+    private bool _isGamePlaying;
     private Stack<Cell> _pool = new();
 
-    public TMP_Text StepsTotalText
+    public int Level
     {
-        get => stepsTotalText;
-        set => stepsTotalText = value;
-    }
-
-    public int StepsTotal
-    {
-        get => stepsTotal;
-        set => stepsTotal = value;
+        get => _level;
+        set => _level = value;
     }
 
     public float MatchTime
     {
         get => matchTime;
         set => matchTime = value;
-    }
-
-    public TMP_Text ObstaclesTotalText
-    {
-        get => obstaclesTotalText;
-        set => obstaclesTotalText = value;
     }
 
     public float TimeScale
@@ -107,12 +93,6 @@ public class ConfigGame : Singleton<ConfigGame>
     public float BackgroundSize => backgroundSize;
 
     public float FillTime => fillTime;
-
-    public int ObstaclesTotal
-    {
-        get => obstaclesTotal;
-        set => obstaclesTotal = value;
-    }
 
     public int MaxListImage => maxListImage;
 

@@ -1,4 +1,5 @@
-﻿using QFramework;
+﻿using System.Collections.Generic;
+using QFramework;
 
 namespace Interfaces
 {
@@ -8,9 +9,9 @@ namespace Interfaces
         int LoadInt(string key, int defaultValue = 0);
         
         void SaveFloat(string key, float value);
-        int LoadFloat(string key, float defaultValue = 0);
+        float LoadFloat(string key, float defaultValue = 0);
         
         void SaveString(string key, string value);
-        int LoadString(string key, string defaultValue = "");
+        string LoadString(string key);
     }
 }

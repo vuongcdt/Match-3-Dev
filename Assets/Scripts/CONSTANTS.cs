@@ -11,7 +11,13 @@
         Normal,
         Row,
         Column,
-        // Rainbow,
+    }
+    
+    public enum TypeCard
+    {
+        Checked,
+        UnLock,
+        Lock,
     }
 
     public enum CellType
@@ -26,5 +32,9 @@
         Green,
         Pink,
         Rainbow,
+    }
+    public class Volume
+    {
+        public const float VOLUME_DEFAULT = 0.5f;
     }
 }

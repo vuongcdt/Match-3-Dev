@@ -2,6 +2,7 @@
 using GameControllers;
 using QFramework;
 using Queries;
+using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Commands
@@ -10,6 +11,16 @@ namespace Commands
     {
         private Cell[,] _grid;
         private ConfigGame _configGame;
+        private bool _isInverted;
+
+        public MatchGridCommand()
+        {
+        }
+
+        public MatchGridCommand(bool isInverted)
+        {
+            _isInverted = isInverted;
+        }
 
         protected override bool OnExecute()
         {
@@ -52,12 +63,42 @@ namespace Commands
                 }
             }
 
+            var countCell = 0;
+            foreach (var matchCell in matchCellList)
+            {
+                countCell+= matchCell.CellList.Count;
+            }
+
+            this.SendCommand(new AddScoreCommand(countCell));
+
+            Cell cellCanRainbow = null;
+            if (matchCellList.Count == 2 && _isInverted)
+            {
+                foreach (var cellOut in matchCellList[0].CellList)
+                {
+                    foreach (var cellIn in matchCellList[1].CellList)
+                    {
+                        if (cellIn.GridPosition.x == cellOut.GridPosition.x &&
+                            cellIn.GridPosition.y == cellOut.GridPosition.y)
+                        {
+                            cellCanRainbow = cellIn;
+                        }
+                    }
+                }
+            }
+
+            if (_isInverted)
+            {
+                return MergeCells(matchCellList, cellCanRainbow);
+            }
+
             return MergeCells(matchCellList);
         }
 
-        private bool MergeCells(List<Utils.MatchCell> matchCellList)
+        private bool MergeCells(List<Utils.MatchCell> matchCellList, Cell cellCanRainbow = null)
         {
             matchCellList.Sort((listA, listB) => listB.CellList.Count - listA.CellList.Count);
+
             foreach (var matchCell in matchCellList)
             {
                 var cellList = matchCell.CellList;
@@ -71,6 +112,22 @@ namespace Commands
                 {
                     var cell = cellList[index];
                     this.SendCommand(new ClearObstacleAroundCommand(cell.GridPosition.x, cell.GridPosition.y));
+
+                    if (cellCanRainbow != null && _isInverted)
+                    {
+                        var isSameGrid = cellCanRainbow.GridPosition.x == cell.GridPosition.x &&
+                                         cellCanRainbow.GridPosition.y == cell.GridPosition.y;
+                        if (isSameGrid)
+                        {
+                            cell.SetTypeRainbow();
+                        }
+                        else
+                        {
+                            cell.ClearCell();
+                        }
+
+                        continue;
+                    }
 
                     if (MergeCellByCount(index, random, cellList, cell, matchCell)) continue;
 
@@ -90,8 +147,10 @@ namespace Commands
                 for (int newY = 0; newY < _configGame.Height; newY++)
                 {
                     var newCell = _grid[gridPos.x, newY];
+
                     CheckRainbow(newCell);
                     MergeCellRowColumn(newCell);
+
                     this.SendCommand(new ClearObstacleAroundCommand(gridPos.x, newY));
 
                     ClearFish(gridPos.x, newY);
@@ -104,8 +163,10 @@ namespace Commands
                 for (int newX = 0; newX < _configGame.Width; newX++)
                 {
                     var newCell = _grid[newX, gridPos.y];
+
                     CheckRainbow(newCell);
                     MergeCellRowColumn(newCell);
+
                     this.SendCommand(new ClearObstacleAroundCommand(newX, gridPos.y));
 
                     ClearFish(newX, gridPos.y);
@@ -118,10 +179,12 @@ namespace Commands
             if (newCell.Type == CONSTANTS.CellType.Rainbow)
             {
                 var randomType = Random.Range(3, _configGame.MaxListImage);
+                var countCell = 0;
                 foreach (var cell in _grid)
                 {
                     if (cell.Type == (CONSTANTS.CellType)randomType)
                     {
+                        countCell++;
                         cell.ClearCell();
                         this.SendCommand(new ClearObstacleAroundCommand(cell.GridPosition.x, cell.GridPosition.y));
                     }
@@ -134,16 +197,18 @@ namespace Commands
             _grid[x, y].ClearCell();
         }
 
-        private static bool MergeCellByCount(int index, int random, List<Cell> cellList, Cell cell,
+        private bool MergeCellByCount(int index, int random, List<Cell> cellList, Cell cell,
             Utils.MatchCell matchCell)
         {
-            if (index == random && cellList.Count >= 5)
+            var cellListCount = cellList.Count;
+
+            if (index == random && cellListCount >= 5)
             {
                 cell.SetTypeRainbow();
                 return true;
             }
 
-            if (index == random && cellList.Count == 4)
+            if (index == random && cellListCount == 4)
             {
                 SetTriggerAndSpecialType(matchCell, index);
                 return true;
@@ -208,10 +273,9 @@ namespace Commands
         private static void SetTriggerAndSpecialType(Utils.MatchCell matchCell, int index)
         {
             var cells = matchCell.CellList;
-            var isTriggerRow = matchCell.Type == CONSTANTS.GridType.Row;
+            var isRow = matchCell.Type == CONSTANTS.GridType.Row;
 
-            // cells[index].Animator.SetTrigger(isTriggerRow ? RowAnimator : ColumnAnimator);
-            cells[index].SpecialType = isTriggerRow ? CONSTANTS.CellSpecialType.Row : CONSTANTS.CellSpecialType.Column;
+            cells[index].SpecialType = isRow ? CONSTANTS.CellSpecialType.Column : CONSTANTS.CellSpecialType.Row;
         }
     }
 }

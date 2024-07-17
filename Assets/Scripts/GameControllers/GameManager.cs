@@ -1,6 +1,7 @@
 using System.Collections;
 using Commands;
 using Events;
+using Interfaces;
 using QFramework;
 using UnityEngine;
 
@@ -10,46 +11,52 @@ namespace GameControllers
     {
         private Cell[,] _grid;
         private ConfigGame _configGame;
+        private IGameModel _gameModel;
+        private int _level;
 
         private void Start()
         {
             Application.targetFrameRate = 60;
-
-            this.RegisterEvent<ProcessingGridEvent>(e => StartCoroutine(ProcessingGrid()))
-                .UnRegisterWhenGameObjectDestroyed(gameObject);
-
+            _gameModel = this.GetModel<IGameModel>();
             _configGame = ConfigGame.Instance;
-            _configGame.ButtonReset.onClick.RemoveAllListeners();
-            _configGame.ButtonReset.onClick.AddListener(OnRestartClick);
 
             _grid = new Cell[_configGame.Width, _configGame.Height];
             this.SendCommand(new InitGridModelCommand(_grid));
             this.SendCommand<RenderBackgroundGridCommand>();
-
-            InitGame();
+            
+            this.RegisterEvent<ProcessingGridEvent>(e => StartCoroutine(ProcessingGrid()))
+                .UnRegisterWhenGameObjectDestroyed(gameObject);
+            this.RegisterEvent<ResetGameEvent>(e => StartCoroutine(ResetGame()))
+                .UnRegisterWhenGameObjectDestroyed(gameObject);
+            this.RegisterEvent<InitLevelEvent>(e => InitLevel(e.Level))
+                .UnRegisterWhenGameObjectDestroyed(gameObject);
+            // _gameModel.LevelSelect.RegisterWithInitValue(InitLevel);
         }
 
-        private void InitGame()
+        private void InitLevel(int level)
+        {
+            _configGame.Level = level;
+            StartCoroutine(InitGame());
+        }
+
+        private IEnumerator InitGame()
         {
             this.SendCommand<RenderCellGridCommand>();
             this.SendCommand<RenderRandomObstaclesCommand>();
 
+            this.SendCommand<SetObstaclesTotalCommand>();
+            this.SendCommand<SetStepsTotalCommand>();
+
+            yield return new WaitForSeconds(1);
             StartCoroutine(ProcessingGrid());
         }
 
         private IEnumerator ProcessingGrid()
         {
             _configGame.IsProcessing = true;
-
-            if (_configGame.ObstaclesTotal == 0)
+            if (_gameModel.ObstaclesTotal.Value == 0 || _gameModel.StepsTotal.Value == 0)
             {
-                Debug.Log("GAME WIN");
-                // StartCoroutine(ResetGame());
-                // yield break;
-            }
-            if (_configGame.ObstaclesTotal > 0 && _configGame.StepsTotal == 0)
-            {
-                Debug.Log("GAME OVER");
+                yield break;
             }
 
             this.SendCommand<FillCommand>();
@@ -59,32 +66,25 @@ namespace GameControllers
             {
                 yield return new WaitForSeconds(_configGame.FillTime);
                 StartCoroutine(ProcessingGrid());
+                yield break;
             }
-            else
-            {
-                var isMatch = this.SendCommand(new MatchGridCommand());
-                yield return new WaitForSeconds(_configGame.MatchTime);
 
-                if (isMatch)
-                {
-                    StartCoroutine(ProcessingGrid());
-                }
-                else
-                {
-                    _configGame.IsProcessing = false;
-                }
+            var isMatch = this.SendCommand(new MatchGridCommand());
+
+            if (isMatch)
+            {
+                yield return new WaitForSeconds(_configGame.MatchTime);
+                StartCoroutine(ProcessingGrid());
+                yield break;
             }
+
+            _configGame.IsProcessing = false;
         }
 
         private IEnumerator ResetGame()
         {
-            yield return new WaitForSeconds(_configGame.MatchTime * 5);
-            InitGame();
-        }
-
-        public void OnRestartClick()
-        {
-            InitGame();
+            yield return new WaitForSeconds(_configGame.MatchTime);
+            StartCoroutine(InitGame());
         }
 
         public IArchitecture GetArchitecture()

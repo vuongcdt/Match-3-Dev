@@ -55,16 +55,7 @@ namespace Commands
             if (obstacle.Type == CONSTANTS.CellType.Obstacle)
             {
                 obstacle.ClearObstacle();
-                int count = 0;
-                foreach (var cell in _grid)
-                {
-                    if (cell.Type == CONSTANTS.CellType.Obstacle)
-                    {
-                        count++;
-                    }
-                }
-                _configGame.ObstaclesTotal = count;
-                _configGame.ObstaclesTotalText.text = count.ToString();
+                this.SendCommand<SetObstaclesTotalCommand>();
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using GameControllers;
+using Interfaces;
 using QFramework;
 using Queries;
 using UnityEngine;
@@ -13,7 +14,8 @@ namespace Commands
 
         protected override void OnExecute()
         {
-            _grid = this.SendQuery(new GetGridQuery());
+            // _grid = this.SendQuery(new GetGridQuery());
+            _grid = this.GetModel<IGameModel>().GridArray.Value;
             _configGame = ConfigGame.Instance;
             RenderCellGrid();
         }

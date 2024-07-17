@@ -24,6 +24,19 @@ public static class Utils
         }
     }
 
+    [Serializable]
+    public struct LevelData
+    {
+        public int Level;
+        public int Star;
+
+        public LevelData(int level, int star)
+        {
+            Level = level;
+            Star = star;
+        }
+    }
+
     public struct MatchCell
     {
         public readonly List<Cell> CellList;
@@ -33,6 +46,16 @@ public static class Utils
         {
             CellList = cellList;
             Type = type;
+        }
+    }
+
+    public struct JsonHelper<T>
+    {
+        public List<T> ListData;
+
+        public JsonHelper(List<T> listData)
+        {
+            ListData = listData;
         }
     }
 
@@ -59,5 +82,15 @@ public static class Utils
         var isEmpty = sourceCell.Type == CONSTANTS.CellType.None || targetCell.Type == CONSTANTS.CellType.None;
 
         return isObstacle || isEmpty;
+    }
+
+    public static int GetObstaclesTotal(int level)
+    {
+        return level / 2 + 2;
+    }
+
+    public static int GetStepsMove(int level)
+    {
+        return GetObstaclesTotal(level) * 2 + 4;
     }
 }
