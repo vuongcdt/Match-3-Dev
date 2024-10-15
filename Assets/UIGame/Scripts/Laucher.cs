@@ -23,12 +23,12 @@ namespace UIGame.Scripts
 
         protected override void OnPostCreateContainers()
         {
-            base.OnPostCreateContainers();
-            _screenContainer = ContainerManager.Find<ScreenContainer>(ContainerKey.Screens);
-            _modalContainer = ModalContainer.Find(ContainerKey.Modals);
+            // base.OnPostCreateContainers();
+            // _screenContainer = ContainerManager.Find<ScreenContainer>(ContainerKey.Screens);
+            // _modalContainer = ModalContainer.Find(ContainerKey.Modals);
 
-            PreloadingScreen();
-            ShowLoadingPage().Forget();
+            // PreloadingScreen();
+            // ShowLoadingPage().Forget();
         }
 
         private void PreloadingScreen()
